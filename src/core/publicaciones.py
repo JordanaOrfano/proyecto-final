@@ -159,7 +159,7 @@ class MostrarPublicacion:
             text=f" Creador: {self.creador}",
             font=("Roboto", 12, "bold"),
             compound="left",
-            image=crear_imagen("src/assets/icons/user-circle.png"),
+            image=crear_imagen("src/assets/icons/title.png"),
             text_color=COLOR_PRIMARIO_HOVER,
         )
         creador_label.grid(row=0, column=0, padx=5, pady=0, sticky="w")
@@ -171,7 +171,7 @@ class MostrarPublicacion:
                 text=f" Fecha de creación: {self.fecha_edicion}",
                 font=("Roboto", 12, "bold"),
                 compound="left",
-                image=crear_imagen("src/assets/icons/calendar-user.png"),
+                image=crear_imagen("src/assets/icons/title.png"),
                 text_color=COLOR_PRIMARIO_HOVER,
             )
             fecha_edicion_label.grid(row=1, column=0, padx=5, pady=0, sticky="w")
@@ -182,7 +182,7 @@ class MostrarPublicacion:
                 text=f" Fecha de creación: {self.fecha_creacion}",
                 font=("Roboto", 12, "bold"),
                 compound="left",
-                image=crear_imagen("src/assets/icons/calendar-user.png"),
+                image=crear_imagen("src/assets/icons/title.png"),
                 text_color=COLOR_PRIMARIO_HOVER,
             )
             fecha_creacion_label.grid(row=1, column=0, padx=5, pady=0, sticky="w")
@@ -193,7 +193,7 @@ class MostrarPublicacion:
             text=f" Fecha del evento: {self.fecha_evento}",
             font=("Roboto", 12, "bold"),
             compound="left",
-            image=crear_imagen("src/assets/icons/calendar-stats.png"),
+            image=crear_imagen("src/assets/icons/title.png"),
             text_color=COLOR_PRIMARIO_HOVER,
         )
         fecha_evento_label.grid(row=1, column=1, padx=5, pady=0, sticky="e")
@@ -204,7 +204,7 @@ class MostrarPublicacion:
             text=f" Ubicación: {self.ubicacion}",
             font=("Roboto", 12, "bold"),
             compound="left",
-            image=crear_imagen("src/assets/icons/map.png"),
+            image=crear_imagen("src/assets/icons/title.png"),
             text_color=COLOR_PRIMARIO_HOVER,
         )
         ubicacion_label.grid(row=0, column=1, padx=5, pady=0, sticky="e")

@@ -1,7 +1,7 @@
 import customtkinter as ctk
 from config.config import *
 from gui.componentes import *
-from gui.crear_publicacion import *
+from gui.crear_producto import *
 from core.usuarios import *
 from gui.perfil import *
 
@@ -51,10 +51,10 @@ class InicioFrame(ctk.CTkFrame):
             image=crear_imagen("src/assets/icons/home.png"),
         )
 
-        self.botones_sideframe["crear_publicacion"] = crear_boton_sideframe(
+        self.botones_sideframe["crear_producto"] = crear_boton_sideframe(
             centrar_frame,
-            text="Crear publicación",
-            command=self.crear_publicacion,
+            text="Añadir producto",
+            command=self.crear_producto,
             image=crear_imagen("src/assets/icons/pencil-plus.png"),
         )
 
