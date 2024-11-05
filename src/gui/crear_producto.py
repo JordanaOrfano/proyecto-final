@@ -10,7 +10,7 @@ class CrearProducto:
 
         # Frame principal que ocupa toda la ventana y se expande
         self.frame_publicar = ctk.CTkFrame(master=self.contenedor, fg_color=COLOR_BG)
-        self.frame_publicar.grid(sticky="nsew", padx=165)
+        self.frame_publicar.grid(sticky="nsew", padx=150)
         
         # Configuración para centrar el frame en ambas direcciones
         self.contenedor.grid_rowconfigure(0, weight=1)

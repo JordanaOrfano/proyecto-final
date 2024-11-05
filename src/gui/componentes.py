@@ -75,7 +75,7 @@ def crear_entry(
     return entry
 
 
-def crear_label(parent, metodo="pack", text="", pady=10, anchor="w", padx=170, text_color=COLOR_PRIMARIO, font=("Roboto", 14), **kwargs):
+def crear_label(parent, metodo="pack", text="", pady=10, anchor="w", padx=0, text_color=COLOR_PRIMARIO, font=("Roboto", 14), **kwargs):
     label = ctk.CTkLabel(
         parent,
         text=text,

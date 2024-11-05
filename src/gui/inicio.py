@@ -2,8 +2,10 @@ import customtkinter as ctk
 from config.config import *
 from gui.componentes import *
 from gui.crear_producto import *
+from gui.estadisticas import *
+from gui.vencimientos import *
+from gui.configuracion import *
 from core.usuarios import *
-from gui.perfil import *
 
 
 class InicioFrame(ctk.CTkFrame):
@@ -40,7 +42,7 @@ class InicioFrame(ctk.CTkFrame):
             centrar_frame,
             text="",
             image=crear_imagen("src/assets/eco.png", size=(220, 220)),
-        ).pack(pady=50)
+        ).pack(pady=30)
 
         # Creación de botones en el sideFrame con el estado de selección inicial
         self.botones_sideframe["inicio"] = crear_boton_sideframe(
@@ -57,12 +59,19 @@ class InicioFrame(ctk.CTkFrame):
             command=self.crear_producto,
             image=crear_imagen("src/assets/icons/pencil-plus.png"),
         )
+        
+        self.botones_sideframe["vencimientos"] = crear_boton_sideframe(
+            centrar_frame,
+            text="Vencimientos",
+            command=self.vencimientos,
+            image=crear_imagen("src/assets/icons/calendar-exclamation.png"),
+        )
 
         self.botones_sideframe["estadisticas"] = crear_boton_sideframe(
             centrar_frame,
             text="Estadísticas",
-            command=self.perfil,
-            image=crear_imagen("src/assets/icons/user-circle-white.png"),
+            command=self.estadisticas,
+            image=crear_imagen("src/assets/icons/stats.png"),
         )
 
         self.botones_sideframe["configuracion"] = crear_boton_sideframe(
@@ -127,31 +136,25 @@ class InicioFrame(ctk.CTkFrame):
         frame_publicar = ctk.CTkFrame(master=self, fg_color=COLOR_BG)
 
         CrearProducto(contenedor=frame_publicar)
-
-        # Cambiar el contenido principal para mostrar el formulario
         self.cambiar_contenido(frame_publicar, "crear_producto")
 
-    def perfil(self):
-        frame_perfil = ctk.CTkFrame(master=self, fg_color=COLOR_BG)
+    def estadisticas(self):
+        frame_estadisticas = ctk.CTkFrame(master=self, fg_color=COLOR_BG)
         
-        
-        Perfil(contenedor=frame_perfil)
-        self.cambiar_contenido(frame_perfil, "estadisticas")
+        Estadisticas(contenedor=frame_estadisticas)
+        self.cambiar_contenido(frame_estadisticas, "estadisticas")
 
+    def vencimientos(self):
+        frame_vencimientos = ctk.CTkFrame(master=self, fg_color=COLOR_BG)
+        
+        Vencimientos(contenedor=frame_vencimientos)
+        self.cambiar_contenido(frame_vencimientos, "vencimientos")
+    
     def configuracion(self):
         frame_configuracion = ctk.CTkFrame(
             master=self, fg_color=COLOR_BG)
-        crear_label(
-            frame_configuracion,
-            text="Configuración",
-            font=("Roboto", 32, "bold"),
-            pady=(30, 10),
-        )
         
-        crear_label(frame_configuracion, text="Tema", font=("Roboto", 18, "bold"))
-        crear_label(frame_configuracion, text="Cambiar nombre", font=("Roboto", 18, "bold"))
-        crear_label(frame_configuracion, text="Cambiar contraseña", font=("Roboto", 18, "bold"))
-        
+        Configuracion(contenedor=frame_configuracion)
         self.cambiar_contenido(frame_configuracion, "configuracion")
 
     def cerrar_sesion(self):
