@@ -58,9 +58,9 @@ class InicioFrame(ctk.CTkFrame):
             image=crear_imagen("src/assets/icons/pencil-plus.png"),
         )
 
-        self.botones_sideframe["perfil"] = crear_boton_sideframe(
+        self.botones_sideframe["estadisticas"] = crear_boton_sideframe(
             centrar_frame,
-            text="Mi perfil",
+            text="Estadísticas",
             command=self.perfil,
             image=crear_imagen("src/assets/icons/user-circle-white.png"),
         )
@@ -123,20 +123,20 @@ class InicioFrame(ctk.CTkFrame):
 
         self.cambiar_contenido(frame_inicio, "inicio")
 
-    def crear_publicacion(self):
+    def crear_producto(self):
         frame_publicar = ctk.CTkFrame(master=self, fg_color=COLOR_BG)
 
-        FormularioPublicacion(contenedor=frame_publicar)
+        CrearProducto(contenedor=frame_publicar)
 
         # Cambiar el contenido principal para mostrar el formulario
-        self.cambiar_contenido(frame_publicar, "crear_publicacion")
+        self.cambiar_contenido(frame_publicar, "crear_producto")
 
     def perfil(self):
         frame_perfil = ctk.CTkFrame(master=self, fg_color=COLOR_BG)
         
         
         Perfil(contenedor=frame_perfil)
-        self.cambiar_contenido(frame_perfil, "perfil")
+        self.cambiar_contenido(frame_perfil, "estadisticas")
 
     def configuracion(self):
         frame_configuracion = ctk.CTkFrame(
