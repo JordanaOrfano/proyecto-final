@@ -1,5 +1,3 @@
-import customtkinter as ctk
-from datetime import datetime
 from config.config import *
 from core.publicaciones import *
 from core.usuarios import *
@@ -10,7 +8,7 @@ class CrearProducto:
 
         # Frame principal que ocupa toda la ventana y se expande
         self.frame_publicar = ctk.CTkFrame(master=self.contenedor, fg_color=COLOR_BG)
-        self.frame_publicar.grid(sticky="nsew", padx=150)
+        self.frame_publicar.grid(sticky="nsew", padx=130)
         
         # Configuración para centrar el frame en ambas direcciones
         self.contenedor.grid_rowconfigure(0, weight=1)
@@ -39,7 +37,7 @@ class CrearProducto:
                                    image=crear_imagen("src/assets/icons/title.png", size=(22, 22)))
         label_nombre.grid(row=1, column=0, sticky="w", pady=(10,0), padx=10)
         
-        self.nombre = crear_entry(formulario_frame, placeholder_text="Nombre del producto")
+        self.nombre = crear_entry(formulario_frame, placeholder_text="Nombre del producto", metodo="grid")
         self.nombre.grid(row=2, column=0, columnspan=2, sticky="ew", padx=(10, 10), pady=(0, 10))
 
         # Campo de entrada para Marca
@@ -50,7 +48,7 @@ class CrearProducto:
                                   image=crear_imagen("src/assets/icons/description.png", size=(22, 22)))
         label_marca.grid(row=3, column=0, sticky="w", pady=(10,0), padx=10)
         
-        self.marca = crear_entry(formulario_frame, placeholder_text="Marca del producto")
+        self.marca = crear_entry(formulario_frame, placeholder_text="Marca del producto", metodo="grid")
         self.marca.grid(row=4, column=0, sticky="ew", padx=10, pady=(0, 10))
 
         # Campo de entrada para Categoría
@@ -62,7 +60,7 @@ class CrearProducto:
         label_categoria.grid(row=3, column=1, sticky="w", pady=(10,0), padx=10)
         
         self.categoria = crear_dropdown(formulario_frame, 
-                                        values=["Elija una Opción", "Opción 1", "Opción 2", "Opción 3"])
+                                        values=["Elija una Opción", "Opción 1", "Opción 2", "Opción 3"], metodo="grid")
         self.categoria.grid(row=4, column=1, sticky="ew", padx=10, pady=(0, 10))
 
         # Campo de entrada para Precio de compra
@@ -73,7 +71,7 @@ class CrearProducto:
                                           image=crear_imagen("src/assets/icons/currency-dollar.png", size=(22, 22)))
         label_precio_compra.grid(row=5, column=0, sticky="w", pady=(10,0), padx=10)
         
-        self.precio_compra = crear_entry(formulario_frame, placeholder_text="$")
+        self.precio_compra = crear_entry(formulario_frame, placeholder_text="$", metodo="grid")
         self.precio_compra.grid(row=6, column=0, sticky="ew", padx=10, pady=(0, 10))
 
         # Campo de entrada para Precio de venta
@@ -85,7 +83,7 @@ class CrearProducto:
         label_precio_venta.grid(row=5, column=1, sticky="w", pady=(10,0), padx=10)
         
         self.precio_venta = crear_entry(formulario_frame, 
-                                        placeholder_text="$")
+                                        placeholder_text="$", metodo="grid")
         self.precio_venta.grid(row=6, column=1, sticky="ew", padx=10, pady=(0, 10))
 
         # Campo de entrada para Cantidad
@@ -96,7 +94,7 @@ class CrearProducto:
                                      image=crear_imagen("src/assets/icons/pencil.png", size=(22, 22)))
         label_cantidad.grid(row=9, column=0, sticky="w", pady=(10,0), padx=10)
 
-        self.cantidad = crear_entry(formulario_frame, placeholder_text="0")
+        self.cantidad = crear_entry(formulario_frame, placeholder_text="0", metodo="grid")
         self.cantidad.grid(row=10, column=0, sticky="ew", padx=10, pady=(0, 10))
 
         # Campo de entrada para Vencimiento
@@ -107,7 +105,7 @@ class CrearProducto:
                                         image=crear_imagen("src/assets/icons/calendar.png", size=(22, 22)))
         label_vencimiento.grid(row=9, column=1, sticky="w", pady=(10,0), padx=10)
 
-        self.vencimiento = crear_entry(formulario_frame, placeholder_text="DD/MM/AA")
+        self.vencimiento = crear_entry(formulario_frame, placeholder_text="DD/MM/AA", metodo="grid")
         self.vencimiento.grid(row=10, column=1, sticky="ew", padx=10, pady=(0, 10))
 
 

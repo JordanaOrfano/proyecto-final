@@ -4,6 +4,7 @@ import customtkinter as ctk
 import tkinter as tk
 from tkinter import ttk
 from datetime import datetime, timedelta
+from PIL import Image
 
 
 ctk.set_appearance_mode("light")

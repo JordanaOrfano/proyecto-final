@@ -1,4 +1,3 @@
-import customtkinter as ctk
 from gui.terminos_condiciones import Terminos_CondicionesFrame
 from core.usuarios import *
 from config.config import *

@@ -1,4 +1,3 @@
-import customtkinter as ctk
 from config.config import *
 from gui.componentes import *
 from gui.crear_producto import *

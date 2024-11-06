@@ -1,10 +1,9 @@
 import customtkinter as ctk
 from config.config import *
-from PIL import Image
 
 
 def crear_boton(
-    parent, text, command=None, fill="none", padx=50, width=350, pady=20, metodo="grid", **kwargs,
+    parent, text, command=None, fill="none", padx=50, width=350, pady=20, metodo="pack", **kwargs,
 ):
     boton = ctk.CTkButton(
         parent,
@@ -55,7 +54,7 @@ def crear_imagen(route, size=(20, 20)):
 
 
 def crear_entry(
-    parent, metodo="grid", placeholder_text="", padx=0, fill="none", pady=10, **kwargs
+    parent, metodo="pack", placeholder_text="", padx=0, fill="none", pady=10, **kwargs
 ):
     entry = ctk.CTkEntry(
         parent,

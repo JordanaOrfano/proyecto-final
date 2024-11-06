@@ -1,5 +1,3 @@
-import customtkinter as ctk
-from PIL import Image
 from core.usuarios import *
 from config.config import *
 from gui.componentes import *

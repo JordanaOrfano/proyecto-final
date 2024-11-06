@@ -1,5 +1,3 @@
-import customtkinter as ctk
-from config.config import centrar_ventana
 from config.config import *
 
 
