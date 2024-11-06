@@ -1,6 +1,10 @@
 # En este archivo van las constantes, ajustes generales.
 
 import customtkinter as ctk
+import tkinter as tk
+from tkinter import ttk
+from datetime import datetime, timedelta
+
 
 ctk.set_appearance_mode("light")
 ctk.set_default_color_theme("green")

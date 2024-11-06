@@ -97,13 +97,14 @@ def crear_label(parent, metodo="pack", text="", pady=10, anchor="w", padx=0, tex
     return label
 
 
-def crear_stat(parent, titulo, contador, padx=0):
+def crear_stat(parent, titulo, contador, padx=0, **kwargs):
     label_stat = ctk.CTkLabel(
         parent,
-        text=f"{titulo}\n {contador}",
+        text=f"{titulo}\n{contador}",
         height=40,
         width=150,
         anchor="center",
+        compound="left",
         corner_radius=8,
         font=("Roboto", 18, "bold"),
         text_color=COLOR_BG,
@@ -113,10 +114,11 @@ def crear_stat(parent, titulo, contador, padx=0):
 
     return label_stat
 
-def crear_dropdown(parent, values=[]):
+def crear_dropdown(parent, values=[], metodo="pack", pady=10, padx=0, width=200, **kwargs):
     dropdown = ctk.CTkComboBox(
             parent,
-            height=40,
+            height=45,
+            width=width,
             corner_radius=8,
             font=("Roboto", 14),
             border_color=COLOR_PRIMARIO,
@@ -125,4 +127,77 @@ def crear_dropdown(parent, values=[]):
             values=values,
         )
     
+    if metodo == "grid":
+        pass
+    else:
+        dropdown.pack(pady=pady, padx=padx, fill="x")
+    
     return dropdown
+
+def crear_tabla(parent, columnas, encabezados, datos):
+    configurar_estilo_tabla()
+
+    # Frame de la tabla
+    frame_tabla = ctk.CTkFrame(parent, fg_color=COLOR_BG)
+    frame_tabla.pack(fill="both", padx=0, pady=20)
+
+    # Crear el Treeview
+    tree = ttk.Treeview(frame_tabla, columns=columnas, show="headings", style="Treeview")
+
+    # Configuración de encabezados
+    for col, encabezado in zip(columnas, encabezados):
+        tree.heading(col, text=encabezado)
+        width = 50 if col == "lote" else 80 if col == "cantidad" else 120  # Ajuste de ancho
+        tree.column(col, anchor="center", width=width, minwidth=width)
+
+    # Insertar datos
+    for dato in datos:
+        tree.insert("", tk.END, values=dato)
+
+    # Scrollbar
+    scrollbar = ctk.CTkScrollbar(frame_tabla, 
+                                 orientation="vertical", 
+                                 command=tree.yview, 
+                                 button_color=COLOR_PRIMARIO, 
+                                 button_hover_color=COLOR_PRIMARIO_HOVER)
+    tree.configure(yscroll=scrollbar.set)
+    scrollbar.pack(side="right", fill="y")
+
+    # Desactivar ajuste de ancho de columnas
+    tree.bind('<Motion>', 'break')
+
+    tree.pack(fill="both", expand=True)
+    ajustar_altura_tabla(tree, len(datos))
+
+    return frame_tabla, tree
+
+
+def ajustar_altura_tabla(tree, cantidad_productos):
+    max_filas = 10  # Establecer un límite máximo para la altura
+    if cantidad_productos == 0:
+        tree.configure(height=1)  # Si no hay productos, mostrar solo una fila
+    else:
+        tree.configure(height=min(max_filas, cantidad_productos))  # Ajustar según la cantidad de productos
+
+def configurar_estilo_tabla():
+    style = ttk.Style()
+    style.theme_use("default")
+
+    style.configure("Treeview.Heading", 
+                    background=COLOR_PRIMARIO,
+                    font=("Roboto", 11, "bold"),
+                    foreground="white",
+                    relief="flat",
+                    padding=5,
+                    )
+    style.map("Treeview.Heading",
+                background=[('active', COLOR_PRIMARIO_HOVER)])
+
+    style.configure("Treeview", 
+                    background="white",
+                    fieldbackground=COLOR_BG,
+                    foreground="black",
+                    rowheight=35,
+                    borderwidth=0)  # No border for Treeview
+    style.map("Treeview",
+                background=[('selected', COLOR_PRIMARIO_HOVER)])
