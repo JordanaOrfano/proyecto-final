@@ -60,12 +60,35 @@ def crear_schema_tablas(cursor, conexion):
             """
             # (ENGINE-INNODB;) Es el motor de almacenamiento Avanzado
 
+            tabla_usuarios = """
+            CREATE TABLE IF NOT EXISTS usuarios (
+            documento INT PRIMARY KEY,
+            correo VARCHAR(60) NOT NULL,
+            contrasena VARCHAR(60) NOT NULL,
+            nombre VARCHAR(50) NOT NULL,
+            apellido VARCHAR(50) NOT NULL
+            ) ENGINE=INNODB;
+            """
+
+            tabla_ventas = """
+            CREATE TABLE IF NOT EXISTS ventas (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            producto_id INT NOT NULL,
+            cantidad_vendida INT NOT NULL,
+            ganancia_venta DECIMAL(10, 2) NOT NULL,
+            fecha_venta TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+            FOREIGN KEY (producto_id) REFERENCES productos(id)
+            ) ENGINE=INNODB;
+            """
+
             # Seleccionamos el nuevo schema
             conexion.database = nombre_schema
 
             # Crear la tabla en el nuevo esquema
             cursor.execute(tabla_productos)
             cursor.execute(tabla_lotes)
+            cursor.execute(tabla_usuarios)
+            cursor.execute(tabla_ventas)
             print("Se creó una base de datos nueva.")
 
         return True
@@ -73,7 +96,3 @@ def crear_schema_tablas(cursor, conexion):
     except mysql.connector.Error as err:
         print(f"Error al crear el esquema o la tabla: {err}")
         return False
-
-
-# Conectar a la base de datos
-conexion = conectar_db()
