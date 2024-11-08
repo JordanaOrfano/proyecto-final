@@ -51,11 +51,11 @@ def crear_schema_tablas(cursor, conexion):
             CREATE TABLE IF NOT EXISTS lotes (
             lote_id INT AUTO_INCREMENT PRIMARY KEY,
             nombre VARCHAR(30) NOT NULL,
-            producto_id INT NOT NULL,
+            producto_nombre INT NOT NULL,
             cantidad INT NOT NULL,
             fecha_vencimiento DATE,
-            fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (producto_id) REFERENCES productos(id) 
+            fecha_creacion DATE,
+            FOREIGN KEY (producto_nombre) REFERENCES productos(id) 
             ) ENGINE=INNODB; 
             """
             # (ENGINE-INNODB;) Es el motor de almacenamiento Avanzado
@@ -76,7 +76,7 @@ def crear_schema_tablas(cursor, conexion):
             producto_id INT NOT NULL,
             cantidad_vendida INT NOT NULL,
             ganancia_venta DECIMAL(10, 2) NOT NULL,
-            fecha_venta TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+            fecha_venta DATE,
             FOREIGN KEY (producto_id) REFERENCES productos(id)
             ) ENGINE=INNODB;
             """

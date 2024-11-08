@@ -1,6 +1,6 @@
 from config.config import *
 from gui.componentes import *
-from gui.crear_producto import *
+from gui.agregar_producto import *
 from gui.estadisticas import *
 from gui.vencimientos import *
 from gui.configuracion import *
@@ -113,8 +113,8 @@ class InicioFrame(ctk.CTkFrame):
             font=("Roboto", 32, "bold"),
             pady=(30, 10),
         )
-        publicaciones = Publicaciones()
-        publicaciones.mostrar_publicaciones(contenedor=frame_inicio)
+        productos = Productos()
+        productos.mostrar_publicaciones(contenedor=frame_inicio)
 
         self.cambiar_contenido(frame_inicio, "inicio")
 
@@ -126,8 +126,9 @@ class InicioFrame(ctk.CTkFrame):
             font=("Roboto", 32, "bold"),
             pady=(30, 10),
         )
-        publicaciones = Publicaciones()
-        publicaciones.mostrar_publicaciones(contenedor=frame_inicio)
+
+        productos = Productos()
+        productos.mostrar_publicaciones(contenedor=frame_inicio)
 
         self.cambiar_contenido(frame_inicio, "inicio")
 

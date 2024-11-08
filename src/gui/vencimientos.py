@@ -5,11 +5,7 @@ class Vencimientos:
     def __init__(self, contenedor):
         self.contenedor = contenedor
 
-        # Frame principal
-        frame_bg = ctk.CTkFrame(master=self.contenedor, fg_color=COLOR_BG)
-        frame_bg.pack(expand=True, fill="both", padx=0)
-
-        frame_vencimientos = ctk.CTkFrame(frame_bg, fg_color=COLOR_BG)
+        frame_vencimientos = ctk.CTkFrame(self.contenedor, fg_color=COLOR_BG)
         frame_vencimientos.pack(expand=True, fill="x", padx=60)
 
         # Título
@@ -65,6 +61,7 @@ class Vencimientos:
             pady=0,
             padx=15,
         )
+        
         filtro_vencimiento.pack(side="left")
         filtro_vencimiento.bind("<<ComboboxSelected>>", lambda event: self.filtrar_por_fecha(filtro_vencimiento.get()))
 

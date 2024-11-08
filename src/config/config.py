@@ -6,6 +6,8 @@ from tkinter import ttk
 from datetime import datetime, timedelta
 from PIL import Image
 
+from database.conexion import *
+
 
 ctk.set_appearance_mode("light")
 ctk.set_default_color_theme("green")

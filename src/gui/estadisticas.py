@@ -1,6 +1,6 @@
 from config.config import *
 from gui.componentes import *
-from gui.crear_producto import *
+from gui.agregar_producto import *
 
 
 class Estadisticas:

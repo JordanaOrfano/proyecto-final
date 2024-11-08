@@ -1,5 +1,5 @@
 from config.config import *
-from core.publicaciones import *
+from core.productos import *
 from core.usuarios import *
 
 class CrearProducto:
@@ -7,38 +7,49 @@ class CrearProducto:
         self.contenedor = contenedor
 
         # Frame principal que ocupa toda la ventana y se expande
-        self.frame_publicar = ctk.CTkFrame(master=self.contenedor, fg_color=COLOR_BG)
-        self.frame_publicar.grid(sticky="nsew", padx=130)
+        self.frame_crear = ctk.CTkFrame(master=self.contenedor, fg_color=COLOR_BG)
+        self.frame_crear.grid(sticky="nsew", padx=130)
         
         # Configuración para centrar el frame en ambas direcciones
         self.contenedor.grid_rowconfigure(0, weight=1)
         self.contenedor.grid_columnconfigure(0, weight=1)
-        self.frame_publicar.grid_rowconfigure(0, weight=1)
-        self.frame_publicar.grid_rowconfigure(2, weight=1)  # Fila extra para centrar verticalmente
-        self.frame_publicar.grid_columnconfigure(0, weight=1)
+        self.frame_crear.grid_rowconfigure(0, weight=1)
+        self.frame_crear.grid_rowconfigure(2, weight=1)  # Fila extra para centrar verticalmente
+        self.frame_crear.grid_columnconfigure(0, weight=1)
 
         # Frame del formulario centrado y ajustable
-        formulario_frame = ctk.CTkFrame(self.frame_publicar, fg_color=COLOR_BG)
+        formulario_frame = ctk.CTkFrame(self.frame_crear, fg_color=COLOR_BG)
         formulario_frame.grid(row=1, column=0, padx=20, pady=20, sticky="nsew")
         formulario_frame.grid_columnconfigure((0, 1), weight=1)  # Hacer que las columnas se expandan
 
         # Título
         label_titulo = crear_label(formulario_frame, 
                                    metodo="grid", 
-                                   text="Crear producto", 
+                                   text="Añadir producto", 
                                    font=("Roboto", 32, "bold"))
         label_titulo.grid(row=0, column=0, columnspan=2, pady=(0, 25), sticky="ew")
 
-        # Campo de entrada para Nombre
-        label_nombre = crear_label(formulario_frame, 
+        # Campo de entrada para Nombre del producto
+        label_nombre_producto = crear_label(formulario_frame, 
                                    metodo="grid", 
-                                   text=" Nombre", 
+                                   text=" Nombre del producto", 
                                    font=("Roboto", 18, "bold"), 
                                    image=crear_imagen("src/assets/icons/title.png", size=(22, 22)))
-        label_nombre.grid(row=1, column=0, sticky="w", pady=(10,0), padx=10)
+        label_nombre_producto.grid(row=1, column=0, sticky="w", pady=(10,0), padx=10)
         
-        self.nombre = crear_entry(formulario_frame, placeholder_text="Nombre del producto", metodo="grid")
-        self.nombre.grid(row=2, column=0, columnspan=2, sticky="ew", padx=(10, 10), pady=(0, 10))
+        self.nombre_producto = crear_entry(formulario_frame, placeholder_text="Nombre del producto", metodo="grid")
+        self.nombre_producto.grid(row=2, column=0, sticky="ew", padx=(10, 10), pady=(0, 10))
+
+        # Campo de entrada para Nombre del lote
+        label_nombre_lote = crear_label(formulario_frame, 
+                                   metodo="grid", 
+                                   text=" Nombre del lote", 
+                                   font=("Roboto", 18, "bold"), 
+                                   image=crear_imagen("src/assets/icons/lote.png", size=(22, 22)))
+        label_nombre_lote.grid(row=1, column=1, sticky="w", pady=(10,0), padx=10)
+        
+        self.nombre_lote = crear_entry(formulario_frame, placeholder_text="Nombre del lote", metodo="grid")
+        self.nombre_lote.grid(row=2, column=1, sticky="ew", padx=(10, 10), pady=(0, 10))
 
         # Campo de entrada para Marca
         label_marca = crear_label(formulario_frame, 
@@ -113,22 +124,11 @@ class CrearProducto:
         boton_crear = crear_boton(formulario_frame, 
                                   metodo="grid",
                                   text="Crear", 
-                                  command=self.enviar_publicacion)
+                                  command=self.enviar_producto_a_bd)
         boton_crear.grid(row=13, column=0, columnspan=2, pady=(20, 10), padx=10, sticky="ew")
 
-    def enviar_publicacion(self):
-        # Obtener los datos de los campos de entrada
-        nombre = self.nombre.get()
-        marca = self.marca.get()
-        precio_compra = self.precio_compra.get()
-        precio_venta = self.precio_venta.get()
-        categoria = self.categoria.get()
-        cantidad = self.cantidad.get()
-        vencimiento = self.vencimiento.get()
+    def enviar_producto_a_bd(self):
+        # creador = f"{Usuario.usuario_actual[0]} {Usuario.usuario_actual[1]}"
 
-        # Procesar datos antes de enviar a la base de datos
-        fecha_creacion = datetime.now().date()
-        creador = f"{Usuario.usuario_actual[0]} {Usuario.usuario_actual[1]}"
-
-        publicar = Publicaciones()
-        publicar.subir_publicacion_a_bd(nombre, marca, precio_compra, precio_venta, categoria, cantidad, vencimiento, fecha_creacion, creador)
+        Productos.subir_producto_a_bd(self, self.nombre_lote.get(), self.nombre_producto.get(), self.marca.get(), self.precio_compra.get(), self.precio_venta.get(), self.categoria.get(), self.cantidad.get(), self.vencimiento.get())
+ 
