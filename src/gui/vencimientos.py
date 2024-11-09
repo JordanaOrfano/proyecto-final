@@ -1,5 +1,6 @@
 from config.config import *
 from gui.componentes import *
+from core.productos import *
 
 class Vencimientos:
     def __init__(self, contenedor):
@@ -63,82 +64,78 @@ class Vencimientos:
         )
         
         filtro_vencimiento.pack(side="left")
-        filtro_vencimiento.bind("<<ComboboxSelected>>", lambda event: self.filtrar_por_fecha(filtro_vencimiento.get()))
+        # filtro_vencimiento.bind("<<ComboboxSelected>>", lambda event: self.filtrar_por_fecha(filtro_vencimiento.get()))
 
-        # Datos de ejemplo
-        self.datos = [
-            (1, "Producto 1", "Marca A", "Categoría A", "$10.00", "$15.00", "100", "2024-11-03"),
-            (2, "Producto 2", "Marca B", "Categoría B", "$20.00", "$30.00", "50", "2024-10-20"),
-            (3, "Producto 3", "Marca C", "Categoría C", "$15.00", "$25.00", "70", "2024-12-01"),
-            (4, "Producto 4", "Marca D", "Categoría D", "$12.00", "$18.00", "30", "2025-12-26"),
-            (5, "Producto 5", "Marca E", "Categoría E", "$16.00", "$18.00", "30", "2024-11-26"),
-        ]
+        lotes = Productos()
+        self.lotes = lotes.obtener_productos_lotes()
+
         
         # Crear la tabla
         columnas = ("lote", "nombre", "marca", "categoria", "precio_compra", "precio_venta", "cantidad", "vencimiento")
         encabezados = ["Lote", "Nombre", "Marca", "Categoría", "Precio compra", "Precio venta", "Cantidad", "Vencimiento"]
-        self.frame_tabla, self.tree = crear_tabla(frame_vencimientos, columnas, encabezados, self.datos)
+        self.frame_tabla, self.tree = crear_tabla(frame_vencimientos, columnas, encabezados, self.lotes)
 
-        # Aplicar filtro inicial
-        self.filtrar_por_fecha("Todos")
+        # # Aplicar filtro inicial
+        # self.filtrar_por_fecha("Todos")
 
         # Actualizar contadores iniciales
-        self.actualizar_contadores()
+        # self.actualizar_contadores()
 
-    def actualizar_contadores(self):
-        vencidos = 0
-        proximos = 0
-        perdidas = 0.0
-        fecha_actual = datetime.now().date()
+    # def actualizar_contadores(self):
+    #     vencidos = 0
+    #     proximos = 0
+    #     perdidas = 0.0
+    #     fecha_actual = datetime.now().date()
 
-        for dato in self.datos:
-            lote, nombre, marca, categoria, precio_compra, precio_venta, cantidad, fecha_vencimiento_str = dato
-            fecha_vencimiento = datetime.strptime(fecha_vencimiento_str, "%Y-%m-%d").date()
-            precio_compra = float(precio_compra.replace("$", ""))
-            cantidad = int(cantidad)
+    #     for prod in self.producto:
+    #         lote, nombre, marca, categoria, precio_compra, precio_venta = prod
+            
+    #         # fecha_vencimiento = datetime.strptime(fecha_vencimiento_str, "%Y-%m-%d").date()
+    #         precio_compra = float(precio_compra.replace("$", ""))
+    #         cantidad = int(cantidad)
 
-            if fecha_vencimiento < fecha_actual:
-                vencidos += 1
-                perdidas += precio_compra * cantidad
-            elif (fecha_vencimiento - fecha_actual).days <= 30:
-                proximos += 1
+    #         # if fecha_vencimiento < fecha_actual:
+    #         #     vencidos += 1
+    #         #     perdidas += precio_compra * cantidad
+    #         # elif (fecha_vencimiento - fecha_actual).days <= 30:
+    #         #     proximos += 1
 
-        self.contador_vencidos.configure(text=f"Productos vencidos\n{vencidos}")
-        self.contador_proximos.configure(text=f"Próximos a vencer\n{proximos}")
-        self.contador_perdidas.configure(text=f"Pérdidas\n${perdidas:.2f}")
+    #     self.contador_vencidos.configure(text=f"Productos vencidos\n{vencidos}")
+    #     self.contador_proximos.configure(text=f"Próximos a vencer\n{proximos}")
+    #     self.contador_perdidas.configure(text=f"Pérdidas\n${perdidas:.2f}")
 
-    def filtrar_por_fecha(self, filtro):
-        fecha_actual = datetime.now().date()
-        fecha_limite = fecha_actual + timedelta(days=30)
+    # def filtrar_por_fecha(self, filtro):
+    #     fecha_actual = datetime.now().date()
+    #     fecha_limite = fecha_actual + timedelta(days=30)
 
-        # Limpiar la tabla antes de aplicar el filtro
-        for item in self.tree.get_children():
-            self.tree.delete(item)
+    #     # Limpiar la tabla antes de aplicar el filtro
+    #     for item in self.tree.get_children():
+    #         self.tree.delete(item)
 
-        for dato in self.datos:
-            lote, nombre, marca, categoria, precio_compra, precio_venta, cantidad, fecha_vencimiento_str = dato
-            fecha_vencimiento = datetime.strptime(fecha_vencimiento_str, "%Y-%m-%d").date()
+    #     for dato in self.datos :
+    #         lote, nombre, marca, categoria, precio_compra, precio_venta, cantidad, fecha_vencimiento_str = dato
+    #         fecha_vencimiento = datetime.strptime(fecha_vencimiento_str, "%Y-%m-%d").date()
 
-            # Asegurarnos de que solo se muestren productos con fecha de vencimiento dentro de los próximos 30 días o vencidos
-            if fecha_vencimiento > fecha_limite:
-                continue  # Saltar productos con vencimiento mayor a 30 días
+    #         # Asegurarnos de que solo se muestren productos con fecha de vencimiento dentro de los próximos 30 días o vencidos
+    #         if fecha_vencimiento > fecha_limite:
+    #             continue  # Saltar productos con vencimiento mayor a 30 días
 
-            # Determinar si el producto debe mostrarse según el filtro
-            mostrar = False
-            if filtro == "Todos":
-                mostrar = True
-            elif filtro == "Vencidos" and fecha_vencimiento < fecha_actual:
-                mostrar = True
-            elif filtro == "Próximos a vencer (1 mes)" and fecha_actual <= fecha_vencimiento <= fecha_limite:
-                mostrar = True
+    #         # Determinar si el producto debe mostrarse según el filtro
+    #         mostrar = False
+    #         if filtro == "Todos":
+    #             mostrar = True
+    #         elif filtro == "Vencidos" and fecha_vencimiento < fecha_actual:
+    #             mostrar = True
+    #         elif filtro == "Próximos a vencer (1 mes)" and fecha_actual <= fecha_vencimiento <= fecha_limite:
+    #             mostrar = True
 
-            if mostrar:
-                tag = "vencido" if fecha_vencimiento < fecha_actual else "proximo"
-                self.tree.insert("", tk.END, values=dato, tags=(tag,))
+    #         if mostrar:
+    #             tag = "vencido" if fecha_vencimiento < fecha_actual else "proximo"
+    #             self.tree.insert("", tk.END, values=dato, tags=(tag,))
 
-        # Ajuste de estilo para vencidos y próximos a vencer
-        self.tree.tag_configure("vencido", background="tomato")
-        self.tree.tag_configure("proximo", background="white")
+    #     # Ajuste de estilo para vencidos y próximos a vencer
+    #     self.tree.tag_configure("vencido", background="tomato")
+    #     self.tree.tag_configure("proximo", background="white")
 
-        # Ajustar la altura de la tabla después de aplicar el filtro
-        ajustar_altura_tabla(self.tree, len(self.tree.get_children()))
+    #     # Ajustar la altura de la tabla después de aplicar el filtro
+    #     ajustar_altura_tabla(self.tree, len(self.tree.get_children()))

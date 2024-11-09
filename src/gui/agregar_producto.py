@@ -1,6 +1,8 @@
 from config.config import *
 from core.productos import *
 from core.usuarios import *
+from gui.componentes import *
+
 
 class CrearProducto:
     def __init__(self, contenedor):
@@ -70,9 +72,14 @@ class CrearProducto:
                                       image=crear_imagen("src/assets/icons/category.png", size=(22, 22)))
         label_categoria.grid(row=3, column=1, sticky="w", pady=(10,0), padx=10)
         
+        categorias = Productos()
+        categorias = categorias.obtener_categorias()
+
+
         self.categoria = crear_dropdown(formulario_frame, 
-                                        values=["Elija una Opción", "Opción 1", "Opción 2", "Opción 3"], metodo="grid")
+                                        values=["Elija o escriba una categoría"] + categorias, metodo="grid")
         self.categoria.grid(row=4, column=1, sticky="ew", padx=10, pady=(0, 10))
+
 
         # Campo de entrada para Precio de compra
         label_precio_compra = crear_label(formulario_frame, 

@@ -1,6 +1,5 @@
-import customtkinter as ctk
 from config.config import *
-
+from core.productos import *
 
 def crear_boton(
     parent, text, command=None, fill="none", padx=50, width=350, pady=20, metodo="pack", **kwargs,
@@ -133,7 +132,7 @@ def crear_dropdown(parent, values=[], metodo="pack", pady=10, padx=0, width=200,
     
     return dropdown
 
-def crear_tabla(parent, columnas, encabezados, datos):
+def crear_tabla(parent, columnas, encabezados, lotes):
     configurar_estilo_tabla()
 
     # Frame de la tabla
@@ -148,10 +147,9 @@ def crear_tabla(parent, columnas, encabezados, datos):
         tree.heading(col, text=encabezado)
         width = 50 if col == "lote" else 80 if col == "cantidad" else 120  # Ajuste de ancho
         tree.column(col, anchor="center", width=width, minwidth=width)
-
-    # Insertar datos
-    for dato in datos:
-        tree.insert("", tk.END, values=dato)
+   
+    for lote in lotes:
+        tree.insert("", tk.END, values=lote)
 
     # Scrollbar
     scrollbar = ctk.CTkScrollbar(frame_tabla, 
@@ -166,7 +164,7 @@ def crear_tabla(parent, columnas, encabezados, datos):
     tree.bind('<Motion>', 'break')
 
     tree.pack(fill="both", expand=True)
-    ajustar_altura_tabla(tree, len(datos))
+    ajustar_altura_tabla(tree, len(lotes))
 
     return frame_tabla, tree
 

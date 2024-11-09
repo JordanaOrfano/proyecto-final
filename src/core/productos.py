@@ -56,13 +56,45 @@ class Productos:
             cursor.close()
             conexion.close()
 
+    def obtener_productos_lotes(self):
+        try:
+            sql = """
+                    SELECT 
+                        lotes.nombre, 
+                        productos.nombre, 
+                        productos.marca, 
+                        productos.categoria, 
+                        productos.precio_compra, 
+                        productos.precio_venta, 
+                        lotes.cantidad, 
+                        lotes.fecha_vencimiento 
+                    FROM 
+                        lotes
+                    JOIN 
+                        productos ON lotes.producto_id = productos.id;
+                """
+            conexion = conectar_db()
+            cursor = conexion.cursor()
+
+            cursor.execute(sql)
+
+            resultados = cursor.fetchall()
+
+            cursor.close()
+            conexion.close()
+
+            return resultados
+
+        except mysql.connector.Error as error:
+            print(f"Error al obtener los lotes combinados: {error}")
+            return []
+
     def obtener_productos(self):
         try:
             sql = "SELECT * FROM productos ORDER BY id DESC"
             conexion = conectar_db()
 
-            # Vamos a usar el cursor como un diccionario para acceder con claves y valores
-            cursor = conexion.cursor(dictionary=True)
+            cursor = conexion.cursor()
             cursor.execute(sql)
 
             # Obtenemos todas los productos
@@ -75,3 +107,40 @@ class Productos:
 
         except mysql.connector.Error as error:
             print("Ocurrió un error al pedir los productos", error)
+
+    def obtener_lotes(self):
+        try:
+            sql = "SELECT * FROM lotes ORDER BY lote_id DESC"
+            conexion = conectar_db()
+
+            cursor = conexion.cursor()
+            cursor.execute(sql)
+
+            lotes = cursor.fetchall()
+
+            cursor.close()
+            conexion.close()
+
+            return lotes
+
+        except mysql.connector.Error as error:
+            print("Ocurrió un error al pedir los lotes", error)
+
+    def obtener_categorias(self):
+        try:
+            sql = "SELECT distinct categoria FROM proyecto_final.productos"
+            conexion = conectar_db()
+
+            cursor = conexion.cursor()
+            cursor.execute(sql)
+
+            categorias = cursor.fetchall()
+            categorias_lista = [categoria[0] for categoria in categorias]
+
+            cursor.close()
+            conexion.close()
+
+            return categorias_lista
+
+        except mysql.connector.Error as error:
+            print("Ocurrió un error al obtener las categorias", error)
