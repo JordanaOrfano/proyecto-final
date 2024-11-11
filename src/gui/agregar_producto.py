@@ -37,21 +37,10 @@ class CrearProducto:
                                    text=" Nombre del producto", 
                                    font=("Roboto", 18, "bold"), 
                                    image=crear_imagen("src/assets/icons/title.png", size=(22, 22)))
-        label_nombre_producto.grid(row=1, column=0, sticky="w", pady=(10,0), padx=10)
+        label_nombre_producto.grid(row=1, column=0, columnspan=2, sticky="w", pady=(10,0), padx=10)
         
         self.nombre_producto = crear_entry(formulario_frame, placeholder_text="Nombre del producto", metodo="grid")
-        self.nombre_producto.grid(row=2, column=0, sticky="ew", padx=(10, 10), pady=(0, 10))
-
-        # Campo de entrada para Nombre del lote
-        label_nombre_lote = crear_label(formulario_frame, 
-                                   metodo="grid", 
-                                   text=" Nombre del lote", 
-                                   font=("Roboto", 18, "bold"), 
-                                   image=crear_imagen("src/assets/icons/lote.png", size=(22, 22)))
-        label_nombre_lote.grid(row=1, column=1, sticky="w", pady=(10,0), padx=10)
-        
-        self.nombre_lote = crear_entry(formulario_frame, placeholder_text="Nombre del lote", metodo="grid")
-        self.nombre_lote.grid(row=2, column=1, sticky="ew", padx=(10, 10), pady=(0, 10))
+        self.nombre_producto.grid(row=2, column=0, columnspan=2, sticky="ew", padx=(10, 10), pady=(0, 10))
 
         # Campo de entrada para Marca
         label_marca = crear_label(formulario_frame, 
@@ -137,5 +126,5 @@ class CrearProducto:
     def enviar_producto_a_bd(self):
         # creador = f"{Usuario.usuario_actual[0]} {Usuario.usuario_actual[1]}"
 
-        Productos.subir_producto_a_bd(self, self.nombre_lote.get(), self.nombre_producto.get(), self.marca.get(), self.precio_compra.get(), self.precio_venta.get(), self.categoria.get(), self.cantidad.get(), self.vencimiento.get())
+        Productos.subir_producto_a_bd(self, self.nombre_producto.get(), self.marca.get(), self.precio_compra.get(), self.precio_venta.get(), self.categoria.get(), self.cantidad.get(), self.vencimiento.get())
  

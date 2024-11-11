@@ -5,7 +5,6 @@ from gui.componentes import *
 class Productos:
     def subir_producto_a_bd(
         self,
-        nombre_lote,
         nombre_producto,
         marca,
         precio_compra,
@@ -42,8 +41,8 @@ class Productos:
             else:
                 producto_id = existe[0]  # Obtiene el id del producto existente
 
-            sql = "INSERT INTO lotes VALUES(null, %s, %s, %s, %s)"
-            valores = (nombre_lote, producto_id, cantidad, vencimiento)
+            sql = "INSERT INTO lotes VALUES(null, %s, %s, %s)"
+            valores = (producto_id, cantidad, vencimiento)
 
             cursor.execute(sql, valores)
             conexion.commit()

@@ -70,8 +70,7 @@ class Database:
 
                 tabla_lotes = """
                 CREATE TABLE IF NOT EXISTS lotes (
-                lote_id INT AUTO_INCREMENT PRIMARY KEY,
-                nombre VARCHAR(30) NOT NULL,
+                lote INT AUTO_INCREMENT PRIMARY KEY,
                 producto_id INT NOT NULL,
                 cantidad INT NOT NULL,
                 fecha_vencimiento DATE,
