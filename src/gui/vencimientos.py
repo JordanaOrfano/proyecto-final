@@ -2,9 +2,11 @@ from config.config import *
 from gui.componentes import *
 from core.productos import *
 
+
 class Vencimientos:
     def __init__(self, contenedor):
         self.contenedor = contenedor
+        self.fecha_actual = datetime.now().date()
 
         frame_vencimientos = ctk.CTkFrame(self.contenedor, fg_color=COLOR_BG)
         frame_vencimientos.pack(expand=True, fill="x", padx=60)
@@ -14,36 +16,38 @@ class Vencimientos:
             frame_vencimientos,
             text="Vencimientos",
             font=("Roboto", 32, "bold"),
-            pady=(0, 25)
+            pady=25,
         )
-        
+
         # Contadores de productos
         frame_contadores = ctk.CTkFrame(frame_vencimientos, fg_color=COLOR_BG)
         frame_contadores.pack(fill="x", pady=(0,20))
 
         self.contador_vencidos = crear_stat(frame_contadores, "Productos vencidos", "0")
-        self.contador_proximos = crear_stat(frame_contadores, "Próximos a vencer", "0", padx=10)
+        self.contador_proximos = crear_stat(
+            frame_contadores, "Próximos a vencer", "0", padx=10
+        )
         self.contador_perdidas = crear_stat(frame_contadores, "Pérdidas", "$0.00")
 
         crear_label(
             frame_vencimientos,
             text="Productos",
             font=("Roboto", 24, "bold"),
-            pady=(20,0)
+            pady=(20, 0),
         )
         # Búsqueda y filtro
         frame_busqueda = ctk.CTkFrame(frame_vencimientos, fg_color=COLOR_BG)
-        frame_busqueda.pack(fill="x", pady=(10,0))
+        frame_busqueda.pack(fill="x", pady=(10, 0))
 
-        entry_busqueda = crear_entry(
+        self.entry_busqueda = crear_entry(
             parent=frame_busqueda,
             placeholder_text="Buscar por nombre, marca o categoría",
             fill="x",
             padx=0,
             pady=0,
-            metodo="pack"
+            metodo="pack",
         )
-        entry_busqueda.pack(side="left", expand=True, fill="x")
+        self.entry_busqueda.pack(side="left", expand=True, fill="x")
 
         boton_buscar = crear_boton(
             parent=frame_busqueda,
@@ -51,91 +55,171 @@ class Vencimientos:
             width=100,
             padx=0,
             pady=0,
-            metodo="pack"
+            metodo="pack",
+            command=self.evento_buscar,
         )
         boton_buscar.pack(side="right")
 
         # Dropdown de filtro para seleccionar vencidos o próximos a vencer
-        filtro_vencimiento = crear_dropdown(
+        self.filtro_vencimiento = crear_dropdown(
             parent=frame_busqueda,
             values=["Todos", "Próximos a vencer", "Vencidos"],
             pady=0,
             padx=15,
         )
-        
-        filtro_vencimiento.pack(side="left")
-        # filtro_vencimiento.bind("<<ComboboxSelected>>", lambda event: self.filtrar_por_fecha(filtro_vencimiento.get()))
 
-        lotes = Productos()
-        self.lotes = lotes.obtener_productos_lotes()
+        self.filtro_vencimiento.pack(side="left")
 
-        
-        # Crear la tabla
-        columnas = ("lote", "nombre", "marca", "categoria", "precio_compra", "precio_venta", "cantidad", "vencimiento")
-        encabezados = ["Lote", "Nombre", "Marca", "Categoría", "Precio compra", "Precio venta", "Cantidad", "Vencimiento"]
-        self.frame_tabla, self.tree = crear_tabla(frame_vencimientos, columnas, encabezados, self.lotes)
+        # Crear las columnas y encabezados
+        columnas = (
+            "lote",
+            "nombre",
+            "marca",
+            "categoria",
+            "precio_compra",
+            "precio_venta",
+            "cantidad",
+            "vencimiento",
+        )
+        encabezados = [
+            "Lote",
+            "Nombre",
+            "Marca",
+            "Categoría",
+            "Precio compra",
+            "Precio venta",
+            "Cantidad",
+            "Vencimiento",
+        ]
 
-        # # Aplicar filtro inicial
-        # self.filtrar_por_fecha("Todos")
+        # Obtenemos los productos y lotes combinados
+        lotes = Database()
 
-        # Actualizar contadores iniciales
-        # self.actualizar_contadores()
+        self.lotes = lotes.consultar_bd(
+            sql="""
+                    SELECT 
+                        lotes.nombre, 
+                        productos.nombre, 
+                        productos.marca, 
+                        productos.categoria, 
+                        productos.precio_compra, 
+                        productos.precio_venta, 
+                        lotes.cantidad, 
+                        lotes.fecha_vencimiento 
+                    FROM 
+                        lotes
+                    JOIN 
+                        productos ON lotes.producto_id = productos.id;
+                """,
+            valores=None,
+        )
 
-    # def actualizar_contadores(self):
-    #     vencidos = 0
-    #     proximos = 0
-    #     perdidas = 0.0
-    #     fecha_actual = datetime.now().date()
+        self.frame_tabla, self.tree = crear_tabla(
+            frame_vencimientos, columnas, encabezados, self.lotes
+        )
 
-    #     for prod in self.producto:
-    #         lote, nombre, marca, categoria, precio_compra, precio_venta = prod
-            
-    #         # fecha_vencimiento = datetime.strptime(fecha_vencimiento_str, "%Y-%m-%d").date()
-    #         precio_compra = float(precio_compra.replace("$", ""))
-    #         cantidad = int(cantidad)
+        self.tree.tag_configure("vencido", background="tomato")
+        self.tree.tag_configure("proximo", background="yellow")
 
-    #         # if fecha_vencimiento < fecha_actual:
-    #         #     vencidos += 1
-    #         #     perdidas += precio_compra * cantidad
-    #         # elif (fecha_vencimiento - fecha_actual).days <= 30:
-    #         #     proximos += 1
+        # Aplicar filtro inicial
+        self.filtrar(False)
 
-    #     self.contador_vencidos.configure(text=f"Productos vencidos\n{vencidos}")
-    #     self.contador_proximos.configure(text=f"Próximos a vencer\n{proximos}")
-    #     self.contador_perdidas.configure(text=f"Pérdidas\n${perdidas:.2f}")
+    # Obtener productos con vencimiento a un mes o vencidos
+    def obtener_vencimientos(self, busqueda):
+        fecha_limite = self.fecha_actual + timedelta(days=30)
 
-    # def filtrar_por_fecha(self, filtro):
-    #     fecha_actual = datetime.now().date()
-    #     fecha_limite = fecha_actual + timedelta(days=30)
+        productos_vencidos = []
+        proximo_vencimiento = []
 
-    #     # Limpiar la tabla antes de aplicar el filtro
-    #     for item in self.tree.get_children():
-    #         self.tree.delete(item)
+        if busqueda is None:
+            return productos_vencidos, proximo_vencimiento
 
-    #     for dato in self.datos :
-    #         lote, nombre, marca, categoria, precio_compra, precio_venta, cantidad, fecha_vencimiento_str = dato
-    #         fecha_vencimiento = datetime.strptime(fecha_vencimiento_str, "%Y-%m-%d").date()
+        if busqueda is False:
+            for producto in self.lotes:
+                fecha_vencimiento = producto[7]
 
-    #         # Asegurarnos de que solo se muestren productos con fecha de vencimiento dentro de los próximos 30 días o vencidos
-    #         if fecha_vencimiento > fecha_limite:
-    #             continue  # Saltar productos con vencimiento mayor a 30 días
+                if fecha_vencimiento < self.fecha_actual:
+                    productos_vencidos.append(producto)
 
-    #         # Determinar si el producto debe mostrarse según el filtro
-    #         mostrar = False
-    #         if filtro == "Todos":
-    #             mostrar = True
-    #         elif filtro == "Vencidos" and fecha_vencimiento < fecha_actual:
-    #             mostrar = True
-    #         elif filtro == "Próximos a vencer (1 mes)" and fecha_actual <= fecha_vencimiento <= fecha_limite:
-    #             mostrar = True
+                elif fecha_vencimiento > fecha_limite:
+                    proximo_vencimiento.append(producto)
 
-    #         if mostrar:
-    #             tag = "vencido" if fecha_vencimiento < fecha_actual else "proximo"
-    #             self.tree.insert("", tk.END, values=dato, tags=(tag,))
+        else:
+            for producto in busqueda:
+                # Si el usuario ingresa algo en el buscador se itera ahí
+                fecha_vencimiento = producto[7]
+                if fecha_vencimiento < self.fecha_actual:
+                    productos_vencidos.append(producto)
 
-    #     # Ajuste de estilo para vencidos y próximos a vencer
-    #     self.tree.tag_configure("vencido", background="tomato")
-    #     self.tree.tag_configure("proximo", background="white")
+                elif fecha_vencimiento > fecha_limite:
+                    proximo_vencimiento.append(producto)
 
-    #     # Ajustar la altura de la tabla después de aplicar el filtro
-    #     ajustar_altura_tabla(self.tree, len(self.tree.get_children()))
+        return productos_vencidos, proximo_vencimiento
+
+    # Filtrar según un criterio
+    def filtrar(self, busqueda):
+        fecha_limite = self.fecha_actual + timedelta(days=30)
+
+        # Limpiar la tabla antes de aplicar el filtro
+        for item in self.tree.get_children():
+            self.tree.delete(item)
+
+        productos_vencidos, proximo_vencimiento = self.obtener_vencimientos(busqueda)
+
+        if not productos_vencidos and not proximo_vencimiento:
+            # Añadir mensaje para tabla vacía
+            return
+
+        else:
+            if (
+                self.filtro_vencimiento.get() == "Próximos a vencer"
+                or self.filtro_vencimiento.get() == "Todos"
+            ):
+                for proximo_a_vencer in proximo_vencimiento:
+                    self.tree.insert(
+                        "", tk.END, values=proximo_a_vencer, tags=("proximo",)
+                    )
+
+            if (
+                self.filtro_vencimiento.get() == "Vencidos"
+                or self.filtro_vencimiento.get() == "Todos"
+            ):
+                for producto_vencido in productos_vencidos:
+                    self.tree.insert(
+                        "", tk.END, values=producto_vencido, tags=("vencido",)
+                    )
+
+        ajustar_altura_tabla(self.tree, len(self.tree.get_children()))
+
+    # Click en "Buscar" activa el filtrado o busca lo ingresado en el Entry
+    def evento_buscar(self):
+        # Implementar la logica de busqueda
+        if len(self.entry_busqueda.get().strip()) == 0:
+            self.filtrar(False)
+            return
+
+        busqueda = Database()
+        busqueda = busqueda.consultar_bd(
+            sql="""
+            SELECT 
+                lotes.nombre, 
+                productos.nombre,
+                productos.marca, 
+                productos.categoria, 
+                productos.precio_compra, 
+                productos.precio_venta, 
+                lotes.cantidad, 
+                lotes.fecha_vencimiento 
+            FROM 
+                lotes
+            JOIN 
+                productos ON lotes.producto_id = productos.id
+            WHERE 
+                productos.nombre LIKE %s 
+                OR productos.marca LIKE %s 
+                OR productos.categoria LIKE %s
+        """,
+            valores=("%" + self.entry_busqueda.get().strip() + "%",) * 3,
+        )
+
+        self.filtrar(busqueda)
