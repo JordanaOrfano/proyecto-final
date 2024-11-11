@@ -195,6 +195,6 @@ def configurar_estilo_tabla():
                     fieldbackground=COLOR_BG,
                     foreground="black",
                     rowheight=35,
-                    borderwidth=0)  # No border for Treeview
+                    borderwidth=0) 
     style.map("Treeview",
                 background=[('selected', COLOR_PRIMARIO_HOVER)])
