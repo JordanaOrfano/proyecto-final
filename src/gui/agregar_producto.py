@@ -125,6 +125,8 @@ class CrearProducto:
 
     def enviar_producto_a_bd(self):
         # creador = f"{Usuario.usuario_actual[0]} {Usuario.usuario_actual[1]}"
-
-        Productos.subir_producto_a_bd(self, self.nombre_producto.get(), self.marca.get(), self.precio_compra.get(), self.precio_venta.get(), self.categoria.get(), self.cantidad.get(), self.vencimiento.get())
+        vencimiento = datetime.strptime(self.vencimiento.get(), "%d/%m/%Y")
+        fecha_formateada = vencimiento.strftime("%Y/%m/%d")
+        
+        Productos.subir_producto_a_bd(self, self.nombre_producto.get(), self.marca.get(), self.precio_compra.get(), self.precio_venta.get(), self.categoria.get(), self.cantidad.get(), fecha_formateada)
  

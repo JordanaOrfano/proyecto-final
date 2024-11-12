@@ -93,9 +93,8 @@ class Vencimientos:
         ]
 
         # Obtenemos los productos y lotes combinados
-        lotes = Database()
-
-        self.lotes = lotes.consultar_bd(
+        self.conexion = Database()
+        lotes = self.conexion.consultar_bd(
             sql="""
                     SELECT 
                         lotes.lote, 
@@ -115,6 +114,14 @@ class Vencimientos:
             valores=None,
         )
 
+        # Transformamos a una lista
+        lotes_lista = []
+
+        for fila in lotes:
+            lotes_lista.append(list(fila))
+
+        self.lotes = lotes_lista
+
         self.frame_tabla, self.tree = crear_tabla(
             frame_vencimientos, columnas, encabezados, self.lotes
         )
@@ -131,44 +138,66 @@ class Vencimientos:
     # Obtener productos con vencimiento a un mes o vencidos
     def obtener_vencimientos(self, busqueda):
         fecha_limite = self.fecha_actual + timedelta(days=30)
-
         productos_vencidos = []
         proximo_vencimiento = []
 
+        def formatear_fecha(fecha_vencimiento):
+            if isinstance(fecha_vencimiento, str):
+                fecha_objeto = datetime.strptime(fecha_vencimiento, "%d/%m/%Y").date()
+            elif isinstance(fecha_vencimiento, datetime):
+                fecha_objeto = fecha_vencimiento.date()
+            else:
+                fecha_objeto = fecha_vencimiento
+
+            return fecha_objeto
+
+        # No encuentra ningun producto que coincida con la búsqueda
         if busqueda is None:
             return productos_vencidos, proximo_vencimiento
 
+        # No procesa la búsqueda porque el Entry está vacío
         if busqueda is False:
             for producto in self.lotes:
                 fecha_vencimiento = producto[7]
+                fecha_objeto = formatear_fecha(fecha_vencimiento)
 
-                if fecha_vencimiento < self.fecha_actual:
+                # Si la fecha es anterior a la fecha actual, está vencido
+                if fecha_objeto < self.fecha_actual:
+                    fecha_formateada = fecha_objeto.strftime("%d/%m/%Y")
+                    producto[7] = fecha_formateada
                     productos_vencidos.append(producto)
 
-                elif fecha_vencimiento > fecha_limite:
+                # Si la fecha es mayor que la fecha límite, es un próximo vencimiento
+                elif fecha_objeto > fecha_limite:
+                    fecha_formateada = fecha_objeto.strftime("%d/%m/%Y")
+                    producto[7] = fecha_formateada
                     proximo_vencimiento.append(producto)
 
         else:
             for producto in busqueda:
-                # Si el usuario ingresa algo en el buscador se itera ahí
                 fecha_vencimiento = producto[7]
-                if fecha_vencimiento < self.fecha_actual:
+                fecha_objeto = formatear_fecha(fecha_vencimiento)
+
+                if fecha_objeto < self.fecha_actual:
                     productos_vencidos.append(producto)
 
-                elif fecha_vencimiento > fecha_limite:
+                elif fecha_objeto > fecha_limite:
                     proximo_vencimiento.append(producto)
+
         return productos_vencidos, proximo_vencimiento
 
     def actualizar_contadores(self):
-        perdidas = Database()
-        perdidas = perdidas.consultar_bd("""
+        perdidas = self.conexion.consultar_bd(
+            """
         SELECT SUM(productos.precio_compra * lotes.cantidad) AS perdidas
         FROM 
             lotes 
         JOIN 
             productos ON lotes.producto_id = productos.id
         WHERE 
-            lotes.fecha_vencimiento < CURRENT_DATE;""", None)
+            lotes.fecha_vencimiento < CURRENT_DATE;""",
+            None,
+        )
 
         productos_vencidos, proximo_vencimiento = self.obtener_vencimientos(False)
 
@@ -178,8 +207,12 @@ class Vencimientos:
         else:
             perdidas = 0
 
-        self.contador_vencidos.configure(text=f"Productos vencidos\n{len(productos_vencidos)}")
-        self.contador_proximos.configure(text=f"Próximos a vencer\n{len(proximo_vencimiento)}")
+        self.contador_vencidos.configure(
+            text=f"Productos vencidos\n{len(productos_vencidos)}"
+        )
+        self.contador_proximos.configure(
+            text=f"Próximos a vencer\n{len(proximo_vencimiento)}"
+        )
         self.contador_perdidas.configure(text=f"Pérdidas\n${perdidas}")
 
     # Filtrar según un criterio
@@ -224,8 +257,7 @@ class Vencimientos:
             self.filtrar(False)
             return
 
-        busqueda = Database()
-        busqueda = busqueda.consultar_bd(
+        busqueda = self.conexion.consultar_bd(
             sql="""
             SELECT 
                 lotes.lote, 

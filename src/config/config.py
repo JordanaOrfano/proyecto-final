@@ -3,7 +3,7 @@
 import customtkinter as ctk
 import tkinter as tk
 from tkinter import ttk
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from PIL import Image
 
 from database.conexion import *
