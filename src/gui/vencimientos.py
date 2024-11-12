@@ -21,7 +21,7 @@ class Vencimientos:
 
         # Contadores de productos
         frame_contadores = ctk.CTkFrame(frame_vencimientos, fg_color=COLOR_BG)
-        frame_contadores.pack(fill="x", pady=(0,20))
+        frame_contadores.pack(fill="x", pady=(0, 20))
 
         self.contador_vencidos = crear_stat(frame_contadores, "Productos vencidos", "0")
         self.contador_proximos = crear_stat(
@@ -98,7 +98,7 @@ class Vencimientos:
         self.lotes = lotes.consultar_bd(
             sql="""
                     SELECT 
-                        lotes.nombre, 
+                        lotes.lote, 
                         productos.nombre, 
                         productos.marca, 
                         productos.categoria, 
@@ -109,7 +109,8 @@ class Vencimientos:
                     FROM 
                         lotes
                     JOIN 
-                        productos ON lotes.producto_id = productos.id;
+                        productos ON lotes.producto_id = productos.id
+                    ORDER BY productos.nombre, lotes.fecha_vencimiento;
                 """,
             valores=None,
         )
@@ -120,6 +121,9 @@ class Vencimientos:
 
         self.tree.tag_configure("vencido", background="tomato")
         self.tree.tag_configure("proximo", background="yellow")
+
+        # Actualizar contadores
+        self.actualizar_contadores()
 
         # Aplicar filtro inicial
         self.filtrar(False)
@@ -153,8 +157,30 @@ class Vencimientos:
 
                 elif fecha_vencimiento > fecha_limite:
                     proximo_vencimiento.append(producto)
-
         return productos_vencidos, proximo_vencimiento
+
+    def actualizar_contadores(self):
+        perdidas = Database()
+        perdidas = perdidas.consultar_bd("""
+        SELECT SUM(productos.precio_compra * lotes.cantidad) AS perdidas
+        FROM 
+            lotes 
+        JOIN 
+            productos ON lotes.producto_id = productos.id
+        WHERE 
+            lotes.fecha_vencimiento < CURRENT_DATE;""", None)
+
+        productos_vencidos, proximo_vencimiento = self.obtener_vencimientos(False)
+
+        if perdidas and perdidas[0][0] is not None:
+            perdidas = round(perdidas[0][0])
+
+        else:
+            perdidas = 0
+
+        self.contador_vencidos.configure(text=f"Productos vencidos\n{len(productos_vencidos)}")
+        self.contador_proximos.configure(text=f"Próximos a vencer\n{len(proximo_vencimiento)}")
+        self.contador_perdidas.configure(text=f"Pérdidas\n${perdidas}")
 
     # Filtrar según un criterio
     def filtrar(self, busqueda):
@@ -202,7 +228,7 @@ class Vencimientos:
         busqueda = busqueda.consultar_bd(
             sql="""
             SELECT 
-                lotes.nombre, 
+                lotes.lote, 
                 productos.nombre,
                 productos.marca, 
                 productos.categoria, 
@@ -218,6 +244,7 @@ class Vencimientos:
                 productos.nombre LIKE %s 
                 OR productos.marca LIKE %s 
                 OR productos.categoria LIKE %s
+            ORDER BY productos.nombre, lotes.fecha_vencimiento;
         """,
             valores=("%" + self.entry_busqueda.get().strip() + "%",) * 3,
         )
