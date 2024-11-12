@@ -7,6 +7,7 @@ class Vencimientos:
     def __init__(self, contenedor):
         self.contenedor = contenedor
         self.fecha_actual = datetime.now().date()
+        self.fecha_limite = self.fecha_actual + timedelta(days=30)
 
         frame_vencimientos = ctk.CTkFrame(self.contenedor, fg_color=COLOR_BG)
         frame_vencimientos.pack(expand=True, fill="x", padx=60)
@@ -24,9 +25,7 @@ class Vencimientos:
         frame_contadores.pack(fill="x", pady=(0, 20))
 
         self.contador_vencidos = crear_stat(frame_contadores, "Productos vencidos", "0")
-        self.contador_proximos = crear_stat(
-            frame_contadores, "Próximos a vencer", "0", padx=10
-        )
+        self.contador_proximos = crear_stat(frame_contadores, "Próximos a vencer", "0", padx=10)
         self.contador_perdidas = crear_stat(frame_contadores, "Pérdidas", "$0.00")
 
         crear_label(
@@ -61,7 +60,7 @@ class Vencimientos:
         boton_buscar.pack(side="right")
 
         # Dropdown de filtro para seleccionar vencidos o próximos a vencer
-        self.filtro_vencimiento = crear_dropdown(
+        self.filtro_vencimiento = crear_optionmenu(
             parent=frame_busqueda,
             values=["Todos", "Próximos a vencer", "Vencidos"],
             pady=0,
@@ -127,7 +126,7 @@ class Vencimientos:
         )
 
         self.tree.tag_configure("vencido", background="tomato")
-        self.tree.tag_configure("proximo", background="yellow")
+        self.tree.tag_configure("proximo", background="#FFEAAE")
 
         # Actualizar contadores
         self.actualizar_contadores()
@@ -137,7 +136,6 @@ class Vencimientos:
 
     # Obtener productos con vencimiento a un mes o vencidos
     def obtener_vencimientos(self, busqueda):
-        fecha_limite = self.fecha_actual + timedelta(days=30)
         productos_vencidos = []
         proximo_vencimiento = []
 
@@ -168,7 +166,7 @@ class Vencimientos:
                     productos_vencidos.append(producto)
 
                 # Si la fecha es mayor que la fecha límite, es un próximo vencimiento
-                elif fecha_objeto > fecha_limite:
+                elif fecha_objeto > self.fecha_limite:
                     fecha_formateada = fecha_objeto.strftime("%d/%m/%Y")
                     producto[7] = fecha_formateada
                     proximo_vencimiento.append(producto)
@@ -181,7 +179,7 @@ class Vencimientos:
                 if fecha_objeto < self.fecha_actual:
                     productos_vencidos.append(producto)
 
-                elif fecha_objeto > fecha_limite:
+                elif fecha_objeto > self.fecha_limite:
                     proximo_vencimiento.append(producto)
 
         return productos_vencidos, proximo_vencimiento
@@ -217,8 +215,6 @@ class Vencimientos:
 
     # Filtrar según un criterio
     def filtrar(self, busqueda):
-        fecha_limite = self.fecha_actual + timedelta(days=30)
-
         # Limpiar la tabla antes de aplicar el filtro
         for item in self.tree.get_children():
             self.tree.delete(item)

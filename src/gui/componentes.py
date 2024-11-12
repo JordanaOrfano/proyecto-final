@@ -122,6 +122,8 @@ def crear_dropdown(parent, values=[], metodo="pack", pady=10, padx=0, width=200,
             border_color=COLOR_PRIMARIO,
             button_color=COLOR_PRIMARIO,
             button_hover_color=COLOR_PRIMARIO_HOVER,
+            dropdown_fg_color=COLOR_BG,
+            dropdown_hover_color=COLOR_PRIMARIO,
             values=values,
         )
     
@@ -129,6 +131,24 @@ def crear_dropdown(parent, values=[], metodo="pack", pady=10, padx=0, width=200,
         pass
     else:
         dropdown.pack(pady=pady, padx=padx, fill="x")
+    
+    return dropdown
+
+def crear_optionmenu(parent, values=[], pady=10, padx=0, width=200, **kwargs):
+    dropdown = ctk.CTkOptionMenu(
+            parent,
+            height=45,
+            width=width,
+            corner_radius=8,
+            font=("Roboto", 14),
+            fg_color=COLOR_PRIMARIO,
+            button_color=COLOR_PRIMARIO_HOVER,
+            values=values,
+            dropdown_fg_color=COLOR_BG,
+            dropdown_hover_color=COLOR_PRIMARIO,
+        )
+
+    dropdown.pack(pady=pady, padx=padx, fill="x")
     
     return dropdown
 
@@ -145,7 +165,17 @@ def crear_tabla(parent, columnas, encabezados, lotes):
     # Configuración de encabezados
     for col, encabezado in zip(columnas, encabezados):
         tree.heading(col, text=encabezado)
-        width = 50 if col == "lote" else 80 if col == "cantidad" else 120  # Ajuste de ancho
+        
+        # Ajuste de ancho de columnas
+        if col == "lote":
+            width = 50
+        elif col == "cantidad":
+            width = 80
+        elif col == "nombre":
+            width = 140
+        else:
+            width = 120
+        
         tree.column(col, anchor="center", width=width, minwidth=width)
    
     for lote in lotes:

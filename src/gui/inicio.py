@@ -40,8 +40,8 @@ class InicioFrame(ctk.CTkFrame):
         ctk.CTkLabel(
             centrar_frame,
             text="",
-            image=crear_imagen("src/assets/eco.png", size=(220, 220)),
-        ).pack(pady=30)
+            image=crear_imagen("src/assets/menu-icon.png", size=(240, 240)),
+        ).pack(pady=25)
 
         # Creación de botones en el sideFrame con el estado de selección inicial
         self.botones_sideframe["inicio"] = crear_boton_sideframe(
