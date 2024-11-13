@@ -249,13 +249,32 @@ class Vencimientos:
 
     # Click en "Buscar" activa el filtrado o busca lo ingresado en el Entry
     def evento_buscar(self):
-        termino = self.entry_busqueda.get().strip()
         
-        if len(termino) == 0:
-            # Si no hay término de búsqueda, filtrar con todos los productos
+        if len(self.entry_busqueda.get().strip()) == 0:
+            # Si no hay un criterio de búsqueda, filtrar con todos los productos
             self.filtrar(False)
         else:
-            # Utilizamos el método buscar_productos de Productos
-            busqueda = self.productos.buscar_productos(termino)
-            # self.filtrar(busqueda)
-            self.productos.filtrar_productos(self.tree, self.filtro_vencimiento.get(), *self.obtener_vencimientos(busqueda))
+            busqueda = self.conexion.consultar_bd(
+            sql="""
+            SELECT 
+                lotes.lote, 
+                productos.nombre,
+                productos.marca, 
+                productos.categoria, 
+                productos.precio_compra, 
+                productos.precio_venta, 
+                lotes.cantidad, 
+                lotes.fecha_vencimiento 
+            FROM 
+                lotes
+            JOIN 
+                productos ON lotes.producto_id = productos.id
+            WHERE 
+                productos.nombre LIKE %s 
+                OR productos.marca LIKE %s 
+                OR productos.categoria LIKE %s
+            ORDER BY productos.nombre, lotes.fecha_vencimiento;
+        """,
+            valores=("%" + self.entry_busqueda.get().strip() + "%",) * 3,
+        )
+            self.filtrar(busqueda)

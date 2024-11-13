@@ -179,19 +179,23 @@ class InicioFrame(ctk.CTkFrame):
         self.conexion = Database()
         productos = self.conexion.consultar_bd(
             sql="""
-                    SELECT 
+                   SELECT
                         productos.id,
                         productos.nombre, 
                         productos.marca, 
                         productos.categoria, 
                         productos.precio_compra, 
                         productos.precio_venta, 
-                        lotes.cantidad
+                        SUM(lotes.cantidad) AS cantidad 
                     FROM 
-                        lotes
-                    JOIN 
-                        productos ON lotes.producto_id = productos.id
-                    ORDER BY productos.nombre;
+                        lotes 
+                    JOIN productos ON lotes.producto_id = productos.id 
+                    GROUP BY productos.id, 
+                        productos.nombre, 
+                        productos.marca, 
+                        productos.categoria, 
+                        productos.precio_compra, 
+                        productos.precio_venta;
                 """,
             valores=None,
         )
@@ -216,18 +220,20 @@ class InicioFrame(ctk.CTkFrame):
         # --------------- tabla lotes ---------------
         # Crear las columnas y encabezados
         columnas = ["lote", "id", "cantidad", "fecha_vencimiento"]
-        encabezados = ["Lote", "Producto ID", "Cantidad", "Fecha vencimiento"]
+        encabezados = ["Lote", "Producto", "Cantidad", "Fecha vencimiento"]
         
         # Obtenemos los productos y lotes combinados
         lotes = self.conexion.consultar_bd(
             sql="""
                     SELECT 
                         lotes.lote, 
-                        lotes.producto_id, 
+                        productos.nombre, 
                         lotes.cantidad, 
                         lotes.fecha_vencimiento
                     FROM 
                         lotes
+                    JOIN
+                        productos ON lotes.producto_id = productos.id
                     ORDER BY lotes.lote;
                 """,
             valores=None,
@@ -235,19 +241,25 @@ class InicioFrame(ctk.CTkFrame):
 
         # Transformamos a una lista
         lotes_lista = []
+        lotes_acomodados = []
 
         for fila in lotes:
             lotes_lista.append(list(fila))
 
-        self.lotes = lotes_lista
-        
+        for fila in lotes_lista:
+            fecha_vencimiento = fila[3]
+            fecha_formateada = fecha_vencimiento.strftime("%d/%m/%Y")
+            fila[3] = fecha_formateada
+            lotes_acomodados.append(fila)        
+
         crear_label(
             frame_inicio_cont,
             text="Lotes",
             font=("Roboto", 24, "bold"),
             pady=(30, 0),
         )
-        crear_tabla(frame_inicio_cont, columnas, encabezados, lotes_lista, pady=10)
+        
+        crear_tabla(frame_inicio_cont, columnas, encabezados, lotes_acomodados, pady=10)
         
         self.cambiar_contenido(frame_inicio, "inicio")
     
