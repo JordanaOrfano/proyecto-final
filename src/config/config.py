@@ -5,6 +5,7 @@ import tkinter as tk
 from tkinter import ttk, Menu, messagebox
 from datetime import datetime, timedelta, date
 from PIL import Image
+from ctkcomponents import *
 
 from database.conexion import *
 
