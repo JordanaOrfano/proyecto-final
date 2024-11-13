@@ -15,10 +15,10 @@ class InicioFrame(ctk.CTkFrame):
         self.botones_sideframe = {}  # Diccionario para almacenar botones del sideFrame
         self.side_frame()
         
-        if Usuario.usuario_actual[2].strip('"') == "usuario":
+        if Usuario.usuario_actual[2].strip('"') == "empleado":
             self.inicio()
 
-        if Usuario.usuario_actual[2].strip('"') == "administrador":
+        if Usuario.usuario_actual[2].strip('"') == "supervisor":
             self.inicio_administrador()
 
     def side_frame(self):

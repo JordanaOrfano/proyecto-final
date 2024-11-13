@@ -1,5 +1,6 @@
 import mysql.connector
 
+
 class Database:
     def conectar_db(self):
         try:
@@ -35,6 +36,7 @@ class Database:
 
             resultados = cursor.fetchall()
 
+            conexion.commit()  # Guarda la base de datos
             cursor.close()
             conexion.close()
 
@@ -43,7 +45,6 @@ class Database:
         except mysql.connector.Error as error:
             print(f"Error al hacer la consulta SQL {error}")
             return []
-
 
     def crear_schema_tablas(self, cursor, conexion):
         try:
@@ -85,7 +86,8 @@ class Database:
                 correo VARCHAR(60) NOT NULL,
                 contrasena VARCHAR(60) NOT NULL,
                 nombre VARCHAR(50) NOT NULL,
-                apellido VARCHAR(50) NOT NULL
+                apellido VARCHAR(50) NOT NULL,
+                rol VARCHAR(20) DEFAULT 'empleado'
                 ) ENGINE=INNODB;
                 """
 

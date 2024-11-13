@@ -14,7 +14,6 @@ class App(ctk.CTk):
         self.minsize(width=1300, height=700)
         self.frame_actual = None
         self.frame_cambiar("login")  # Mostrar el frame de inicio de sesión al iniciar
-        self.frame_cambiar("inicio")  # Mostrar el frame de inicio de sesión al iniciar
 
     def frame_cambiar(self, frame_nombre):
         # Destruir el frame actual para poner el nuevo

@@ -36,8 +36,8 @@ class RegistroFrame(ctk.CTkFrame):
         self.login_button = crear_boton(
             imgFrame, text="", fill="x", width=470)
 
-        crear_boton(
-            imgFrame, text="", fill="x", width=470)
+        # crear_boton(
+        #     imgFrame, text="", fill="x", width=470)
 
         # Frame derecho con formulario de registro
         frameRegistro = ctk.CTkFrame(master=frameFondo, fg_color=COLOR_BG)
@@ -47,6 +47,14 @@ class RegistroFrame(ctk.CTkFrame):
             frameRegistro, text="Registrarse", font=("Roboto", 32, "bold"), pady=0, padx=(110, 170), anchor="center"
         )
 
+        crear_label(frameRegistro, text="Documento", font=("Roboto", 18, "bold"), pady=(20, 0), padx=(90, 170),
+                    image=crear_imagen(
+                        "src/assets/icons/login-mail.png", size=(22, 22))
+                    )
+
+        self.usuario_dni = crear_entry(
+            frameRegistro, placeholder_text="Ingresa tu documento sin puntos (.)", padx=(110, 170), pady=0, fill="x")
+        
         crear_label(frameRegistro, text=" Correo electrónico", font=("Roboto", 18, "bold"), pady=(20, 0), padx=(90, 170),
                     image=crear_imagen(
                         "src/assets/icons/login-mail.png", size=(22, 22))
@@ -116,7 +124,11 @@ class RegistroFrame(ctk.CTkFrame):
 
     def verificar_campos(self):
         # Validar campos vacíos
-        if not self.usuario_correo.get() or not chequear(self.usuario_correo.get()):
+        if not self.usuario_dni.get().strip():
+            # FALTA label "Dni erroneo o no ingresado"
+            return
+        
+        if not self.usuario_correo.get().strip() or not chequear(self.usuario_correo.get().strip()):
             # FALTA label "Correo electronico invalido o en uso"
             return
         if (
@@ -126,10 +138,10 @@ class RegistroFrame(ctk.CTkFrame):
             # FALTA label debes ingresar una contrasena válida, recuerda que debe tener al menos 8 caracteres
             return
 
-        if not self.usuario_nombre.get():
+        if not self.usuario_nombre.get().strip():
             # FALTA label debes ingresar un nombre
             return
-        if not self.usuario_apellido.get():
+        if not self.usuario_apellido.get().strip():
             # FALTA label debes ingresar un apellido
             return
         if not self.terminosCheckbox.get() == "on":
@@ -141,6 +153,7 @@ class RegistroFrame(ctk.CTkFrame):
             self.usuario_correo.get(), self.__usuario_contrasena.get()
         )
         usuario.registrar_usuario(
+            self.usuario_dni.get(),
             self.usuario_nombre.get(),
             self.usuario_apellido.get(),
         )

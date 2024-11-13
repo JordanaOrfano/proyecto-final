@@ -7,6 +7,7 @@ class Usuario:
     def __init__(self, correo, contrasena):
         self.correo = correo
         self.__contrasena = contrasena
+        self.conexion = Database()
 
     def encriptar_contrasena(self):
         # Genera una cadena de texto aleatoria en formato de bytes
@@ -14,20 +15,17 @@ class Usuario:
         self.__hashed = bcrypt.hashpw(self.__contrasena.encode("utf-8"), salt)
         return self.__hashed
 
-    def registrar_usuario(self, nombre, apellido):
+    def registrar_usuario(self, dni, nombre, apellido):
+        self.dni = dni
         self.nombre = nombre
         self.apellido = apellido
+
         try:
             self.__hashed = self.encriptar_contrasena()
-            valores = (self.correo, self.__hashed, self.nombre, self.apellido)
-            sql = "insert into usuarios values(null, %s, %s, %s, %s, 'usuario')"
+            valores = (self.dni, self.correo, self.__hashed, self.nombre, self.apellido)
+            sql = "insert into usuarios values(%s, %s, %s, %s, %s, 'empleado')"
 
-            conexion = conectar_db()
-            cursor = conexion.cursor()
-
-            cursor.execute(sql, valores)  # Pushea los usuarios
-            conexion.commit()  # Guarda la base de datos
-            conexion.close()  # Cierra la conexion
+            consulta = self.conexion.consultar_bd(sql, valores)
 
         except mysql.connector.Error as error:
             print("Ocurrio un error al guardar los datos", error)
@@ -36,7 +34,9 @@ class Usuario:
         try:
             correo_ingresado = correo_ingresado
             self.__contrasena_ingresada = contrasena_ingresada
-            conexion = conectar_db()
+
+            conexion = self.conexion.conectar_db()
+
             if conexion is None:
                 print("Error: No se pudo establecer la conexión a la base de datos")
                 return False

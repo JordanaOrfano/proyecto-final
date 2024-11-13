@@ -48,7 +48,6 @@ class LoginFrame(ctk.CTkFrame):
                         "src/assets/icons/login-mail.png", size=(22, 22))
                     )
 
-        self.usuario_correo = crear_entry(self, placeholder_text="Correo electrónico")
         self.usuario_correo = crear_entry(
             frameLogin, placeholder_text="Correo electrónico", padx=(110, 170), pady=0, fill="x")
 
@@ -60,14 +59,6 @@ class LoginFrame(ctk.CTkFrame):
         self.__usuario_contrasena = crear_entry(
             frameLogin, placeholder_text="**********", show="*", padx=(110, 170), pady=0, fill="x")
 
-        self.login_button = crear_boton(self, text="Iniciar Sesión", command=self.login)
-
-        self.label_registrar = crear_label(
-            self,
-            text="¿No tienes una cuenta? ¡Registrate!",
-            font=("Roboto", 18, "bold"),
-            pady=(90, 0),
-        )
         self.login_button = crear_boton(
             frameLogin, text="Iniciar Sesión", command=self.login, padx=(110, 170), fill="x")
 

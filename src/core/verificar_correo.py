@@ -3,7 +3,8 @@ from email_validator import validate_email, EmailNotValidError
 
 
 def chequear(email):
-    conexion = conectar_db()
+    conexion = Database()
+    conexion = conexion.conectar_db()
     cursor = conexion.cursor()
 
     # Consulta para verificar si el correo ya está registrado
