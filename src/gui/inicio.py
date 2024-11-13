@@ -107,17 +107,150 @@ class InicioFrame(ctk.CTkFrame):
     # ------------------------------------- FRAMES DE CONTENIDO -------------------------------------
     def inicio(self):
         frame_inicio = ctk.CTkScrollableFrame(master=self, fg_color=COLOR_BG)
+        
+        # Centrar contenido
+        frame_inicio_cont = ctk.CTkFrame(master=frame_inicio, fg_color=COLOR_BG)
+        frame_inicio_cont.pack( fill="both", padx=40)
+        
         crear_label(
-            frame_inicio,
+            frame_inicio_cont,
             text="Inicio",
             font=("Roboto", 32, "bold"),
             pady=(30, 10),
         )
-        productos = Productos()
-        productos.mostrar_publicaciones(contenedor=frame_inicio)
 
+        # Búsqueda y filtro
+        frame_busqueda = ctk.CTkFrame(frame_inicio_cont, fg_color=COLOR_BG)
+        frame_busqueda.pack(fill="x", pady=(10, 0))
+
+        self.entry_busqueda = crear_entry(
+            parent=frame_busqueda,
+            placeholder_text="Buscar por nombre, marca o categoría",
+            fill="x",
+            padx=0,
+            pady=0,
+            metodo="pack",
+        )
+        self.entry_busqueda.pack(side="left", expand=True, fill="x")
+
+        boton_buscar = crear_boton(
+            parent=frame_busqueda,
+            text="Buscar",
+            width=100,
+            padx=0,
+            pady=0,
+            metodo="pack",
+            
+        )
+        boton_buscar.pack(side="right")
+        
+        # Dropdown de filtro para seleccionar orden
+        self.filtro_vencimiento = crear_optionmenu(
+            parent=frame_busqueda,
+            values=["Ordenar por", "ID", "Nombre", "Marca", "Categoría"],
+            pady=0,
+            padx=15,
+        )
+
+        self.filtro_vencimiento.pack(side="left")
+        
+        # --------------- tabla productos ---------------
+        # Crear las columnas y encabezados
+        columnas = [
+            "id",
+            "nombre",
+            "marca",
+            "categoria",
+            "precio_compra",
+            "precio_venta",
+            "cantidad",
+        ]
+        encabezados = [
+            "ID",
+            "Nombre",
+            "Marca",
+            "Categoría",
+            "Precio compra",
+            "Precio venta",
+            "Cantidad",
+        ]
+        
+        # Obtenemos los productos y lotes combinados
+        self.conexion = Database()
+        productos = self.conexion.consultar_bd(
+            sql="""
+                    SELECT 
+                        productos.id,
+                        productos.nombre, 
+                        productos.marca, 
+                        productos.categoria, 
+                        productos.precio_compra, 
+                        productos.precio_venta, 
+                        lotes.cantidad
+                    FROM 
+                        lotes
+                    JOIN 
+                        productos ON lotes.producto_id = productos.id
+                    ORDER BY productos.nombre;
+                """,
+            valores=None,
+        )
+
+        # Transformamos a una lista
+        productos_lista = []
+
+        for fila in productos:
+            productos_lista.append(list(fila))
+
+        self.productos = productos_lista
+        
+        crear_label(
+            frame_inicio_cont,
+            text="Productos",
+            font=("Roboto", 24, "bold"),
+            pady=(30, 0),
+        )
+        crear_tabla(frame_inicio_cont, columnas, encabezados, productos_lista, pady=10)
+        
+        
+        # --------------- tabla lotes ---------------
+        # Crear las columnas y encabezados
+        columnas = ["lote", "id", "cantidad", "fecha_vencimiento"]
+        encabezados = ["Lote", "Producto ID", "Cantidad", "Fecha vencimiento"]
+        
+        # Obtenemos los productos y lotes combinados
+        lotes = self.conexion.consultar_bd(
+            sql="""
+                    SELECT 
+                        lotes.lote, 
+                        lotes.producto_id, 
+                        lotes.cantidad, 
+                        lotes.fecha_vencimiento
+                    FROM 
+                        lotes
+                    ORDER BY lotes.lote;
+                """,
+            valores=None,
+        )
+
+        # Transformamos a una lista
+        lotes_lista = []
+
+        for fila in lotes:
+            lotes_lista.append(list(fila))
+
+        self.lotes = lotes_lista
+        
+        crear_label(
+            frame_inicio_cont,
+            text="Lotes",
+            font=("Roboto", 24, "bold"),
+            pady=(30, 0),
+        )
+        crear_tabla(frame_inicio_cont, columnas, encabezados, lotes_lista, pady=10)
+        
         self.cambiar_contenido(frame_inicio, "inicio")
-
+    
     def inicio_administrador(self):
         frame_inicio = ctk.CTkScrollableFrame(master=self, fg_color=COLOR_BG)
         crear_label(

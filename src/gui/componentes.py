@@ -152,12 +152,12 @@ def crear_optionmenu(parent, values=[], pady=10, padx=0, width=200, **kwargs):
     
     return dropdown
 
-def crear_tabla(parent, columnas, encabezados, lotes):
+def crear_tabla(parent, columnas, encabezados, lotes, pady=20):
     configurar_estilo_tabla()
 
     # Frame de la tabla
     frame_tabla = ctk.CTkFrame(parent, fg_color=COLOR_BG)
-    frame_tabla.pack(fill="both", padx=0, pady=20)
+    frame_tabla.pack(fill="both", padx=0, pady=pady)
 
     # Crear el Treeview
     tree = ttk.Treeview(frame_tabla, columns=columnas, show="headings", style="Treeview")
@@ -167,8 +167,8 @@ def crear_tabla(parent, columnas, encabezados, lotes):
         tree.heading(col, text=encabezado)
         
         # Ajuste de ancho de columnas
-        if col == "lote":
-            width = 50
+        if col in ["lote", "id"]:
+            width = 40
         elif col == "cantidad":
             width = 80
         elif col == "nombre":
@@ -196,15 +196,40 @@ def crear_tabla(parent, columnas, encabezados, lotes):
     tree.pack(fill="both", expand=True)
     ajustar_altura_tabla(tree, len(lotes))
 
+    # Crear el menú contextual
+    menu_contextual = Menu(tree, tearoff=0)
+    menu_contextual.add_command(label="Editar", command=lambda: editar_producto(tree))
+    menu_contextual.add_command(label="Eliminar", command=lambda: eliminar_producto(tree))
+
+    # Función para mostrar el menú en clic derecho
+    def mostrar_menu(event):
+        item = tree.identify_row(event.y)
+        if item:
+            tree.selection_set(item)  # Selecciona la fila donde se hizo clic derecho
+            menu_contextual.post(event.x_root, event.y_root)  # Muestra el menú en la posición del cursor
+
+    # Asociar el menú de clic derecho
+    tree.bind("<Button-3>", mostrar_menu)
+
+    
     return frame_tabla, tree
 
+# Editar el producto seleccionado
+def editar_producto(tree):
+    item = tree.selection()[0]
+    valores = tree.item(item, "values")
+    # Código para abrir una ventana de edición, falta
+    messagebox.showinfo("Editar", f"Editar producto: {valores[1]}")
 
-def ajustar_altura_tabla(tree, cantidad_productos):
-    max_filas = 10  # Establecer un límite máximo para la altura
-    if cantidad_productos == 0:
-        tree.configure(height=1)  # Si no hay productos, mostrar solo una fila
-    else:
-        tree.configure(height=min(max_filas, cantidad_productos))  # Ajustar según la cantidad de productos
+# Eliminar el producto seleccionado
+def eliminar_producto(tree):
+    item = tree.selection()[0]
+    valores = tree.item(item, "values")
+    respuesta = messagebox.askyesno("Eliminar", f"¿Desea eliminar el producto {valores[1]}?")
+    if respuesta:
+        tree.delete(item)
+        # Código para eliminar el producto de la base de datos, falta
+        messagebox.showinfo("Eliminar", f"Producto {valores[1]} eliminado.")
 
 def configurar_estilo_tabla():
     style = ttk.Style()

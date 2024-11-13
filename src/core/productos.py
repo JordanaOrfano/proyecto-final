@@ -1,7 +1,6 @@
 from config.config import *
 from gui.componentes import *
 
-
 class Productos:
     def subir_producto_a_bd(
         self,
@@ -74,3 +73,59 @@ class Productos:
 
         except mysql.connector.Error as error:
             print("Ocurrió un error al obtener las categorias", error)
+    
+    def buscar_productos(self, termino_busqueda):
+        conexion = Database()
+        
+        try:
+            sql = """
+                SELECT 
+                    lotes.lote, 
+                    productos.nombre,
+                    productos.marca, 
+                    productos.categoria, 
+                    productos.precio_compra, 
+                    productos.precio_venta, 
+                    lotes.cantidad, 
+                    lotes.fecha_vencimiento 
+                FROM 
+                    lotes
+                JOIN 
+                    productos ON lotes.producto_id = productos.id
+                WHERE 
+                    productos.nombre LIKE %s 
+                    OR productos.marca LIKE %s 
+                    OR productos.categoria LIKE %s
+                ORDER BY productos.nombre, lotes.fecha_vencimiento;
+            """
+
+            valores = ("%" + termino_busqueda + "%",) * 3
+            resultado = conexion.consultar_bd(sql=sql, valores=valores)
+
+            return resultado
+
+        except mysql.connector.Error as error:
+            print(f"Ocurrió un error al buscar productos: {error}")
+
+        finally:
+            conexion.conectar_db().close()
+    
+    def filtrar_productos(self, tree, filtro, productos_vencidos, proximo_vencimiento):
+        """Filtra los productos en función del estado de vencimiento."""
+        # Limpiar la tabla antes de aplicar el filtro
+        for item in tree.get_children():
+            tree.delete(item)
+
+        if not productos_vencidos and not proximo_vencimiento:
+            return  # Añadir mensaje para tabla vacía, si se desea
+
+        else:
+            if filtro in ["Próximos a vencer", "Todos"]:
+                for proximo in proximo_vencimiento:
+                    tree.insert("", tk.END, values=proximo, tags=("proximo",))
+
+            if filtro in ["Vencidos", "Todos"]:
+                for vencido in productos_vencidos:
+                    tree.insert("", tk.END, values=vencido, tags=("vencido",))
+
+        ajustar_altura_tabla(tree, len(tree.get_children()))

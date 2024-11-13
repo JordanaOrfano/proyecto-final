@@ -8,9 +8,10 @@ class Vencimientos:
         self.contenedor = contenedor
         self.fecha_actual = datetime.now().date()
         self.fecha_limite = self.fecha_actual + timedelta(days=30)
+        self.productos = Productos()
 
         frame_vencimientos = ctk.CTkFrame(self.contenedor, fg_color=COLOR_BG)
-        frame_vencimientos.pack(expand=True, fill="x", padx=60)
+        frame_vencimientos.pack(expand=True, fill="x", padx=40)
 
         # Título
         crear_label(
@@ -70,7 +71,7 @@ class Vencimientos:
         self.filtro_vencimiento.pack(side="left")
 
         # Crear las columnas y encabezados
-        columnas = (
+        columnas = [
             "lote",
             "nombre",
             "marca",
@@ -79,7 +80,7 @@ class Vencimientos:
             "precio_venta",
             "cantidad",
             "vencimiento",
-        )
+        ]
         encabezados = [
             "Lote",
             "Nombre",
@@ -248,33 +249,13 @@ class Vencimientos:
 
     # Click en "Buscar" activa el filtrado o busca lo ingresado en el Entry
     def evento_buscar(self):
-        # Implementar la logica de busqueda
-        if len(self.entry_busqueda.get().strip()) == 0:
+        termino = self.entry_busqueda.get().strip()
+        
+        if len(termino) == 0:
+            # Si no hay término de búsqueda, filtrar con todos los productos
             self.filtrar(False)
-            return
-
-        busqueda = self.conexion.consultar_bd(
-            sql="""
-            SELECT 
-                lotes.lote, 
-                productos.nombre,
-                productos.marca, 
-                productos.categoria, 
-                productos.precio_compra, 
-                productos.precio_venta, 
-                lotes.cantidad, 
-                lotes.fecha_vencimiento 
-            FROM 
-                lotes
-            JOIN 
-                productos ON lotes.producto_id = productos.id
-            WHERE 
-                productos.nombre LIKE %s 
-                OR productos.marca LIKE %s 
-                OR productos.categoria LIKE %s
-            ORDER BY productos.nombre, lotes.fecha_vencimiento;
-        """,
-            valores=("%" + self.entry_busqueda.get().strip() + "%",) * 3,
-        )
-
-        self.filtrar(busqueda)
+        else:
+            # Utilizamos el método buscar_productos de Productos
+            busqueda = self.productos.buscar_productos(termino)
+            # self.filtrar(busqueda)
+            self.productos.filtrar_productos(self.tree, self.filtro_vencimiento.get(), *self.obtener_vencimientos(busqueda))
