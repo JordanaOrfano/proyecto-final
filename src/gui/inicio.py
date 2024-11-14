@@ -112,12 +112,29 @@ class InicioFrame(ctk.CTkFrame):
         frame_inicio_cont = ctk.CTkFrame(master=frame_inicio, fg_color=COLOR_BG)
         frame_inicio_cont.pack( fill="both", padx=40)
         
+        # Crear contenedor para "Inicio" y "Carrito"
+        frame_titulo = ctk.CTkFrame(master=frame_inicio_cont, fg_color=COLOR_BG)
+        frame_titulo.pack(fill="x", pady=(30, 20))
+
         crear_label(
-            frame_inicio_cont,
+            frame_titulo,
             text="Inicio",
             font=("Roboto", 32, "bold"),
-            pady=(30, 10),
+            pady=0,
+            metodo="grid"
+        ).pack(fill="x", pady=0, side="left")
+
+        boton_carrito = crear_boton(
+            parent=frame_titulo,
+            text="0",
+            width=100,
+            padx=10,
+            pady=0,
+            metodo="grid",  
+            image=crear_imagen("src/assets/icons/cart.png", size=(24, 24)),
+            command=self.carrito
         )
+        boton_carrito.pack(side="right")
 
         # Búsqueda y filtro
         frame_busqueda = ctk.CTkFrame(frame_inicio_cont, fg_color=COLOR_BG)
@@ -274,6 +291,84 @@ class InicioFrame(ctk.CTkFrame):
         productos.mostrar_publicaciones(contenedor=frame_inicio)
 
         self.cambiar_contenido(frame_inicio, "inicio")
+    
+    def carrito(self):
+        frame_carrito_fondo = ctk.CTkFrame(master=self, fg_color=COLOR_BG)
+        
+        frame_carrito = ctk.CTkFrame(master=frame_carrito_fondo, fg_color=COLOR_BG)
+        frame_carrito.pack(expand=True, fill="x", padx=40)
+        
+        crear_label(
+            frame_carrito,
+            text="Carrito",
+            font=("Roboto", 32, "bold"),
+            pady=(0, 10),
+        )
+        
+        columnas = ("id", "nombre", "marca", "precio_venta", "cantidad")
+        encabezados = ("ID", "Nombre", "Marca", "Precio", "Cantidad")
+        
+        productos_carrito = self.conexion.consultar_bd(
+            sql="""
+                   SELECT
+                        productos.id,
+                        productos.nombre, 
+                        productos.marca, 
+                        productos.precio_venta, 
+                        SUM(lotes.cantidad) AS cantidad 
+                    FROM 
+                        lotes 
+                    JOIN 
+                        productos ON lotes.producto_id = productos.id 
+                    GROUP BY 
+                        productos.id, 
+                        productos.nombre, 
+                        productos.marca, 
+                        productos.precio_venta;
+                """,
+            valores=None,
+        )
+
+        # Transformamos a una lista
+        productos_carrito_lista = []
+
+        for fila in productos_carrito:
+            productos_carrito_lista.append(list(fila))
+        
+        crear_tabla(frame_carrito, columnas=columnas, encabezados=encabezados, lotes=productos_carrito_lista, pady=10)
+        
+        # Sección Pago
+        frame_pago = ctk.CTkFrame(master=frame_carrito, fg_color=COLOR_BG)
+        frame_pago.pack(pady=(20, 10), fill="x") 
+        
+        crear_label(frame_pago, text="Pago", font=("Roboto", 24, "bold"), metodo="grid").pack(fill="x", side="left")
+        pago = crear_entry(frame_pago, placeholder_text="$", fill="x", metodo="grid")
+        pago.pack(side="right", fill="x", expand=True)
+        
+        # Sección Total y Vuelto
+        frame_info = ctk.CTkFrame(master=frame_carrito, fg_color=COLOR_BG)
+        frame_info.pack(pady=15, fill="x") 
+        
+        label_total = crear_label(frame_info, text=f"Total: ${0}", font=("Roboto", 24, "bold"), metodo="grid")
+        label_total.pack(side="left", fill="x")
+        
+        label_vuelto = crear_label(frame_info, text=f"Vuelto: ${0}", font=("Roboto", 24, "bold"), metodo="grid")
+        label_vuelto.pack(side="right", fill="x")
+        
+        # Sección botones
+        frame_botones = ctk.CTkFrame(master=frame_carrito, fg_color=COLOR_BG)
+        frame_botones.pack(fill="x") 
+
+        btn_finalizar_compra = crear_boton(frame_botones, text="Finalizar compra")
+        btn_finalizar_compra.pack(side="left", padx=5, pady=0, fill="x", expand=True) 
+        
+        btn_cancelar_compra = crear_boton(frame_botones, text="Cancelar")
+        btn_cancelar_compra.pack(side="left", padx=5, pady=0, fill="x", expand=True)
+        
+        btn_volver = crear_boton(frame_botones, text="Volver", command=self.inicio)
+        btn_volver.pack(side="left", padx=5, pady=0, fill="x", expand=True)
+        
+        self.cambiar_contenido(frame_carrito_fondo, "ventas")
 
     def crear_producto(self):
         frame_publicar = ctk.CTkFrame(master=self, fg_color=COLOR_BG)
