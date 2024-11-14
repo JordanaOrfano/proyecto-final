@@ -152,7 +152,7 @@ def crear_optionmenu(parent, values=[], pady=10, padx=0, width=200, **kwargs):
     
     return dropdown
 
-def crear_tabla(parent, columnas, encabezados, lotes, pady=20):
+def crear_tabla(parent, columnas, encabezados, lotes, pady=20, metodo="pack"):
     configurar_estilo_tabla()
 
     # Frame de la tabla
@@ -167,7 +167,7 @@ def crear_tabla(parent, columnas, encabezados, lotes, pady=20):
         tree.heading(col, text=encabezado)
         
         # Ajuste de ancho de columnas
-        if col in ["lote", "id"]:
+        if col in ("lote", "id"):
             width = 40
         elif col == "cantidad":
             width = 80

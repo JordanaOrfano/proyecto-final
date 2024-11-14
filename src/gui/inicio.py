@@ -139,15 +139,13 @@ class InicioFrame(ctk.CTkFrame):
             width=100,
             padx=0,
             pady=0,
-            metodo="pack",
-            
         )
         boton_buscar.pack(side="right")
         
         # Dropdown de filtro para seleccionar orden
         self.filtro_vencimiento = crear_optionmenu(
             parent=frame_busqueda,
-            values=["Ordenar por", "ID", "Nombre", "Marca", "Categoría"],
+            values=("Ordenar por", "ID", "Nombre", "Marca", "Categoría"),
             pady=0,
             padx=15,
         )
@@ -156,7 +154,7 @@ class InicioFrame(ctk.CTkFrame):
         
         # --------------- tabla productos ---------------
         # Crear las columnas y encabezados
-        columnas = [
+        columnas = (
             "id",
             "nombre",
             "marca",
@@ -164,8 +162,8 @@ class InicioFrame(ctk.CTkFrame):
             "precio_compra",
             "precio_venta",
             "cantidad",
-        ]
-        encabezados = [
+        )
+        encabezados = (
             "ID",
             "Nombre",
             "Marca",
@@ -173,7 +171,7 @@ class InicioFrame(ctk.CTkFrame):
             "Precio compra",
             "Precio venta",
             "Cantidad",
-        ]
+        )
         
         # Obtenemos los productos y lotes combinados
         self.conexion = Database()
@@ -219,8 +217,8 @@ class InicioFrame(ctk.CTkFrame):
         
         # --------------- tabla lotes ---------------
         # Crear las columnas y encabezados
-        columnas = ["lote", "id", "cantidad", "fecha_vencimiento"]
-        encabezados = ["Lote", "Producto", "Cantidad", "Fecha vencimiento"]
+        columnas = ("lote", "id", "cantidad", "fecha_vencimiento")
+        encabezados = ("Lote", "Producto", "Cantidad", "Fecha vencimiento")
         
         # Obtenemos los productos y lotes combinados
         lotes = self.conexion.consultar_bd(
