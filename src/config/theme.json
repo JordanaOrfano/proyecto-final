@@ -105,7 +105,7 @@
       "border_spacing": 4,
       "fg_color": "transparent",
       "button_color": ["#0c955a", "#0a7e4c"],
-      "button_hover_color": ["gray40", "gray53"]
+      "button_hover_color": ["#0a7e4c", "gray53"]
     },
     "CTkSegmentedButton": {
       "corner_radius": 6,

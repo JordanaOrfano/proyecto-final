@@ -205,9 +205,9 @@ def crear_tabla(parent, columnas, encabezados, lotes, pady=20):
                            activebackground=COLOR_PRIMARIO_HOVER,
                            activeborderwidth=0,
                            )
-    menu_contextual.add_command(label="Agregar al carrito", command=lambda: agregar_a_carrito(tree))
-    menu_contextual.add_command(label="Editar", command=lambda: editar_producto(tree))
-    menu_contextual.add_command(label="Eliminar", command=lambda: eliminar_producto(tree))
+    menu_contextual.add_command(label="Agregar al carrito", command=lambda: MenuTablas.agregar_a_carrito(tree))
+    menu_contextual.add_command(label="Editar", command=lambda: MenuTablas.editar_producto(tree))
+    menu_contextual.add_command(label="Eliminar", command=lambda: MenuTablas.eliminar_producto(tree))
 
     # Función para mostrar el menú en clic derecho
     def mostrar_menu(event):
@@ -221,30 +221,6 @@ def crear_tabla(parent, columnas, encabezados, lotes, pady=20):
 
     
     return frame_tabla, tree
-
-# Editar el producto seleccionado
-def editar_producto(tree):
-    item = tree.selection()[0]
-    valores = tree.item(item, "values")
-    # Código para abrir una ventana de edición, falta
-    CTkAlert(state="warning", title="Editar producto", body_text=f"Editar producto: {valores[1]}", btn1="Ok")
-
-# Eliminar el producto seleccionado
-def eliminar_producto(tree):
-    item = tree.selection()[0]
-    valores = tree.item(item, "values")
-    respuesta = CTkAlert(state="warning", title="Eliminar producto", body_text=f"¿Desea eliminar el producto {valores[1]}?", btn1="Si", btn2="No")
-    
-    if respuesta.get() == "Si":
-        tree.delete(item)
-        # Código para eliminar el producto de la base de datos, falta
-        CTkAlert(state="warning", title="Eliminar producto", body_text=f"Producto {valores[1]} eliminado.", btn1="Ok")
-
-def agregar_a_carrito(tree):
-    item = tree.selection()[0]
-    valores = tree.item(item, "values")
-    # Código para agregar el producto al carrito, falta
-    CTkAlert(state="info", title="Agregar al producto", body_text=f"Producto {valores[1]} agregado.", btn1="Ok")
 
 def configurar_estilo_tabla():
     style = ttk.Style()

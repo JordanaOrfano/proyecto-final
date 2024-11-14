@@ -131,3 +131,30 @@ class Productos:
     #                 tree.insert("", tk.END, values=vencido, tags=("vencido",))
 
     #     ajustar_altura_tabla(tree, len(tree.get_children()))
+
+
+class MenuTablas:
+    def editar_producto(tree):
+        item = tree.selection()[0]
+        valores = tree.item(item, "values") # obtiene los valores de la fila
+        # Código para abrir una ventana de edición, falta
+        
+        CTkAlert(state="warning", title="Editar producto", body_text=f"Editar producto: {valores[1]}", btn1="Ok")
+    
+    def eliminar_producto(tree):
+        item = tree.selection()[0]
+        valores = tree.item(item, "values")
+        respuesta = CTkAlert(state="warning", title="Eliminar producto", body_text=f"¿Desea eliminar el producto {valores[1]}?", btn1="Si", btn2="No")
+        
+        if respuesta.get() == "Si":
+            tree.delete(item)
+            # Código para eliminar el producto de la base de datos, falta
+            
+            CTkAlert(state="warning", title="Eliminar producto", body_text=f"Producto {valores[1]} eliminado.", btn1="Ok")
+
+    def agregar_a_carrito(tree):
+        item = tree.selection()[0]
+        valores = tree.item(item, "values")
+        # Código para agregar el producto al carrito, falta
+        
+        CTkAlert(state="info", title="Agregar al producto", body_text=f"Producto {valores[1]} agregado.", btn1="Ok")
