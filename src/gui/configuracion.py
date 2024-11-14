@@ -1,4 +1,3 @@
-import customtkinter as ctk
 from config.config import *
 from gui.componentes import *
 
@@ -8,7 +7,7 @@ class Configuracion:
         self.contenedor = contenedor
 
         frame_config = ctk.CTkFrame(master=self.contenedor, fg_color=COLOR_BG)
-        frame_config.pack(expand=True, fill="both", padx=150)
+        frame_config.pack(expand=True, fill="x", padx=100)
 
         crear_label(
             frame_config,

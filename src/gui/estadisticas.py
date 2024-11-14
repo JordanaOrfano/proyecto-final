@@ -8,7 +8,7 @@ class Estadisticas:
         self.contenedor = contenedor
 
         frame_estadisticas = ctk.CTkFrame(master=self.contenedor, fg_color=COLOR_BG)
-        frame_estadisticas.pack(expand=True, fill="both", padx=150)
+        frame_estadisticas.pack(expand=True, fill="x", padx=100)
 
         crear_label(
             frame_estadisticas,

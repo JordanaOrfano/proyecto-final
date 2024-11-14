@@ -25,9 +25,9 @@ class Vencimientos:
         frame_contadores = ctk.CTkFrame(frame_vencimientos, fg_color=COLOR_BG)
         frame_contadores.pack(fill="x", pady=(0, 20))
 
-        self.contador_vencidos = crear_stat(frame_contadores, "Productos vencidos", "0")
-        self.contador_proximos = crear_stat(frame_contadores, "Próximos a vencer", "0", padx=10)
-        self.contador_perdidas = crear_stat(frame_contadores, "Pérdidas", "$0.00")
+        self.contador_vencidos = crear_stat(frame_contadores, " Productos vencidos", "0", image=crear_imagen("src/assets/icons/alarm.png", size=(40, 40)))
+        self.contador_proximos = crear_stat(frame_contadores, " Próximos a vencer", "0", padx=10, image=crear_imagen("src/assets/icons/calendar-exclamation.png", size=(40, 40)))
+        self.contador_perdidas = crear_stat(frame_contadores, " Pérdidas", "$0.00", image=crear_imagen("src/assets/icons/cash-off.png", size=(40, 40)))
 
         crear_label(
             frame_vencimientos,
@@ -207,12 +207,12 @@ class Vencimientos:
             perdidas = 0
 
         self.contador_vencidos.configure(
-            text=f"Productos vencidos\n{len(productos_vencidos)}"
+            text=f" Productos vencidos | {len(productos_vencidos)}"
         )
         self.contador_proximos.configure(
-            text=f"Próximos a vencer\n{len(proximo_vencimiento)}"
+            text=f" Próximos a vencer | {len(proximo_vencimiento)}"
         )
-        self.contador_perdidas.configure(text=f"Pérdidas\n${perdidas}")
+        self.contador_perdidas.configure(text=f" Pérdidas | ${perdidas}")
 
     # Filtrar según un criterio
     def filtrar(self, busqueda):

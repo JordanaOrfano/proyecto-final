@@ -21,8 +21,7 @@ def crear_boton(
     if metodo == "grid":
         pass
     else:
-        boton.pack(pady=pady, padx=padx, fill=fill
-        )
+        boton.pack(pady=pady, padx=padx, fill=fill,)
 
     return boton
 
@@ -95,10 +94,10 @@ def crear_label(parent, metodo="pack", text="", pady=10, anchor="w", padx=0, tex
     return label
 
 
-def crear_stat(parent, titulo, contador, padx=0, **kwargs):
+def crear_stat(parent, titulo, contador, padx=0, image=None, **kwargs):
     label_stat = ctk.CTkLabel(
         parent,
-        text=f"{titulo}\n{contador}",
+        text=f"{titulo} | {contador}",
         height=40,
         width=150,
         anchor="center",
@@ -107,8 +106,9 @@ def crear_stat(parent, titulo, contador, padx=0, **kwargs):
         font=("Roboto", 18, "bold"),
         text_color=COLOR_BG,
         fg_color=COLOR_PRIMARIO,
+        image=image,
     )
-    label_stat.pack(side="left", expand=True, fill="x", padx=padx, pady=0, ipady=20, ipadx=20)
+    label_stat.pack(side="left", expand=True, fill="x", padx=padx, pady=0, ipady=20, ipadx=0)
 
     return label_stat
 

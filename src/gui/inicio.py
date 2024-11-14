@@ -40,8 +40,8 @@ class InicioFrame(ctk.CTkFrame):
         ctk.CTkLabel(
             centrar_frame,
             text="",
-            image=crear_imagen("src/assets/menu-icon.png", size=(240, 240)),
-        ).pack(pady=25)
+            image=crear_imagen("src/assets/menu-icon.png", size=(200, 200)),
+        ).pack(pady=30)
 
         # Creación de botones en el sideFrame con el estado de selección inicial
         self.botones_sideframe["inicio"] = crear_boton_sideframe(
@@ -212,7 +212,7 @@ class InicioFrame(ctk.CTkFrame):
             frame_inicio_cont,
             text="Productos",
             font=("Roboto", 24, "bold"),
-            pady=(30, 0),
+            pady=(24, 0),
         )
         crear_tabla(frame_inicio_cont, columnas, encabezados, productos_lista, pady=10)
         
@@ -256,7 +256,7 @@ class InicioFrame(ctk.CTkFrame):
             frame_inicio_cont,
             text="Lotes",
             font=("Roboto", 24, "bold"),
-            pady=(30, 0),
+            pady=(24, 0),
         )
         
         crear_tabla(frame_inicio_cont, columnas, encabezados, lotes_acomodados, pady=10)
