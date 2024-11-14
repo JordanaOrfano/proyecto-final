@@ -12,7 +12,7 @@ def crear_boton(
         height=45,
         corner_radius=8,
         font=("Roboto", 16, "bold"),
-        compound="right",
+        compound="left",
         fg_color=COLOR_PRIMARIO,
         hover_color=COLOR_PRIMARIO_HOVER,
         **kwargs,
@@ -197,7 +197,15 @@ def crear_tabla(parent, columnas, encabezados, lotes, pady=20):
     ajustar_altura_tabla(tree, len(lotes))
 
     # Crear el menú contextual
-    menu_contextual = Menu(tree, tearoff=0)
+    menu_contextual = Menu(tree, tearoff=0, 
+                           background="white", 
+                           borderwidth=0, 
+                           font=("Roboto", 10), 
+                           selectcolor=COLOR_PRIMARIO_HOVER, 
+                           activebackground=COLOR_PRIMARIO_HOVER,
+                           activeborderwidth=0,
+                           )
+    menu_contextual.add_command(label="Agregar al carrito", command=lambda: agregar_a_carrito(tree))
     menu_contextual.add_command(label="Editar", command=lambda: editar_producto(tree))
     menu_contextual.add_command(label="Eliminar", command=lambda: eliminar_producto(tree))
 
@@ -219,17 +227,24 @@ def editar_producto(tree):
     item = tree.selection()[0]
     valores = tree.item(item, "values")
     # Código para abrir una ventana de edición, falta
-    messagebox.showinfo("Editar", f"Editar producto: {valores[1]}")
+    CTkAlert(state="warning", title="Editar producto", body_text=f"Editar producto: {valores[1]}", btn1="Ok")
 
 # Eliminar el producto seleccionado
 def eliminar_producto(tree):
     item = tree.selection()[0]
     valores = tree.item(item, "values")
-    respuesta = messagebox.askyesno("Eliminar", f"¿Desea eliminar el producto {valores[1]}?")
-    if respuesta:
+    respuesta = CTkAlert(state="warning", title="Eliminar producto", body_text=f"¿Desea eliminar el producto {valores[1]}?", btn1="Si", btn2="No")
+    
+    if respuesta.get() == "Si":
         tree.delete(item)
         # Código para eliminar el producto de la base de datos, falta
-        messagebox.showinfo("Eliminar", f"Producto {valores[1]} eliminado.")
+        CTkAlert(state="warning", title="Eliminar producto", body_text=f"Producto {valores[1]} eliminado.", btn1="Ok")
+
+def agregar_a_carrito(tree):
+    item = tree.selection()[0]
+    valores = tree.item(item, "values")
+    # Código para agregar el producto al carrito, falta
+    CTkAlert(state="info", title="Agregar al producto", body_text=f"Producto {valores[1]} agregado.", btn1="Ok")
 
 def configurar_estilo_tabla():
     style = ttk.Style()

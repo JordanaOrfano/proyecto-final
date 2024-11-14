@@ -11,7 +11,8 @@ from database.conexion import *
 
 
 ctk.set_appearance_mode("light")
-ctk.set_default_color_theme("green")
+ctk.set_default_color_theme("src/config/theme.json")
+
 
 
 def centrar_ventana(ventana, ancho_ventana, alto_ventana):
