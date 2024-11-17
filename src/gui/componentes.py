@@ -205,6 +205,7 @@ def crear_tabla(parent, columnas, encabezados, lotes, pady=20, metodo="pack"):
                            activebackground=COLOR_PRIMARIO_HOVER,
                            activeborderwidth=0,
                            )
+    
     menu_contextual.add_command(label="Agregar al carrito", command=lambda: MenuTablas.agregar_a_carrito(tree))
     menu_contextual.add_command(label="Editar", command=lambda: MenuTablas.editar_producto(tree))
     menu_contextual.add_command(label="Eliminar", command=lambda: MenuTablas.eliminar_producto(tree))

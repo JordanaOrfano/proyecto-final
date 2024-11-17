@@ -11,6 +11,9 @@ class InicioFrame(ctk.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
 
+        self.conexion = Database()
+        self.funciones_productos = Productos()
+
         self.frame_contenido = None
         self.botones_sideframe = {}  # Diccionario para almacenar botones del sideFrame
         self.side_frame()
@@ -155,19 +158,20 @@ class InicioFrame(ctk.CTkFrame):
             text="Buscar",
             width=100,
             padx=0,
-            pady=0,
+            pady=0, 
+            command=self.evento_buscar
         )
         boton_buscar.pack(side="right")
         
         # Dropdown de filtro para seleccionar orden
-        self.filtro_vencimiento = crear_optionmenu(
+        self.filtro_ordenamiento = crear_optionmenu(
             parent=frame_busqueda,
             values=("Ordenar por", "ID", "Nombre", "Marca", "Categoría"),
             pady=0,
             padx=15,
         )
 
-        self.filtro_vencimiento.pack(side="left")
+        self.filtro_ordenamiento.pack(side="left")
         
         # --------------- tabla productos ---------------
         # Crear las columnas y encabezados
@@ -189,83 +193,25 @@ class InicioFrame(ctk.CTkFrame):
             "Precio venta",
             "Cantidad",
         )
-        
-        # Obtenemos los productos y lotes combinados
-        self.conexion = Database()
-        productos = self.conexion.consultar_bd(
-            sql="""
-                   SELECT
-                        productos.id,
-                        productos.nombre, 
-                        productos.marca, 
-                        productos.categoria, 
-                        productos.precio_compra, 
-                        productos.precio_venta, 
-                        SUM(lotes.cantidad) AS cantidad 
-                    FROM 
-                        lotes 
-                    JOIN productos ON lotes.producto_id = productos.id 
-                    GROUP BY productos.id, 
-                        productos.nombre, 
-                        productos.marca, 
-                        productos.categoria, 
-                        productos.precio_compra, 
-                        productos.precio_venta;
-                """,
-            valores=None,
-        )
+        # Obtenemos los productos y lotes para insertarlos en una tabla
+        tabla_productos, tabla_lotes = self.funciones_productos.buscar_productos(None, self.filtro_ordenamiento.get())
 
-        # Transformamos a una lista
-        productos_lista = []
-
-        for fila in productos:
-            productos_lista.append(list(fila))
-
-        self.productos = productos_lista
-        
         crear_label(
             frame_inicio_cont,
             text="Productos",
             font=("Roboto", 24, "bold"),
             pady=(24, 0),
         )
-        crear_tabla(frame_inicio_cont, columnas, encabezados, productos_lista, pady=10)
+        productos, self.tree_productos = crear_tabla(frame_inicio_cont, columnas, encabezados, tabla_productos, pady=10)
         
         
         # --------------- tabla lotes ---------------
         # Crear las columnas y encabezados
-        columnas = ("lote", "id", "cantidad", "fecha_vencimiento")
-        encabezados = ("Lote", "Producto", "Cantidad", "Fecha vencimiento")
-        
-        # Obtenemos los productos y lotes combinados
-        lotes = self.conexion.consultar_bd(
-            sql="""
-                    SELECT 
-                        lotes.lote, 
-                        productos.nombre, 
-                        lotes.cantidad, 
-                        lotes.fecha_vencimiento
-                    FROM 
-                        lotes
-                    JOIN
-                        productos ON lotes.producto_id = productos.id
-                    ORDER BY lotes.lote;
-                """,
-            valores=None,
-        )
+        columnas = ("lote", "id", "cantidad", "marca", "fecha_vencimiento")
+        encabezados = ("Lote", "Producto", "Marca", "Cantidad", "Fecha vencimiento")     
 
-        # Transformamos a una lista
-        lotes_lista = []
-        lotes_acomodados = []
-
-        for fila in lotes:
-            lotes_lista.append(list(fila))
-
-        for fila in lotes_lista:
-            fecha_vencimiento = fila[3]
-            fecha_formateada = fecha_vencimiento.strftime("%d/%m/%Y")
-            fila[3] = fecha_formateada
-            lotes_acomodados.append(fila)        
+        # Pasamos los lotes por una lista, para acomodarle la fecha y que sea en formato dia/mes/año
+        lotes_acomodados = self.funciones_productos.transformar_lotes_a_lista(tabla_lotes)
 
         crear_label(
             frame_inicio_cont,
@@ -274,7 +220,7 @@ class InicioFrame(ctk.CTkFrame):
             pady=(24, 0),
         )
         
-        crear_tabla(frame_inicio_cont, columnas, encabezados, lotes_acomodados, pady=10)
+        lotes, self.tree_lotes = crear_tabla(frame_inicio_cont, columnas, encabezados, lotes_acomodados, pady=10)
         
         self.cambiar_contenido(frame_inicio, "inicio")
     
@@ -291,6 +237,25 @@ class InicioFrame(ctk.CTkFrame):
         productos.mostrar_publicaciones(contenedor=frame_inicio)
 
         self.cambiar_contenido(frame_inicio, "inicio")
+
+    # Obtiene el click cuando el usuario toca "buscar" y hace una funcion
+    def evento_buscar(self):
+        for item in self.tree_productos.get_children():
+            self.tree_productos.delete(item)
+    
+        for item in self.tree_lotes.get_children():
+            self.tree_lotes.delete(item)
+
+        tabla_productos, tabla_lotes = self.funciones_productos.buscar_productos(self.entry_busqueda.get().strip(), self.filtro_ordenamiento.get())
+
+        for producto in tabla_productos:
+            self.tree_productos.insert("", tk.END, values=producto)
+    
+        lotes_acomodados = self.funciones_productos.transformar_lotes_a_lista(tabla_lotes)
+
+        for lote in tabla_lotes:
+            self.tree_lotes.insert("", tk.END, values=lote)
+
     
     def carrito(self):
         frame_carrito_fondo = ctk.CTkFrame(master=self, fg_color=COLOR_BG)

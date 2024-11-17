@@ -217,6 +217,7 @@ class Vencimientos:
     # Filtrar según un criterio
     def filtrar(self, busqueda):
         # Limpiar la tabla antes de aplicar el filtro
+        
         for item in self.tree.get_children():
             self.tree.delete(item)
 
@@ -270,11 +271,12 @@ class Vencimientos:
             JOIN 
                 productos ON lotes.producto_id = productos.id
             WHERE 
+                lotes.lote LIKE %s OR
                 productos.nombre LIKE %s 
                 OR productos.marca LIKE %s 
                 OR productos.categoria LIKE %s
             ORDER BY productos.nombre, lotes.fecha_vencimiento;
         """,
-            valores=("%" + self.entry_busqueda.get().strip() + "%",) * 3,
+            valores=("%" + self.entry_busqueda.get().strip() + "%",) * 4,
         )
             self.filtrar(busqueda)
