@@ -9,6 +9,7 @@ class Vencimientos:
         self.fecha_actual = datetime.now().date()
         self.fecha_limite = self.fecha_actual + timedelta(days=30)
         self.productos = Productos()
+        
 
         frame_vencimientos = ctk.CTkFrame(self.contenedor, fg_color=COLOR_BG)
         frame_vencimientos.pack(expand=True, fill="x", padx=40)
@@ -141,6 +142,7 @@ class Vencimientos:
         proximo_vencimiento = []
 
         def formatear_fecha(fecha_vencimiento):
+            # Comprobar si es un datetime
             if isinstance(fecha_vencimiento, str):
                 fecha_objeto = datetime.strptime(fecha_vencimiento, "%d/%m/%Y").date()
             elif isinstance(fecha_vencimiento, datetime):
@@ -167,7 +169,7 @@ class Vencimientos:
                     productos_vencidos.append(producto)
 
                 # Si la fecha es mayor que la fecha límite, es un próximo vencimiento
-                elif fecha_objeto > self.fecha_limite:
+                elif self.fecha_actual <= fecha_objeto <= self.fecha_limite:
                     fecha_formateada = fecha_objeto.strftime("%d/%m/%Y")
                     producto[7] = fecha_formateada
                     proximo_vencimiento.append(producto)
@@ -180,7 +182,7 @@ class Vencimientos:
                 if fecha_objeto < self.fecha_actual:
                     productos_vencidos.append(producto)
 
-                elif fecha_objeto > self.fecha_limite:
+                elif self.fecha_actual <= fecha_objeto <= self.fecha_limite:
                     proximo_vencimiento.append(producto)
 
         return productos_vencidos, proximo_vencimiento
