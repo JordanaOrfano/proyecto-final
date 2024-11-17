@@ -122,11 +122,87 @@ class CrearProducto:
                                   text="Crear", 
                                   command=self.enviar_producto_a_bd)
         boton_crear.grid(row=13, column=0, columnspan=2, pady=(20, 10), padx=10, sticky="ew")
+    
+    def validar_y_convertir_fecha(self, fecha_ingresada):
+        try:
+            fecha = datetime.strptime(fecha_ingresada, "%d/%m/%Y")
+        except ValueError:
+            # Error, no se puede convertir porque se ingresó en formato dia/mes/24
+            try:
+                fecha = datetime.strptime(fecha_ingresada, "%d/%m/%y")
 
-    def enviar_producto_a_bd(self):
-        # creador = f"{Usuario.usuario_actual[0]} {Usuario.usuario_actual[1]}"
-        vencimiento = datetime.strptime(self.vencimiento.get(), "%d/%m/%Y")
-        fecha_formateada = vencimiento.strftime("%Y/%m/%d")
+                # Transforma el año al formato AAAA
+                if fecha.year % 100 == datetime.now().year % 100:
+                    fecha = fecha.replace(year=datetime.now().year)
+                    
+            except ValueError:
+                return None
+
+        # Convertir a formato año/dia/mes
+        fecha_formateada = fecha.strftime("%Y/%m/%d")
+        return fecha_formateada
+            
+    def validar_precio(self, precio):
+        try:
+            # Reemplazar las comas por puntos decimales
+            precio = precio.strip().replace(",", ".")
+            if "." in precio:
+                parte_entera, parte_decimal = precio.split('.') # Separamos entre la parte entera y parte decimal
+                # Verificar que la parte decimal no tenga más de 2 dígitos
+                if len(parte_decimal) > 2:
+                    return False
+            
+            precio = float(precio)
+            # Verificar que el precio no sea muy largo
+            if precio > 0 and precio < 100000000:
+                return precio
+            
+            return False
+        except ValueError:
+            return False
+
+    def validar_cantidad(self, cantidad):
+        try:
+            cantidad = int(cantidad.strip())  
+            return cantidad
+        except ValueError:
+            return False
         
-        Productos.subir_producto_a_bd(self, self.nombre_producto.get(), self.marca.get(), self.precio_compra.get(), self.precio_venta.get(), self.categoria.get(), self.cantidad.get(), fecha_formateada)
- 
+    def enviar_producto_a_bd(self):
+        try:
+            if not self.nombre_producto.get() or len(self.nombre_producto.get().strip()) == 0 or len(self.nombre_producto.get().strip()) > 21:
+                print("Debes ingresar un nombre")
+                return
+
+            if not self.marca.get().strip() or len(self.marca.get().strip()) == 0 or len(self.marca.get().strip()) > 21:
+                print("Debes ingresar una marca")
+                return
+
+            if self.categoria.get().strip() == "Elija o escriba una categoría" or len(self.categoria.get().strip()) == 0 or len(self.categoria.get().strip()) > 21:
+                print("Debes ingresar una categoria")
+                return
+
+            precio_compra = self.validar_precio(self.precio_compra.get().strip())
+            if not precio_compra or len(self.precio_compra.get().strip()) == 0:
+                print("Debes ingresar un precio de compra válido")
+                return
+
+            precio_venta = self.validar_precio(self.precio_venta.get().strip())
+            if not precio_venta or len(self.precio_venta.get().strip()) == 0:
+                print("Debes ingresar un precio de venta válido")
+                return
+
+            cantidad = self.validar_cantidad(self.cantidad.get().strip())
+            if not self.validar_precio(self.cantidad.get().strip()):
+                print("Debes ingresar una cantidad válida")
+                return
+            
+            fecha_formateada = self.validar_y_convertir_fecha(self.vencimiento.get())
+            if not fecha_formateada:
+                print("Debes ingresar una fecha válida")
+                return
+
+            Productos.subir_producto_a_bd(self, self.nombre_producto.get(), self.marca.get(), precio_compra, precio_venta, self.categoria.get(), cantidad, fecha_formateada)
+
+        except Exception as e:
+            print(f"Error en la bd: {e}")
