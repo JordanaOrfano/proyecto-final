@@ -253,7 +253,7 @@ class InicioFrame(ctk.CTkFrame):
     
         lotes_acomodados = self.funciones_productos.transformar_lotes_a_lista(tabla_lotes)
 
-        for lote in tabla_lotes:
+        for lote in lotes_acomodados:
             self.tree_lotes.insert("", tk.END, values=lote)
 
     
