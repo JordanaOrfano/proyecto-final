@@ -162,27 +162,35 @@ class Vencimientos:
                 fecha_vencimiento = producto[7]
                 fecha_objeto = formatear_fecha(fecha_vencimiento)
 
+                fecha_formateada = fecha_objeto.strftime("%d/%m/%Y")
+                producto[7] = fecha_formateada
+
                 # Si la fecha es anterior a la fecha actual, está vencido
                 if fecha_objeto < self.fecha_actual:
-                    fecha_formateada = fecha_objeto.strftime("%d/%m/%Y")
-                    producto[7] = fecha_formateada
                     productos_vencidos.append(producto)
 
                 # Si la fecha es mayor que la fecha límite, es un próximo vencimiento
                 elif self.fecha_actual <= fecha_objeto <= self.fecha_limite:
-                    fecha_formateada = fecha_objeto.strftime("%d/%m/%Y")
-                    producto[7] = fecha_formateada
                     proximo_vencimiento.append(producto)
 
         else:
-            for producto in busqueda:
+
+            busqueda_lista = []
+            for fila in busqueda:
+                busqueda_lista.append(list(fila))
+
+            for producto in busqueda_lista:
                 fecha_vencimiento = producto[7]
                 fecha_objeto = formatear_fecha(fecha_vencimiento)
+
+                fecha_formateada = fecha_objeto.strftime("%d/%m/%Y")
+                producto[7] = fecha_formateada
 
                 if fecha_objeto < self.fecha_actual:
                     productos_vencidos.append(producto)
 
-                elif self.fecha_actual <= fecha_objeto <= self.fecha_limite:
+                # si fecha_objeto es menor a fecha_limite y mayor a fecha_actual
+                elif fecha_objeto <= self.fecha_limite and fecha_objeto >= self.fecha_actual:
                     proximo_vencimiento.append(producto)
 
         return productos_vencidos, proximo_vencimiento
