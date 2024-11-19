@@ -187,6 +187,7 @@ def crear_tabla(parent, columnas, encabezados, lotes, pady=20, metodo="pack"):
                                  command=tree.yview, 
                                  button_color=COLOR_PRIMARIO, 
                                  button_hover_color=COLOR_PRIMARIO_HOVER)
+    
     tree.configure(yscroll=scrollbar.set)
     scrollbar.pack(side="right", fill="y")
 
@@ -220,7 +221,6 @@ def crear_tabla(parent, columnas, encabezados, lotes, pady=20, metodo="pack"):
     # Asociar el menú de clic derecho
     tree.bind("<Button-3>", mostrar_menu)
 
-    
     return frame_tabla, tree
 
 def configurar_estilo_tabla():

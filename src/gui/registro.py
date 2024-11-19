@@ -2,7 +2,7 @@ from gui.terminos_condiciones import Terminos_CondicionesFrame
 from core.usuarios import *
 from config.config import *
 from gui.componentes import *
-from core.verificar_correo import *
+from core.verificar_correo_dni import *
 
 
 class RegistroFrame(ctk.CTkFrame):
@@ -126,12 +126,14 @@ class RegistroFrame(ctk.CTkFrame):
 
     def verificar_campos(self, frame):
         # Validar campos vacíos
-        if not self.usuario_dni.get().strip():
-            notificacion = CTkNotification(master=frame, state="info", message="Documento inválido", side="right_bottom")
+        dni, correo = chequear(self.usuario_dni.get().strip(), self.usuario_correo.get().strip())
+        
+        if not self.usuario_dni.get().strip() or not dni:
+            notificacion = CTkNotification(master=frame, state="info", message="Documento inválido o ya registrado", side="right_bottom")
             frame.after(3000, notificacion.destroy)
             return
         
-        if not self.usuario_correo.get().strip() or not chequear(self.usuario_correo.get().strip()):
+        if not self.usuario_correo.get().strip() or not correo:
             notificacion = CTkNotification(master=frame, state="info", message="Correo electronico inválido o en uso", side="right_bottom")
             frame.after(3000, notificacion.destroy)
             return
@@ -156,10 +158,11 @@ class RegistroFrame(ctk.CTkFrame):
 
         # Si los campos son correctos, registrar usuario
         usuario = Usuario(
-            self.usuario_correo.get(), self.__usuario_contrasena.get()
+            self.usuario_correo.get().strip(), self.__usuario_contrasena.get()
         )
+
         usuario.registrar_usuario(
-            self.usuario_dni.get(),
-            self.usuario_nombre.get(),
-            self.usuario_apellido.get(),
+            dni,
+            self.usuario_nombre.get().strip(),
+            self.usuario_apellido.get().strip(),
         )

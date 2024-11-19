@@ -3,6 +3,9 @@ from gui.componentes import *
 
 
 class Productos:
+    def __init__(self):
+        self.database = Database()
+
     def subir_producto_a_bd(
         self,
         nombre_producto,
@@ -14,61 +17,98 @@ class Productos:
         vencimiento,
     ):
 
+        # Manejar productos categorizados en 3 categorias: "Producto Nuevo", "Producto con todos los datos iguales" y "Producto con precios diferentes al existente"
         try:
-            conexion = Database()
-            conexion = conexion.conectar_db()
-            cursor = conexion.cursor()
+            sql_principal = """
+                    SELECT 
+                        productos.id,
+                        productos.nombre, 
+                        productos.marca, 
+                        productos.precio_compra, 
+                        productos.precio_venta,
+                        lotes.cantidad,
+                        lotes.fecha_vencimiento 
+                    FROM productos 
+                    JOIN 
+                        lotes ON lotes.producto_id = productos.id
+                    """
 
-            sql = "SELECT id, nombre FROM productos WHERE nombre = %s"
+            valores = (nombre_producto, marca, precio_compra, precio_venta, vencimiento)
 
-            cursor.execute(sql, (nombre_producto,))
-            existe = cursor.fetchone()
+            # Comprobar si el producto tiene la misma fecha de vencimiento al existente
+            sql_misma_fecha = (
+                sql_principal
+                + f" WHERE productos.nombre = %s and productos.marca = %s and productos.precio_compra = %s and productos.precio_venta = %s and lotes.fecha_vencimiento = %s"
+            )
 
-            if not existe:
-                sql = "insert into productos values(null, %s, %s, %s, %s, %s)"
+            # Comprobar si el producto tiene diferente fecha de vencimiento al existente
+            sql_diferente_fecha = (
+                sql_principal
+                + f" WHERE productos.nombre = %s and productos.marca = %s and productos.precio_compra = %s and productos.precio_venta = %s and lotes.fecha_vencimiento != %s"
+            )
 
-                valores = (
-                    nombre_producto,
-                    marca,
-                    categoria,
-                    precio_compra,
-                    precio_venta,
-                )
+            producto_misma_fecha = self.database.ejecutar_bd(sql_misma_fecha, valores)
+            producto_diferente_fecha = self.database.ejecutar_bd(
+                sql_diferente_fecha, valores
+            )
 
-                cursor.execute(sql, valores)
-                producto_id = cursor.lastrowid
+            # Productos con todos los datos iguales, incluso la fecha solo se suma a su lote.
+            if producto_misma_fecha:
+                for producto in producto_misma_fecha:
+                    cantidad_existente = producto[5]
+                    cantidad += cantidad_existente
+                    id = producto[0]
+                sql = """
+                    UPDATE lotes 
+                    SET cantidad = %s
+                    WHERE producto_id = %s AND fecha_vencimiento = %s
+                    """
 
-            else:
-                producto_id = existe[0]  # Obtiene el id del producto existente
+                valores = (cantidad, id, vencimiento)
+                self.database.ejecutar_bd(sql, valores, "update")
+                return True  # Devuelve true si todo se ejecutó correctamente
 
+            # Productos con todos los datos iguales, excepto la fecha. Solo se introduce en lotes pero no en la tabla productos.
+            if producto_diferente_fecha:
+                
+                # Subir a lotes
+                for producto in producto_diferente_fecha:
+                    producto_id = producto[0]
+
+                sql = "INSERT INTO lotes VALUES(null, %s, %s, %s)"
+
+                valores = (producto_id, cantidad, vencimiento)
+                self.database.ejecutar_bd(sql, valores, "insert")
+                return True
+
+            # Subir como producto nuevo a la tabla productos y lotes
+            sql = """
+                        INSERT INTO productos values(null, %s, %s, %s, %s, %s)
+                    """
+
+            valores = (nombre_producto, marca, categoria, precio_compra, precio_venta)
+            producto_id = self.database.ejecutar_bd(sql, valores, "insert")
+
+            # Subir a lotes
             sql = "INSERT INTO lotes VALUES(null, %s, %s, %s)"
-            valores = (producto_id, cantidad, vencimiento)
 
-            cursor.execute(sql, valores)
-            conexion.commit()
+            valores = (producto_id, cantidad, vencimiento)
+            self.database.ejecutar_bd(sql, valores, "insert")
+            return True
 
         except mysql.connector.Error as error:
-            conexion.rollback()
             print(f"Ocurrió un error {error}")
-
-        finally:
-            cursor.close()
-            conexion.close()
+            return False
 
     def obtener_categorias(self):
         try:
             sql = "SELECT distinct categoria FROM proyecto_final.productos"
-            conexion = Database()
-            conexion = conexion.conectar_db()
 
-            cursor = conexion.cursor()
-            cursor.execute(sql)
-
-            categorias = cursor.fetchall()
-            categorias_lista = [categoria[0] for categoria in categorias]
-
-            cursor.close()
-            conexion.close()
+            categorias = self.database.ejecutar_bd(sql)
+            categorias_lista = []
+            for categoria in categorias:
+                categorias_lista.append(categoria[0])
+            # categorias_lista = [categoria[0] for categoria in categorias]
 
             return categorias_lista
 
@@ -76,7 +116,6 @@ class Productos:
             print("Ocurrió un error al obtener las categorias", error)
 
     def buscar_productos(self, busqueda, orden):
-        conexion = Database()
         criterio_busqueda = None
 
         sql_productos = """
@@ -90,12 +129,14 @@ class Productos:
                         SUM(lotes.cantidad) AS cantidad 
                     FROM 
                         lotes 
-                    JOIN productos ON lotes.producto_id = productos.id
+                    JOIN 
+                        productos ON lotes.producto_id = productos.id
                     """
 
         sql_lotes = """
                     SELECT 
                         lotes.lote, 
+                        productos.id,
                         productos.nombre, 
                         productos.marca, 
                         lotes.cantidad, 
@@ -107,8 +148,8 @@ class Productos:
                 """
 
         if busqueda:
-            sql_productos += f" WHERE productos.id LIKE %s OR productos.nombre LIKE %s OR productos.marca LIKE %s OR productos.categoria LIKE %s"
-            sql_lotes += f" WHERE lotes.lote LIKE %s OR productos.nombre LIKE %s OR productos.marca LIKE %s"
+            sql_productos += f" WHERE (productos.id LIKE %s OR productos.nombre LIKE %s OR productos.marca LIKE %s OR productos.categoria LIKE %s) AND lotes.fecha_vencimiento >= CURDATE()"
+            sql_lotes += f" WHERE (lotes.lote LIKE %s OR productos.nombre LIKE %s OR productos.marca LIKE %s) AND lotes.fecha_vencimiento >= CURDATE()"
             criterio_busqueda = busqueda
 
         if not busqueda:
@@ -121,18 +162,19 @@ class Productos:
             orden_tabla_productos, orden_tabla_lotes = self.ordenamiento(orden)
             sql_productos += f" ORDER BY {orden_tabla_productos};"
             sql_lotes += f" ORDER BY {orden_tabla_lotes};"
-            
 
         if criterio_busqueda:
-            tabla_productos = conexion.consultar_bd(sql_productos, ("%" + criterio_busqueda + "%",) * 4)
-            tabla_lotes = conexion.consultar_bd(sql_lotes, ("%" + criterio_busqueda + "%",) * 3)
+            tabla_productos = self.database.ejecutar_bd(
+                sql_productos, ("%" + criterio_busqueda + "%",) * 4, "select"
+            )
+            tabla_lotes = self.database.ejecutar_bd(
+                sql_lotes, ("%" + criterio_busqueda + "%",) * 3, "select"
+            )
             return tabla_productos, tabla_lotes
 
-
-        tabla_productos = conexion.consultar_bd(sql_productos, None)
-        tabla_lotes = conexion.consultar_bd(sql_lotes, None)
+        tabla_productos = self.database.ejecutar_bd(sql_productos, None)
+        tabla_lotes = self.database.ejecutar_bd(sql_lotes, None)
         return tabla_productos, tabla_lotes
-
 
     def ordenamiento(self, orden):
         orden_tabla_lotes = "lotes.lote"
@@ -161,12 +203,13 @@ class Productos:
             lotes_lista.append(list(fila))
 
         for fila in lotes_lista:
-            fecha_vencimiento = fila[4]
+            fecha_vencimiento = fila[5]
             fecha_formateada = fecha_vencimiento.strftime("%d/%m/%Y")
-            fila[4] = fecha_formateada
+            fila[5] = fecha_formateada
             lotes_acomodados.append(fila)
 
         return lotes_acomodados
+
 
 class MenuTablas:
     def editar_producto(tree):

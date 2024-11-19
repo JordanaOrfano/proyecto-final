@@ -7,6 +7,7 @@ from gui.componentes import *
 class CrearProducto:
     def __init__(self, contenedor):
         self.contenedor = contenedor
+        self.productos_funciones = Productos()
 
         # Frame principal que ocupa toda la ventana y se expande
         self.frame_crear = ctk.CTkFrame(master=self.contenedor, fg_color=COLOR_BG)
@@ -61,8 +62,7 @@ class CrearProducto:
                                       image=crear_imagen("src/assets/icons/category.png", size=(22, 22)))
         label_categoria.grid(row=3, column=1, sticky="w", pady=(10,0), padx=10)
         
-        categorias = Productos()
-        categorias = categorias.obtener_categorias()
+        categorias = self.productos_funciones.obtener_categorias()
 
 
         self.categoria = crear_dropdown(formulario_frame, 
@@ -171,38 +171,41 @@ class CrearProducto:
     def enviar_producto_a_bd(self):
         try:
             if not self.nombre_producto.get() or len(self.nombre_producto.get().strip()) == 0 or len(self.nombre_producto.get().strip()) > 21:
-                print("Debes ingresar un nombre")
+                print("Debes ingresar un nombre") #FALTA MENSAJE
                 return
 
             if not self.marca.get().strip() or len(self.marca.get().strip()) == 0 or len(self.marca.get().strip()) > 21:
-                print("Debes ingresar una marca")
+                print("Debes ingresar una marca") #FALTA MENSAJE
                 return
 
             if self.categoria.get().strip() == "Elija o escriba una categoría" or len(self.categoria.get().strip()) == 0 or len(self.categoria.get().strip()) > 21:
-                print("Debes ingresar una categoria")
+                print("Debes ingresar una categoria") #FALTA MENSAJE
                 return
 
             precio_compra = self.validar_precio(self.precio_compra.get().strip())
             if not precio_compra or len(self.precio_compra.get().strip()) == 0:
-                print("Debes ingresar un precio de compra válido")
+                print("Debes ingresar un precio de compra válido") #FALTA MENSAJE
                 return
 
             precio_venta = self.validar_precio(self.precio_venta.get().strip())
             if not precio_venta or len(self.precio_venta.get().strip()) == 0:
-                print("Debes ingresar un precio de venta válido")
+                print("Debes ingresar un precio de venta válido") #FALTA MENSAJE
                 return
 
             cantidad = self.validar_cantidad(self.cantidad.get().strip())
             if not self.validar_precio(self.cantidad.get().strip()):
-                print("Debes ingresar una cantidad válida")
+                print("Debes ingresar una cantidad válida") #FALTA MENSAJE
                 return
             
             fecha_formateada = self.validar_y_convertir_fecha(self.vencimiento.get())
             if not fecha_formateada:
-                print("Debes ingresar una fecha válida")
+                print("Debes ingresar una fecha válida") #FALTA MENSAJE
                 return
 
-            Productos.subir_producto_a_bd(self, self.nombre_producto.get(), self.marca.get(), precio_compra, precio_venta, self.categoria.get(), cantidad, fecha_formateada)
+            if self.productos_funciones.subir_producto_a_bd(self.nombre_producto.get(), self.marca.get(), precio_compra, precio_venta, self.categoria.get(), cantidad, fecha_formateada):
+                print("Mensaje, se cargó el producto con éxito") #FALTA MENSAJE
+            else:
+                print("Mensaje de error") #FALTA MENSAJE ERROR AL CARGAR EL PRODUCTO
 
         except Exception as e:
             print(f"Error en la bd: {e}")

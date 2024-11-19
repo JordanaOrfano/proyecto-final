@@ -71,9 +71,9 @@ class LoginFrame(ctk.CTkFrame):
 
     def resize_image(self, event):
         # Ajusta la imagen al tamaño actual de imgFrame
-        new_width = event.width
-        new_height = event.height
-        self.image_ctk.configure(size=(new_width, new_height))
+        nuevo_width = event.width
+        nuevo_height = event.height
+        self.image_ctk.configure(size=(nuevo_width, nuevo_height))
 
     def login(self, frame):
         if not self.usuario_correo.get():

@@ -95,7 +95,7 @@ class Vencimientos:
 
         # Obtenemos los productos y lotes combinados
         self.conexion = Database()
-        lotes = self.conexion.consultar_bd(
+        lotes = self.conexion.ejecutar_bd(
             sql="""
                     SELECT 
                         lotes.lote, 
@@ -196,7 +196,7 @@ class Vencimientos:
         return productos_vencidos, proximo_vencimiento
 
     def actualizar_contadores(self):
-        perdidas = self.conexion.consultar_bd(
+        perdidas = self.conexion.ejecutar_bd(
             """
         SELECT SUM(productos.precio_compra * lotes.cantidad) AS perdidas
         FROM 
@@ -265,7 +265,7 @@ class Vencimientos:
             # Si no hay un criterio de búsqueda, filtrar con todos los productos
             self.filtrar(False)
         else:
-            busqueda = self.conexion.consultar_bd(
+            busqueda = self.conexion.ejecutar_bd(
             sql="""
             SELECT 
                 lotes.lote, 

@@ -17,11 +17,10 @@ class InicioFrame(ctk.CTkFrame):
         self.frame_contenido = None
         self.botones_sideframe = {}  # Diccionario para almacenar botones del sideFrame
         self.side_frame()
-        
-        if Usuario.usuario_actual[2].strip('"') == "empleado":
+        if Usuario.usuario_actual[0][2].strip('"') == "empleado":
             self.inicio()
 
-        if Usuario.usuario_actual[2].strip('"') == "supervisor":
+        if Usuario.usuario_actual[0][2].strip('"') == "supervisor":
             self.inicio_administrador()
 
     def side_frame(self):
@@ -177,7 +176,7 @@ class InicioFrame(ctk.CTkFrame):
         # Crear las columnas y encabezados
         columnas = (
             "id",
-            "nombre",
+            "producto",
             "marca",
             "categoria",
             "precio_compra",
@@ -186,7 +185,7 @@ class InicioFrame(ctk.CTkFrame):
         )
         encabezados = (
             "ID",
-            "Nombre",
+            "Producto",
             "Marca",
             "Categoría",
             "Precio compra",
@@ -207,8 +206,8 @@ class InicioFrame(ctk.CTkFrame):
         
         # --------------- tabla lotes ---------------
         # Crear las columnas y encabezados
-        columnas = ("lote", "id", "cantidad", "marca", "fecha_vencimiento")
-        encabezados = ("Lote", "Producto", "Marca", "Cantidad", "Fecha vencimiento")     
+        columnas = ("lote", "id", "producto", "marca", "cantidad", "fecha_vencimiento")
+        encabezados = ("Lote", "ID", "Producto", "Marca", "Cantidad", "Fecha vencimiento")     
 
         # Pasamos los lotes por una lista, para acomodarle la fecha y que sea en formato dia/mes/año
         lotes_acomodados = self.funciones_productos.transformar_lotes_a_lista(tabla_lotes)
@@ -273,7 +272,7 @@ class InicioFrame(ctk.CTkFrame):
         columnas = ("id", "nombre", "marca", "precio_venta", "cantidad")
         encabezados = ("ID", "Nombre", "Marca", "Precio", "Cantidad")
         
-        productos_carrito = self.conexion.consultar_bd(
+        productos_carrito = self.conexion.ejecutar_bd(
             sql="""
                    SELECT
                         productos.id,
