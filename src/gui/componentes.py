@@ -152,7 +152,7 @@ def crear_optionmenu(parent, values=[], pady=10, padx=0, width=200, **kwargs):
     
     return dropdown
 
-def crear_tabla(parent, columnas, encabezados, lotes, pady=20, metodo="pack"):
+def crear_tabla(parent, columnas, encabezados, lotes, pady=20, menu=None):
     configurar_estilo_tabla()
 
     # Frame de la tabla
@@ -207,10 +207,15 @@ def crear_tabla(parent, columnas, encabezados, lotes, pady=20, metodo="pack"):
                            activeborderwidth=0,
                            )
     
-    menu_contextual.add_command(label="Agregar al carrito", command=lambda: MenuTablas.agregar_a_carrito(tree))
-    menu_contextual.add_command(label="Editar", command=lambda: MenuTablas.editar_producto(tree))
-    menu_contextual.add_command(label="Eliminar", command=lambda: MenuTablas.eliminar_producto(tree))
-
+    if menu == "productos":
+        menu_contextual.add_command(label="Agregar al carrito", command=lambda: MenuTablas().agregar_a_carrito(tree))
+        menu_contextual.add_command(label="Eliminar producto", command=lambda: MenuTablas().eliminar_producto(tree, frame_tabla))
+    
+    if menu == "lotes":
+        menu_contextual.add_command(label="Eliminar lote", command=lambda: MenuTablas().eliminar_lote(tree, frame_tabla))
+        
+    menu_contextual.add_command(label="Editar", command=lambda: MenuTablas().editar_producto(tree))
+    
     # Función para mostrar el menú en clic derecho
     def mostrar_menu(event):
         item = tree.identify_row(event.y)

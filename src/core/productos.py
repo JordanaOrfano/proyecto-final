@@ -211,8 +211,11 @@ class Productos:
         return lotes_acomodados
 
 
-class MenuTablas:
-    def editar_producto(tree):
+class MenuTablas:    
+    def __init__(self):
+        self.db = Database()
+        
+    def editar_producto(self, tree):
         item = tree.selection()[0]
         valores = tree.item(item, "values")  # obtiene los valores de la fila
         # Código para abrir una ventana de edición, falta
@@ -224,29 +227,105 @@ class MenuTablas:
             btn1="Ok",
         )
 
-    def eliminar_producto(tree):
+    def eliminar_producto(self, tree, frame):
         item = tree.selection()[0]
-        valores = tree.item(item, "values")
+        valores = tree.item(item, "values")  # Obtiene los valores de la fila
+        producto_id = valores[0]
+        
         respuesta = CTkAlert(
             state="warning",
             title="Eliminar producto",
-            body_text=f"¿Desea eliminar el producto {valores[1]}?",
+            body_text=f"¿Desea eliminar el producto '{valores[1]}'?",
             btn1="Si",
             btn2="No",
         )
 
         if respuesta.get() == "Si":
-            tree.delete(item)
-            # Código para eliminar el producto de la base de datos, falta
+            try:
+                # Eliminar lotes asociados al producto
+                self.db.ejecutar_bd(
+                    "DELETE FROM lotes WHERE producto_id = %s",
+                    (producto_id,),
+                    tipo="delete"
+                )
+                # Eliminar producto
+                self.db.ejecutar_bd(
+                    "DELETE FROM productos WHERE id = %s",
+                    (producto_id,),
+                    tipo="delete"
+                )
 
-            CTkAlert(
-                state="warning",
-                title="Eliminar producto",
-                body_text=f"Producto {valores[1]} eliminado.",
-                btn1="Ok",
-            )
+                # Eliminar la fila en la interfaz
+                tree.delete(item)
 
-    def agregar_a_carrito(tree):
+                notificacion = CTkNotification(
+                    master=frame, 
+                    state="info", 
+                    message=f"'{valores[1]}' eliminado.", 
+                    side="right_bottom"
+                )
+                frame.after(3000, notificacion.destroy)
+                
+            except Exception as error:
+                print(f"Error al eliminar producto: {error}")
+    
+    
+    def eliminar_lote(self, tree, frame):
+        item = tree.selection()[0]
+        valores = tree.item(item, "values")
+        print(valores)
+        
+        lote = valores[0]
+        producto_id = valores[1]
+
+        # Confirmación antes de eliminar
+        respuesta = CTkAlert(
+            state="warning",
+            title="Eliminar lote",
+            body_text=f"¿Desea eliminar el lote {valores[0]} de '{valores[2]}'?",
+            btn1="Si",
+            btn2="No",
+        )
+
+        if respuesta.get() == "Si":
+            try:
+                # Eliminar lote de la base de datos
+                self.db.ejecutar_bd(
+                    "DELETE FROM lotes WHERE lote = %s",
+                    (lote,),
+                    tipo="delete"
+                )
+                
+                # Verificar si el producto tiene otros lotes asociados
+                resultado = self.db.ejecutar_bd(
+                    "SELECT COUNT(*) FROM lotes WHERE producto_id = %s",
+                    (producto_id,),
+                    tipo="select"
+                )
+
+                # Si no hay más lotes, eliminar el producto
+                if resultado[0][0] == 0:
+                    self.db.ejecutar_bd(
+                        "DELETE FROM productos WHERE id = %s",
+                        (producto_id,),
+                        tipo="delete"
+                    )
+
+                # Eliminar la fila en la interfaz
+                tree.delete(item)
+
+                notificacion = CTkNotification(
+                    master=frame, 
+                    state="info", 
+                    message=f"Lote {valores[0]} de '{valores[2]}' eliminado.", 
+                    side="right_bottom"
+                )
+                frame.after(3000, notificacion.destroy)
+                
+            except Exception as error:
+                print(f"Error al eliminar lote: {error}")
+
+    def agregar_a_carrito(self, tree):
         item = tree.selection()[0]
         valores = tree.item(item, "values")
         # Código para agregar el producto al carrito, falta
