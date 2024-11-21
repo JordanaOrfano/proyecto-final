@@ -33,7 +33,7 @@ class InicioFrame(ctk.CTkFrame):
 
         ctk.CTkLabel(
             centrar_frame,
-            text="EcoPrint",
+            text="StockUp!",
             font=("Roboto", 32, "bold"),
             text_color=COLOR_BG,
             width=210,
@@ -42,7 +42,7 @@ class InicioFrame(ctk.CTkFrame):
         ctk.CTkLabel(
             centrar_frame,
             text="",
-            image=crear_imagen("src/assets/menu-icon.png", size=(200, 200)),
+            image=crear_imagen("src/assets/menu-icon.png", size=(225, 225)),
         ).pack(pady=30)
 
         # Creación de botones en el sideFrame con el estado de selección inicial

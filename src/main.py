@@ -2,6 +2,7 @@ from gui.login import LoginFrame
 from gui.inicio import InicioFrame
 from gui.registro import RegistroFrame
 from config.config import *
+from database.conexion import *
 
 
 # Utilizamos frames para que todo se muestre en una ventana
@@ -10,7 +11,7 @@ class App(ctk.CTk):
         super().__init__()
 
         centrar_ventana(self, 1300, 700)
-        self.title("EcoPrint")
+        self.title("StockUp!")
         self.minsize(width=1300, height=700)
         self.frame_actual = None
         self.frame_cambiar("login")  # Mostrar el frame de inicio de sesión al iniciar
@@ -34,9 +35,11 @@ class App(ctk.CTk):
 
 
 def run_app():
+    conexion = Database()
+    conexion.conectar_db()
+
     app = App()
     app.mainloop()  # Ejecutar la ventana principal
-
 
 if (
     __name__ == "__main__"
