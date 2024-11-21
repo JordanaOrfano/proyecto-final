@@ -171,41 +171,51 @@ class CrearProducto:
     def enviar_producto_a_bd(self):
         try:
             if not self.nombre_producto.get() or len(self.nombre_producto.get().strip()) == 0 or len(self.nombre_producto.get().strip()) > 21:
-                print("Debes ingresar un nombre") #FALTA MENSAJE
+                notificacion = CTkNotification(master=self.contenedor, state="warning", message="Debes ingresar un nombre", side="right_bottom")
+                self.contenedor.after(3000, notificacion.destroy)
                 return
 
             if not self.marca.get().strip() or len(self.marca.get().strip()) == 0 or len(self.marca.get().strip()) > 21:
-                print("Debes ingresar una marca") #FALTA MENSAJE
+                notificacion = CTkNotification(master=self.contenedor, state="warning", message="Debes ingresar una marca", side="right_bottom")
+                self.contenedor.after(3000, notificacion.destroy)
                 return
 
             if self.categoria.get().strip() == "Elija o escriba una categoría" or len(self.categoria.get().strip()) == 0 or len(self.categoria.get().strip()) > 21:
-                print("Debes ingresar una categoria") #FALTA MENSAJE
+                notificacion = CTkNotification(master=self.contenedor, state="warning", message="Debes ingresar una categoría", side="right_bottom")
+                self.contenedor.after(3000, notificacion.destroy)
                 return
 
             precio_compra = self.validar_precio(self.precio_compra.get().strip())
             if not precio_compra or len(self.precio_compra.get().strip()) == 0:
-                print("Debes ingresar un precio de compra válido") #FALTA MENSAJE
+                notificacion = CTkNotification(master=self.contenedor, state="warning", message="Debes ingresar un precio de compra válido", side="right_bottom")
+                self.contenedor.after(3000, notificacion.destroy)
                 return
 
             precio_venta = self.validar_precio(self.precio_venta.get().strip())
             if not precio_venta or len(self.precio_venta.get().strip()) == 0:
-                print("Debes ingresar un precio de venta válido") #FALTA MENSAJE
+                notificacion = CTkNotification(master=self.contenedor, state="warning", message="Debes ingresar un precio de venta válido", side="right_bottom")
+                self.contenedor.after(3000, notificacion.destroy)
                 return
 
             cantidad = self.validar_cantidad(self.cantidad.get().strip())
             if not self.validar_precio(self.cantidad.get().strip()):
-                print("Debes ingresar una cantidad válida") #FALTA MENSAJE
+                notificacion = CTkNotification(master=self.contenedor, state="warning", message="Debes ingresar una cantidad válida", side="right_bottom")
+                self.contenedor.after(3000, notificacion.destroy)
                 return
             
             fecha_formateada = self.validar_y_convertir_fecha(self.vencimiento.get())
             if not fecha_formateada:
-                print("Debes ingresar una fecha válida") #FALTA MENSAJE
+                notificacion = CTkNotification(master=self.contenedor, state="warning", message="Debes ingresar una fecha válida", side="right_bottom")
+                self.contenedor.after(3000, notificacion.destroy)
                 return
 
             if self.productos_funciones.subir_producto_a_bd(self.nombre_producto.get(), self.marca.get(), precio_compra, precio_venta, self.categoria.get(), cantidad, fecha_formateada):
-                print("Mensaje, se cargó el producto con éxito") #FALTA MENSAJE
+                notificacion = CTkNotification(master=self.contenedor, state="info", message="Se cargó el producto con éxito", side="right_bottom")
+                self.contenedor.after(3000, notificacion.destroy)
+            
             else:
-                print("Mensaje de error") #FALTA MENSAJE ERROR AL CARGAR EL PRODUCTO
+                notificacion = CTkNotification(master=self.contenedor, state="info", message="Error al cargar el producto, intente de nuevo", side="right_bottom")
+                self.contenedor.after(3000, notificacion.destroy)
 
         except Exception as e:
             print(f"Error en la bd: {e}")
