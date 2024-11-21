@@ -1,31 +1,59 @@
-# EcoPrint - Proyecto Final
+# 🛒 Sistema de Gestión de Supermercado
 
-Esta aplicación está diseñada para conectar a personas interesadas en la conservación y mejora del medio ambiente, permitiéndoles publicar y gestionar proyectos relacionados con la protección ambiental. Los usuarios pueden anunciar eventos, compartir los detalles, la ubicación y la fecha de las actividades, así como permitir que otros voten a favor o en contra de participar en los proyectos propuestos.
+Este sistema está diseñado para facilitar la gestión del inventario y la administración de un supermercado. Permite a los administradores y empleados gestionar productos, registrar ventas y analizar estadísticas clave para optimizar la operación. El sistema está desarrollado en Python con CustomTkinter para una interfaz moderna y fácil de usar.
+
+## 📷 Visuales
+<!-- Capturas de pantalla, videos o GIFs -->
 
 ## 📍 Características
 
-<!-- Lista de las principales características del proyecto
-- Ejemplo: Manejo de datos, análisis de archivos, conexión con APIs externas, etc -->
+### Administración de Productos
 
-## 💡 Tecnologías utilizadas
+- **Registrar** nuevos productos, incluyendo detalles como nombre, marca, categoría, precio de compra y venta, cantidad en stock y fecha de vencimiento.
+- **Editar y eliminar** productos. Cada eliminación es registrada con el nombre del empleado que la realizó.
+
+### Gestión de Roles y Permisos
+
+- **Administrador**: Acceso completo a todas las funciones del sistema. Puede crear y gestionar cuentas de empleados, visualizar estadísticas completas, y visualizar productos eliminados.
+- **Empleado**: Acceso limitado a la gestión de productos y al registro de ventas.
+
+### Registro de Ventas
+
+- **Registrar ventas** detalladas, incluyendo productos y cantidades.
+
+### Estadísticas
+
+Visualiza información clave para la toma de decisiones:
+
+- **Categorías más vendidas**
+- **Producto más vendido**
+- **Ganancia total**
+- **Pérdidas**
+- **Cantidad de productos por categoría**
+
+## 💡 Uso
+
+### Inicio de sesión
+
+Al iniciar la aplicación, el usuario debe ingresar sus credenciales. El usuario predeterminado es:
+
+- Usuario: `admin`
+- Contraseña: `123`
+
+## 🛠️ Tecnologías utilizadas
 
 - Python
 - MySQL
-- Tkinter
-- [CustomTkinter](https://customtkinter.tomschimansky.com/)
-- [CTKdlib](https://github.com/Akascape/CTkDesigner-Support)
+- Tkinter y [CustomTkinter](https://customtkinter.tomschimansky.com/)
 - PIL
 - Email Validator
-
-## 💻 Visuales
-<!-- Capturas de pantalla, videos o GIFs que demuestran lo que hace el proyecto -->
+- [CtkComponents](https://github.com/rudymohammadbali/ctk_components)
 
 ## 📋 Prerrequisitos
-<!-- Lista de software y herramientas, incluyendo versiones, que necesitas para instalar y ejecutar el proyecto -->
 
 - Python 3.12
 
-## ✒️ Autores
+## 👩‍💻 Autores
 
-- [Jordana Orfano](https://www.github.com/JordanaOrfano)
+- [Jordana Orfano](https://github.com/JordanaOrfano)
 - [Fernando Hidalgo](https://github.com/HidalgoFernandoo)
