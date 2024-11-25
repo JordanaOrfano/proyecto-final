@@ -209,12 +209,13 @@ def crear_tabla(parent, columnas, encabezados, lotes, pady=20, menu=None):
     
     if menu == "productos":
         menu_contextual.add_command(label="Agregar al carrito", command=lambda: MenuTablas().agregar_a_carrito(tree))
+        menu_contextual.add_command(label="Editar Producto", command=lambda: MenuTablas(parent).editar_producto(tree))
         menu_contextual.add_command(label="Eliminar producto", command=lambda: MenuTablas().eliminar_producto(tree, frame_tabla))
     
     if menu == "lotes":
+        menu_contextual.add_command(label="Editar Lote", command=lambda: MenuTablas(parent).editar_lote(tree))
         menu_contextual.add_command(label="Eliminar lote", command=lambda: MenuTablas().eliminar_lote(tree, frame_tabla))
         
-    menu_contextual.add_command(label="Editar", command=lambda: MenuTablas().editar_producto(tree))
     
     # Función para mostrar el menú en clic derecho
     def mostrar_menu(event):
@@ -250,3 +251,142 @@ def configurar_estilo_tabla():
                     borderwidth=0) 
     style.map("Treeview",
                 background=[('selected', COLOR_PRIMARIO_HOVER)])
+
+
+class MenuTablas:    
+    def __init__(self, frame = None):
+        self.db = Database()
+        self.frame = frame
+        
+
+    def agregar_a_carrito(self, tree):
+        item = tree.selection()[0]
+        valores = tree.item(item, "values")
+        # Código para agregar el producto al carrito, FALTA
+
+        CTkAlert(
+            state="info",
+            title="Agregar al producto",
+            body_text=f"Producto {valores[1]} agregado.",
+            btn1="Ok",
+        )
+
+    def editar_producto(self, tree):
+        item = tree.selection()[0]
+        valores = tree.item(item, "values")  # obtiene los valores de la fila
+
+        # Eliminar todos los elementos que están en pantalla
+        for elemento in self.frame.winfo_children():
+            elemento.destroy()
+
+        from gui.agregar_producto import CrearProducto
+        CrearProducto(contenedor = self.frame, procedencia = "tabla_producto", valor = valores)
+        
+    def editar_lote(self, tree):
+        item = tree.selection()[0]
+        valores = tree.item(item, "values") 
+    
+        # Eliminar todos los elementos que están en pantalla
+        for elemento in self.frame.winfo_children():
+            elemento.destroy()
+
+        from gui.agregar_producto import CrearProducto
+        CrearProducto(contenedor = self.frame, procedencia = "tabla_lote", valor = valores)
+
+    def eliminar_producto(self, tree, frame):
+        item = tree.selection()[0]
+        valores = tree.item(item, "values")  # Obtiene los valores de la fila
+        producto_id = valores[0]
+        
+        respuesta = CTkAlert(
+            state="warning",
+            title="Eliminar producto",
+            body_text=f"¿Desea eliminar el producto '{valores[1]}'?",
+            btn1="Si",
+            btn2="No",
+        )
+
+        if respuesta.get() == "Si":
+            try:
+                # Eliminar lotes asociados al producto
+                self.db.ejecutar_bd(
+                    "DELETE FROM lotes WHERE producto_id = %s",
+                    (producto_id,),
+                    tipo="delete"
+                )
+                # Eliminar producto
+                self.db.ejecutar_bd(
+                    "DELETE FROM productos WHERE id = %s",
+                    (producto_id,),
+                    tipo="delete"
+                )
+
+                # Eliminar la fila en la interfaz
+                tree.delete(item)
+
+                notificacion = CTkNotification(
+                    master=frame, 
+                    state="info", 
+                    message=f"'{valores[1]}' eliminado.", 
+                    side="right_bottom"
+                )
+                frame.after(3000, notificacion.destroy)
+                
+            except Exception as error:
+                print(f"Error al eliminar producto: {error}")
+    
+    
+    def eliminar_lote(self, tree, frame):
+        item = tree.selection()[0]
+        valores = tree.item(item, "values")
+        print(valores)
+        
+        lote = valores[0]
+        producto_id = valores[1]
+
+        # Confirmación antes de eliminar
+        respuesta = CTkAlert(
+            state="warning",
+            title="Eliminar lote",
+            body_text=f"¿Desea eliminar el lote {valores[0]} de '{valores[2]}'?",
+            btn1="Si",
+            btn2="No",
+        )
+
+        if respuesta.get() == "Si":
+            try:
+                # Eliminar lote de la base de datos
+                self.db.ejecutar_bd(
+                    "DELETE FROM lotes WHERE lote = %s",
+                    (lote,),
+                    tipo="delete"
+                )
+                
+                # Verificar si el producto tiene otros lotes asociados
+                resultado = self.db.ejecutar_bd(
+                    "SELECT COUNT(*) FROM lotes WHERE producto_id = %s",
+                    (producto_id,),
+                    tipo="select"
+                )
+
+                # Si no hay más lotes, eliminar el producto
+                if resultado[0][0] == 0:
+                    self.db.ejecutar_bd(
+                        "DELETE FROM productos WHERE id = %s",
+                        (producto_id,),
+                        tipo="delete"
+                    )
+
+                # Eliminar la fila en la interfaz
+                tree.delete(item)
+
+                notificacion = CTkNotification(
+                    master=frame, 
+                    state="info", 
+                    message=f"Lote {valores[0]} de '{valores[2]}' eliminado.", 
+                    side="right_bottom"
+                )
+                frame.after(3000, notificacion.destroy)
+                
+            except Exception as error:
+                print(f"Error al eliminar lote: {error}")

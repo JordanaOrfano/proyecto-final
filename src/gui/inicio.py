@@ -232,8 +232,7 @@ class InicioFrame(ctk.CTkFrame):
             pady=(30, 10),
         )
 
-        productos = Productos()
-        productos.mostrar_publicaciones(contenedor=frame_inicio)
+        self.funciones_productos.mostrar_publicaciones(contenedor=frame_inicio)
 
         self.cambiar_contenido(frame_inicio, "inicio")
 
