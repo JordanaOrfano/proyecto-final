@@ -1,4 +1,3 @@
-from gui.terminos_condiciones import Terminos_CondicionesFrame
 from core.usuarios import *
 from config.config import *
 from gui.componentes import *
@@ -92,77 +91,60 @@ class RegistroFrame(ctk.CTkFrame):
         self.volver_button = crear_boton(frameRegistro, metodo="grid", text="Volver", command=self.volver_login, pady=10, fill="x")
         self.volver_button.grid(row=9, column=1, pady=20, sticky="ew", padx=(5, 0))
 
-        # # Checkbox de términos y condiciones
-        # self.terminosCheckbox = ctk.CTkCheckBox(frameRegistro, 
-        #                                         text="",
-        #                                         onvalue="on", 
-        #                                         offvalue="off", 
-        #                                         border_color=COLOR_PRIMARIO, 
-        #                                         checkmark_color=COLOR_BG,
-        #                                         fg_color=COLOR_PRIMARIO)
-        # self.terminosCheckbox.grid(row=9, column=0, sticky="w")
-
-        # self.terminos_button = ctk.CTkButton(
-        #     frameRegistro,
-        #     fg_color="transparent",
-        #     text="Acepto los términos y condiciones",
-        #     text_color="black",
-        #     anchor="w",
-        #     command=self.ver_terminos,
-        # )
-        # self.terminos_button.grid(row=9, column=1, sticky="w")
-    
     def resize_image(self, event):
         # Ajusta la imagen al tamaño actual de imgFrame
         new_width = event.width
         new_height = event.height
         self.image_ctk.configure(size=(new_width, new_height))
 
-    def ver_terminos(self):
-        Terminos_CondicionesFrame(self)
-
     def volver_login(self):
         self.frame_cambiar("login")
+
+    def mostrar_notificacion(self, frame, mensaje):
+        notificacion = CTkNotification(master=frame, state="info", message=mensaje, side="right_bottom")
+        frame.after(3000, notificacion.destroy)
 
     def verificar_campos(self, frame):
         # Validar campos vacíos
         dni, correo = chequear(self.usuario_dni.get().strip(), self.usuario_correo.get().strip())
+        print("DNI", dni, "correo", correo)
         
         if not self.usuario_dni.get().strip() or not dni:
-            notificacion = CTkNotification(master=frame, state="info", message="Documento inválido o ya registrado", side="right_bottom")
-            frame.after(3000, notificacion.destroy)
+            self.mostrar_notificacion(frame, "Documento inválido o ya registrado.")
             return
         
         if not self.usuario_correo.get().strip() or not correo:
-            notificacion = CTkNotification(master=frame, state="info", message="Correo electronico inválido o en uso", side="right_bottom")
-            frame.after(3000, notificacion.destroy)
+            self.mostrar_notificacion(frame, "Correo inválido, en uso o demasiado largo.")
             return
 
-        if not self.usuario_nombre.get().strip():
-            notificacion = CTkNotification(master=frame, state="info", message="Nombre inválido", side="right_bottom")
-            frame.after(3000, notificacion.destroy)
+        if not self.usuario_nombre.get().strip() or len(self.usuario_nombre.get().strip()) < 4 or len(self.usuario_nombre.get().strip()) > 30 :
+            self.mostrar_notificacion(frame, "Nombre inválido o demasiado largo.")
             return
         
-        if not self.usuario_apellido.get().strip():
-            notificacion = CTkNotification(master=frame, state="info", message="Apellido inválido", side="right_bottom")
-            frame.after(3000, notificacion.destroy)
+        if not self.usuario_apellido.get().strip() or len(self.usuario_apellido.get().strip()) < 4 or len(self.usuario_apellido.get().strip()) > 30:
+            self.mostrar_notificacion(frame, "Apellido inválido o demasiado largo.")
             return
         
         if (
             not self.__usuario_contrasena.get()
-            or len(self.__usuario_contrasena.get()) < 8
+            or len(self.__usuario_contrasena.get()) < 8 or len(self.__usuario_contrasena.get()) > 60
         ):
-            notificacion = CTkNotification(master=frame, state="info", message="Contraseña inválida. Mínimo de 8 caracteres", side="right_bottom")
-            frame.after(3000, notificacion.destroy)
+            self.mostrar_notificacion(frame, "Contraseña debe tener entre 8 y 60 caracteres.")
             return
 
-        # Si los campos son correctos, registrar usuario
-        usuario = Usuario(
-            self.usuario_correo.get().strip(), self.__usuario_contrasena.get()
-        )
+        try:
+            # Si los campos son correctos, registrar usuario
+            usuario = Usuario(
+                self.usuario_correo.get().strip(), self.__usuario_contrasena.get()
+            )
 
-        usuario.registrar_usuario(
-            dni,
-            self.usuario_nombre.get().strip(),
-            self.usuario_apellido.get().strip(),
-        )
+            usuario.registrar_usuario(
+                dni,
+                self.usuario_nombre.get().strip(),
+                self.usuario_apellido.get().strip(),
+            )
+            return
+        
+        except:
+            self.mostrar_notificacion(frame, "Error al registrar el usuario.")
+            return

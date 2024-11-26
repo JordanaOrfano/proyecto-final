@@ -41,10 +41,8 @@ class Usuario:
 
             if Usuario.usuario_actual:
                 self.__hashed = Usuario.usuario_actual[0][3]  # Obtiene la contraseña de Usuario.usuario_actual
-                if bcrypt.checkpw:
-                    # Desencripta la contraseña del usuario, para ver si coinciden
-                    self.__contrasena_ingresada.encode("utf-8"),
-                    self.__hashed.encode("utf-8"),
+                
+                if bcrypt.checkpw(self.__contrasena_ingresada.encode("utf-8"), self.__hashed.encode("utf-8")):
                     return True
                 else:
                     return False

@@ -75,15 +75,17 @@ class LoginFrame(ctk.CTkFrame):
         nuevo_height = event.height
         self.image_ctk.configure(size=(nuevo_width, nuevo_height))
 
+    def mostrar_notificacion(self, frame, mensaje):
+        notificacion = CTkNotification(master=frame, state="info", message=mensaje, side="right_bottom")
+        frame.after(3000, notificacion.destroy)
+
     def login(self, frame):
         if not self.usuario_correo.get():
-            notificacion = CTkNotification(master=frame, state="info", message="Debes ingresar un correo", side="right_bottom")
-            frame.after(3000, notificacion.destroy)
+            self.mostrar_notificacion(frame, "Debes ingresar un correo.")
             return
         
         if not self.__usuario_contrasena.get():
-            notificacion = CTkNotification(master=frame, state="info", message="Debes ingresar una contraseña", side="right_bottom")
-            frame.after(3000, notificacion.destroy)
+            self.mostrar_notificacion(frame, "Debes ingresar una contraseña")
             return
 
         logear_usuario = Usuario(
@@ -94,8 +96,7 @@ class LoginFrame(ctk.CTkFrame):
         if not logear_usuario.verificar_usuario(
             self.usuario_correo.get(), self.__usuario_contrasena.get()
         ):
-            notificacion = CTkNotification(master=frame, state="warning", message="Usuario o contraseña incorrecto", side="right_bottom")
-            frame.after(3000, notificacion.destroy)
+            self.mostrar_notificacion(frame, "Usuario o contraseña incorrecto")
             return
 
         self.frame_cambiar("inicio")

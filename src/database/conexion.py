@@ -117,8 +117,8 @@ class Database:
             documento INT PRIMARY KEY,
             correo VARCHAR(60) NOT NULL,
             contrasena VARCHAR(60) NOT NULL,
-            nombre VARCHAR(50) NOT NULL,
-            apellido VARCHAR(50) NOT NULL,
+            nombre VARCHAR(30) NOT NULL,
+            apellido VARCHAR(30) NOT NULL,
             rol VARCHAR(20) DEFAULT 'empleado'
         ) ENGINE=INNODB;
         """
