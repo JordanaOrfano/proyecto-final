@@ -8,9 +8,10 @@ from core.usuarios import *
 
 
 class InicioFrame(ctk.CTkFrame):
-    def __init__(self, master):
+    def __init__(self, master, frame_cambiar):
         super().__init__(master)
 
+        self.frame_cambiar = frame_cambiar
         self.conexion = Database()
         self.funciones_productos = Productos()
 
@@ -220,7 +221,7 @@ class InicioFrame(ctk.CTkFrame):
         )
         
         lotes, self.tree_lotes = crear_tabla(frame_inicio_cont, columnas, encabezados, lotes_acomodados, pady=(10, 30), menu="lotes")
-        
+        self.frame_inicio_cont = frame_inicio_cont
         self.cambiar_contenido(frame_inicio, "inicio")
     
     def inicio_administrador(self):
@@ -336,7 +337,7 @@ class InicioFrame(ctk.CTkFrame):
     def crear_producto(self):
         frame_publicar = ctk.CTkFrame(master=self, fg_color=COLOR_BG)
 
-        CrearProducto(contenedor=frame_publicar)
+        CrearProducto(contenedor=frame_publicar, frame_origen = self.inicio)
         self.cambiar_contenido(frame_publicar, "crear_producto")
 
     def estadisticas(self):
@@ -359,4 +360,6 @@ class InicioFrame(ctk.CTkFrame):
         self.cambiar_contenido(frame_configuracion, "configuracion")
 
     def cerrar_sesion(self):
-        self.quit()
+        notificacion = CTkNotification(master=self, state="info", message="Cerrando Sesión...", side="right_bottom")
+        self.after(3000, notificacion.destroy)
+        self.after(2000, lambda: self.frame_cambiar("login"))

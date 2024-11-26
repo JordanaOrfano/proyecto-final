@@ -29,13 +29,13 @@ class App(ctk.CTk):
             self.frame_actual = RegistroFrame(self, self.frame_cambiar)
 
         if frame_nombre == "inicio":
-            self.frame_actual = InicioFrame(self)
+            self.frame_actual = InicioFrame(self, self.frame_cambiar)
 
         self.frame_actual.pack(fill="both", expand=True)
 
 
 def run_app():
-    conexion = Database()
+    conexion = Database() # Asegura que exista una conexión con la bd o se cree la bd
     conexion.conectar_db()
 
     app = App()

@@ -2,6 +2,7 @@ from core.usuarios import *
 from config.config import *
 from gui.componentes import *
 
+
 class LoginFrame(ctk.CTkFrame):
     def __init__(self, master, frame_cambiar):
         super().__init__(master)
@@ -80,12 +81,12 @@ class LoginFrame(ctk.CTkFrame):
         frame.after(3000, notificacion.destroy)
 
     def login(self, frame):
-        if not self.usuario_correo.get():
-            self.mostrar_notificacion(frame, "Debes ingresar un correo.")
+        if not self.usuario_correo.get().strip() or len(self.usuario_correo.get().strip()) < 6:
+            self.mostrar_notificacion(frame, "Debes ingresar un correo válido.")
             return
         
-        if not self.__usuario_contrasena.get():
-            self.mostrar_notificacion(frame, "Debes ingresar una contraseña")
+        if not self.__usuario_contrasena.get() or len(self.__usuario_contrasena.get()) < 8:
+            self.mostrar_notificacion(frame, "Debes ingresar una contraseña válida")
             return
 
         logear_usuario = Usuario(
@@ -99,7 +100,8 @@ class LoginFrame(ctk.CTkFrame):
             self.mostrar_notificacion(frame, "Usuario o contraseña incorrecto")
             return
 
-        self.frame_cambiar("inicio")
+        self.mostrar_notificacion(frame, "Sesión iniciada con éxito, redirigiendo...")
+        frame.after(2000, lambda: self.frame_cambiar("inicio"))
 
     def registrarse(self):
         self.frame_cambiar("registrar")

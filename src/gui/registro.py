@@ -107,7 +107,6 @@ class RegistroFrame(ctk.CTkFrame):
     def verificar_campos(self, frame):
         # Validar campos vacíos
         dni, correo = chequear(self.usuario_dni.get().strip(), self.usuario_correo.get().strip())
-        print("DNI", dni, "correo", correo)
         
         if not self.usuario_dni.get().strip() or not dni:
             self.mostrar_notificacion(frame, "Documento inválido o ya registrado.")
@@ -143,6 +142,8 @@ class RegistroFrame(ctk.CTkFrame):
                 self.usuario_nombre.get().strip(),
                 self.usuario_apellido.get().strip(),
             )
+            self.mostrar_notificacion(frame, "Registrado, redirigiendo...")
+            frame.after(2000, lambda: self.frame_cambiar("login"))
             return
         
         except:

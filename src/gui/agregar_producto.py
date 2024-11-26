@@ -6,9 +6,10 @@ from database.conexion import *
 
 
 class CrearProducto:
-    def __init__(self, contenedor, procedencia = "inicio", valor = None):
+    def __init__(self, contenedor, frame_origen = None, procedencia = "inicio", valor = None):
         self.contenedor = contenedor
         self.productos_funciones = Productos()
+        self.frame_origen = frame_origen # Se utiliza para volver al frame anterior
 
         # Frame principal que ocupa toda la ventana y se expande
         self.frame_crear = ctk.CTkFrame(master=self.contenedor, fg_color=COLOR_BG)
@@ -288,7 +289,8 @@ class CrearProducto:
                 return
 
             if self.productos_funciones.subir_producto_a_bd(self.producto_nombre.get(), self.producto_marca.get(), precio_compra, precio_venta, self.producto_categoria.get(), cantidad, fecha_formateada):
-                self.mostrar_notificacion("Se cargó el producto con éxito")
+                self.mostrar_notificacion("Se cargó el producto con éxito, redirigiendo...")
+                self.contenedor.after(2000, lambda: self.frame_origen())
             
             else:
                 self.mostrar_notificacion("Error al cargar el producto, intentelo nuevamente")
@@ -359,7 +361,8 @@ class CrearProducto:
                     sql_producto = f"UPDATE productos SET {campos_producto} WHERE id = %s"
                     conexion.ejecutar_bd(sql_producto, valores_producto, "update")
 
-                    self.mostrar_notificacion("Producto Actualizado Correctamente")
+                    self.mostrar_notificacion("Producto Actualizado Correctamente, redirigiendo...")
+                    self.contenedor.after(2000, lambda: self.frame_origen())
 
             else:
                 self.mostrar_notificacion("Debes ingresar al menos un campo para modificar")
@@ -410,7 +413,8 @@ class CrearProducto:
                     sql_lote = f"UPDATE lotes SET {campos_lote} WHERE lote = %s"
                     conexion.ejecutar_bd(sql_lote, valores_lote, "update")
 
-                    self.mostrar_notificacion("Lote Actualizado Correctamente")
+                    self.mostrar_notificacion("Lote Actualizado Correctamente, redirigiendo...")
+                    self.contenedor.after(2000, lambda: self.frame_origen())
                     
             else:
                 self.mostrar_notificacion("Debes ingresar al menos un campo a modificar")

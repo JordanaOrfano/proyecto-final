@@ -339,7 +339,6 @@ class MenuTablas:
     def eliminar_lote(self, tree, frame):
         item = tree.selection()[0]
         valores = tree.item(item, "values")
-        print(valores)
         
         lote = valores[0]
         producto_id = valores[1]
