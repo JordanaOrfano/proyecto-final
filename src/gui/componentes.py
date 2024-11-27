@@ -304,12 +304,12 @@ class MenuTablas:
         respuesta = CTkAlert(
             state="warning",
             title="Eliminar producto",
-            body_text=f"¿Desea eliminar el producto '{valores[1]}'?",
-            btn1="Si",
-            btn2="No",
+            body_text=f"¿Desea eliminar el producto '{valores[1]}'? Esta acción no se puede deshacer.",
+            btn1="Eliminar",
+            btn2="Cancelar",
         )
 
-        if respuesta.get() == "Si":
+        if respuesta.get() == "Eliminar":
             try:
                 # Eliminar lotes asociados al producto
                 self.db.ejecutar_bd(
@@ -350,12 +350,12 @@ class MenuTablas:
         respuesta = CTkAlert(
             state="warning",
             title="Eliminar lote",
-            body_text=f"¿Desea eliminar el lote {valores[0]} de '{valores[2]}'?",
-            btn1="Si",
-            btn2="No",
+            body_text=f"¿Desea eliminar el lote {valores[0]} de '{valores[2]}'? Esta acción no se puede deshacer.",
+            btn1="Eliminar",
+            btn2="Cancelar",
         )
 
-        if respuesta.get() == "Si":
+        if respuesta.get() == "Eliminar":
             try:
                 # Eliminar lote de la base de datos
                 self.db.ejecutar_bd(
