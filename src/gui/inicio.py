@@ -202,7 +202,7 @@ class InicioFrame(ctk.CTkFrame):
             font=("Roboto", 24, "bold"),
             pady=(24, 0),
         )
-        productos, self.tree_productos = crear_tabla(frame_inicio_cont, columnas, encabezados, tabla_productos, pady=10, menu="productos")
+        productos, self.tree_productos = crear_tabla(frame_inicio_cont, columnas, encabezados, tabla_productos, pady=10, menu="productos", frame_origen = self.inicio)
         
         
         # --------------- tabla lotes ---------------
@@ -220,7 +220,7 @@ class InicioFrame(ctk.CTkFrame):
             pady=(24, 0),
         )
         
-        lotes, self.tree_lotes = crear_tabla(frame_inicio_cont, columnas, encabezados, lotes_acomodados, pady=(10, 30), menu="lotes")
+        lotes, self.tree_lotes = crear_tabla(frame_inicio_cont, columnas, encabezados, lotes_acomodados, pady=(10, 30), menu="lotes", frame_origen = self.inicio)
         self.frame_inicio_cont = frame_inicio_cont
         self.cambiar_contenido(frame_inicio, "inicio")
     

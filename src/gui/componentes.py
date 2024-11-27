@@ -178,7 +178,7 @@ def crear_optionmenu(parent, values=[], pady=10, padx=0, width=200, metodo="pack
     
     return dropdown
 
-def crear_tabla(parent, columnas, encabezados, lotes, pady=20, menu=None):
+def crear_tabla(parent, columnas, encabezados, lotes, pady=20, menu = None, frame_origen = None):
     configurar_estilo_tabla()
 
     # Frame de la tabla
@@ -235,11 +235,11 @@ def crear_tabla(parent, columnas, encabezados, lotes, pady=20, menu=None):
     
     if menu == "productos":
         menu_contextual.add_command(label="Agregar al carrito", command=lambda: MenuTablas().agregar_a_carrito(tree))
-        menu_contextual.add_command(label="Editar Producto", command=lambda: MenuTablas(parent).editar_producto(tree))
+        menu_contextual.add_command(label="Editar Producto", command=lambda: MenuTablas(parent).editar_producto(tree, frame_origen))
         menu_contextual.add_command(label="Eliminar producto", command=lambda: MenuTablas().eliminar_producto(tree, frame_tabla))
     
     if menu == "lotes":
-        menu_contextual.add_command(label="Editar Lote", command=lambda: MenuTablas(parent).editar_lote(tree))
+        menu_contextual.add_command(label="Editar Lote", command=lambda: MenuTablas(parent).editar_lote(tree, frame_origen))
         menu_contextual.add_command(label="Eliminar lote", command=lambda: MenuTablas().eliminar_lote(tree, frame_tabla))
         
     
@@ -297,7 +297,7 @@ class MenuTablas:
             btn1="Ok",
         )
 
-    def editar_producto(self, tree):
+    def editar_producto(self, tree, frame_origen):
         item = tree.selection()[0]
         valores = tree.item(item, "values")  # obtiene los valores de la fila
 
@@ -306,9 +306,9 @@ class MenuTablas:
             elemento.destroy()
 
         from gui.agregar_producto import CrearProducto
-        CrearProducto(contenedor = self.frame, procedencia = "tabla_producto", valor = valores)
+        CrearProducto(contenedor = self.frame, frame_origen = frame_origen, procedencia = "tabla_producto", valor = valores)
         
-    def editar_lote(self, tree):
+    def editar_lote(self, tree, frame_origen):
         item = tree.selection()[0]
         valores = tree.item(item, "values") 
     
@@ -317,7 +317,7 @@ class MenuTablas:
             elemento.destroy()
 
         from gui.agregar_producto import CrearProducto
-        CrearProducto(contenedor = self.frame, procedencia = "tabla_lote", valor = valores)
+        CrearProducto(contenedor = self.frame, frame_origen = frame_origen, procedencia = "tabla_lote", valor = valores)
 
     def eliminar_producto(self, tree, frame):
         item = tree.selection()[0]

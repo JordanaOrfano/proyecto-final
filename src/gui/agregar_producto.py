@@ -199,7 +199,7 @@ class CrearProducto:
         if procedencia in ("tabla_lote", "tabla_producto"):
             boton_volver = crear_boton(formulario_frame, 
                                     metodo="grid",
-                                    text="Volver",
+                                    text="Volver", command=self.frame_origen
                                     )
             boton_volver.grid(row=13, column=1, pady=(20, 10), padx=10, sticky="ew")
 
@@ -466,7 +466,7 @@ class CrearProducto:
                 return
 
             if self.productos_funciones.subir_producto_a_bd(self.producto_nombre.get(), self.producto_marca.get(), precio_compra, precio_venta, self.producto_categoria.get(), cantidad, fecha_formateada):
-                self.mostrar_notificacion("Se cargó el producto con éxito, redirigiendo...")
+                self.mostrar_notificacion("Se cargó el producto, redirigiendo...")
                 self.contenedor.after(2000, lambda: self.frame_origen())
             
             else:
@@ -538,7 +538,7 @@ class CrearProducto:
                     sql_producto = f"UPDATE productos SET {campos_producto} WHERE id = %s"
                     conexion.ejecutar_bd(sql_producto, valores_producto, "update")
 
-                    self.mostrar_notificacion("Producto Actualizado Correctamente, redirigiendo...")
+                    self.mostrar_notificacion("Producto actualizado, redirigiendo...")
                     self.contenedor.after(2000, lambda: self.frame_origen())
 
             else:
@@ -590,7 +590,7 @@ class CrearProducto:
                     sql_lote = f"UPDATE lotes SET {campos_lote} WHERE lote = %s"
                     conexion.ejecutar_bd(sql_lote, valores_lote, "update")
 
-                    self.mostrar_notificacion("Lote Actualizado Correctamente, redirigiendo...")
+                    self.mostrar_notificacion("Lote actualizado, redirigiendo...")
                     self.contenedor.after(2000, lambda: self.frame_origen())
                     
             else:
