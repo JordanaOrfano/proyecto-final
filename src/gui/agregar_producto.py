@@ -38,14 +38,14 @@ class CrearProducto:
         if procedencia == "tabla_producto":
             label_titulo = crear_label(formulario_frame, 
                                     metodo="grid", 
-                                    text=f"Editar producto {valor[1]}, ID: {valor[0]}", 
+                                    text=f"Editar '{valor[1]}'", 
                                     font=("Roboto", 32, "bold"))
             label_titulo.grid(row=0, column=0, columnspan=2, pady=(0, 25), sticky="ew")
 
         if procedencia == "tabla_lote":
             label_titulo = crear_label(formulario_frame, 
                                     metodo="grid", 
-                                    text=f"Editar lote {valor[0]}, producto {valor[2]}", 
+                                    text=f"Editar lote {valor[0]} de '{valor[2]}'", 
                                     font=("Roboto", 32, "bold"))
             label_titulo.grid(row=0, column=0, columnspan=2, pady=(0, 25), sticky="ew")
 
@@ -60,7 +60,7 @@ class CrearProducto:
             self.producto_nombre = crear_entry(formulario_frame, placeholder_text="Nombre del producto", metodo="grid")
 
         else:
-            self.producto_nombre = crear_entry(formulario_frame, placeholder_text="Deshabilitado desde 'Editar Lote'", metodo="grid")
+            self.producto_nombre = crear_entry(formulario_frame, placeholder_text="Deshabilitado desde 'Editar Lote'", metodo="grid", fg_color="#dbd5cd")
             self.producto_nombre.configure(state="disabled")
 
         label_producto_nombre.grid(row=1, column=0, columnspan=2, sticky="w", pady=(10,0), padx=10)
@@ -77,7 +77,7 @@ class CrearProducto:
         if procedencia != "tabla_lote":
             self.producto_marca = crear_entry(formulario_frame, placeholder_text="Marca del producto", metodo="grid")
         else:
-            self.producto_marca = crear_entry(formulario_frame, placeholder_text="Deshabilitado desde 'Editar Lote'", metodo="grid")
+            self.producto_marca = crear_entry(formulario_frame, placeholder_text="Deshabilitado desde 'Editar Lote'", metodo="grid", fg_color="#dbd5cd")
             self.producto_marca.configure(state="disabled")
 
         self.producto_marca.grid(row=4, column=0, sticky="ew", padx=10, pady=(0, 10))
@@ -98,7 +98,7 @@ class CrearProducto:
         else:
             self.producto_categoria = crear_dropdown(formulario_frame, 
                                             values=["Deshabilitado desde 'Editar Lote'"], metodo="grid")
-            self.producto_categoria.configure(state="disabled")
+            self.producto_categoria.configure(state="disabled", fg_color="#dbd5cd")
 
         self.producto_categoria.grid(row=4, column=1, sticky="ew", padx=10, pady=(0, 10))
 
@@ -114,7 +114,7 @@ class CrearProducto:
             self.producto_precio_compra = crear_entry(formulario_frame, placeholder_text="$", metodo="grid")
 
         else:
-            self.producto_precio_compra = crear_entry(formulario_frame, placeholder_text="Deshabilitado desde 'Editar Lote'", metodo="grid")
+            self.producto_precio_compra = crear_entry(formulario_frame, placeholder_text="Deshabilitado desde 'Editar Lote'", metodo="grid", fg_color="#dbd5cd")
             self.producto_precio_compra.configure(state="disabled")
 
         self.producto_precio_compra.grid(row=6, column=0, sticky="ew", padx=10, pady=(0, 10))
@@ -133,7 +133,7 @@ class CrearProducto:
             
         else:
             self.producto_precio_venta = crear_entry(formulario_frame, 
-                                            placeholder_text="Deshabilitado desde 'Editar Lote'", metodo="grid")
+                                            placeholder_text="Deshabilitado desde 'Editar Lote'", metodo="grid", fg_color="#dbd5cd")
             self.producto_precio_venta.configure(state="disabled")
 
 
@@ -151,7 +151,7 @@ class CrearProducto:
             self.producto_cantidad = crear_entry(formulario_frame, placeholder_text="0", metodo="grid")
 
         else:
-            self.producto_cantidad = crear_entry(formulario_frame, placeholder_text="Deshabilitado desde 'Editar Producto'", metodo="grid")
+            self.producto_cantidad = crear_entry(formulario_frame, placeholder_text="Deshabilitado desde 'Editar Producto'", metodo="grid", fg_color="#dbd5cd")
             self.producto_cantidad.configure(state="disabled")
 
         self.producto_cantidad.grid(row=10, column=0, sticky="ew", padx=10, pady=(0, 10))
@@ -167,7 +167,7 @@ class CrearProducto:
         if procedencia != "tabla_producto":
             self.producto_vencimiento = crear_entry(formulario_frame, placeholder_text="DD/MM/AA", metodo="grid")
         else:
-            self.producto_vencimiento = crear_entry(formulario_frame, placeholder_text="Deshabilitado desde 'Editar Producto'", metodo="grid")
+            self.producto_vencimiento = crear_entry(formulario_frame, placeholder_text="Deshabilitado desde 'Editar Producto'", metodo="grid", fg_color="#dbd5cd")
             self.producto_vencimiento.configure(state="disabled")
 
 
@@ -186,15 +186,190 @@ class CrearProducto:
                                     metodo="grid",
                                     text="Editar Producto", 
                                     command=lambda: self.editar_producto(procedencia, id_producto = valor[0]))
-            boton_editar.grid(row=13, column=0, columnspan=2, pady=(20, 10), padx=10, sticky="ew")
+            boton_editar.grid(row=13, column=0, pady=(20, 10), padx=10, sticky="ew")
 
         if procedencia == "tabla_lote":
             boton_editar = crear_boton(formulario_frame, 
                                     metodo="grid",
                                     text="Editar Lote", 
                                     command=lambda: self.editar_lote(procedencia, id_producto = valor[0]))
-            boton_editar.grid(row=13, column=0, columnspan=2, pady=(20, 10), padx=10, sticky="ew")
-    
+            boton_editar.grid(row=13, column=0, pady=(20, 10), padx=10, sticky="ew")
+
+        boton_volver = crear_boton(formulario_frame, 
+                                metodo="grid",
+                                text="Volver",
+                                )
+        boton_volver.grid(row=13, column=1, pady=(20, 10), padx=10, sticky="ew")
+
+        # ------------- Datos previos -------------
+        
+        # Datos previos - Productos
+        if procedencia == "tabla_producto":
+            # Separador, línea horizontal
+            separador = ttk.Separator(formulario_frame, orient='horizontal')
+            separador.grid(row=14, column=0, columnspan=2, pady=(30, 10), sticky="ew")
+            
+            label_titulo = crear_label(formulario_frame, 
+                                    metodo="grid", 
+                                    text="Datos previos",  
+                                    font=("Roboto", 24, "bold"))
+            label_titulo.grid(row=15, column=0, columnspan=2, pady=(25, 10), sticky="ew")
+            
+            # Nombre
+            label_nombre = crear_label(formulario_frame, 
+                                metodo="grid", 
+                                text=" Nombre del producto", 
+                                font=("Roboto", 18, "bold"), 
+                                image=crear_imagen("src/assets/icons/title.png", size=(22, 22)))
+            label_nombre.grid(row=16, columnspan=2, sticky="ew", pady=(10,0), padx=10)
+            
+            
+            info_nombre = crear_info(formulario_frame, text=f"{valor[1]}", metodo="grid")
+            info_nombre.grid(row=17, columnspan=2, sticky="ew", pady=(0, 10), padx=10)
+            
+            # Marca
+            label_marca = crear_label(formulario_frame, 
+                                metodo="grid", 
+                                text=" Marca", 
+                                font=("Roboto", 18, "bold"), 
+                                image=crear_imagen("src/assets/icons/description.png", size=(22, 22)))
+            label_marca.grid(row=18, column=0, sticky="ew", pady=(10,0), padx=10)
+            
+            
+            info_marca = crear_info(formulario_frame, text=f"{valor[2]}", metodo="grid")
+            info_marca.grid(row=19, column=0, sticky="ew", pady=(0, 10), padx=10)
+            
+            # Categoria
+            label_categoria = crear_label(formulario_frame, 
+                                metodo="grid", 
+                                text=" Categoría", 
+                                font=("Roboto", 18, "bold"), 
+                                image=crear_imagen("src/assets/icons/category.png", size=(22, 22)))
+            label_categoria.grid(row=18, column=1, sticky="ew", pady=(10,0), padx=10)
+            
+            
+            info_categoria = crear_info(formulario_frame, text=f"{valor[3]}", metodo="grid")
+            info_categoria.grid(row=19, column=1, sticky="ew", pady=(0, 10), padx=10)
+            
+            # Precio compra
+            label_precio_compra = crear_label(formulario_frame, 
+                                metodo="grid", 
+                                text=" Precio de compra", 
+                                font=("Roboto", 18, "bold"), 
+                                image=crear_imagen("src/assets/icons/currency-dollar.png", size=(22, 22)))
+            label_precio_compra.grid(row=20, column=0, sticky="ew", pady=(10,0), padx=10)
+            
+            
+            info_precio_venta = crear_info(formulario_frame, text=f"{valor[4]}", metodo="grid")
+            info_precio_venta.grid(row=21, column=0, sticky="ew", pady=(0, 10), padx=10)
+            
+            # Precio venta
+            label_precio_venta = crear_label(formulario_frame, 
+                                metodo="grid", 
+                                text=" Precio de venta", 
+                                font=("Roboto", 18, "bold"), 
+                                image=crear_imagen("src/assets/icons/report-money.png", size=(22, 22)))
+            label_precio_venta.grid(row=20, column=1, sticky="ew", pady=(10,0), padx=10)
+            
+            
+            info_precio_venta = crear_info(formulario_frame, text=f"{valor[5]}", metodo="grid")
+            info_precio_venta.grid(row=21, column=1, sticky="ew", pady=(0, 10), padx=10)
+            
+            # Cantidad
+            label_cantidad = crear_label(formulario_frame, 
+                                metodo="grid", 
+                                text=" Cantidad", 
+                                font=("Roboto", 18, "bold"), 
+                                image=crear_imagen("src/assets/icons/pencil.png", size=(22, 22)))
+            label_cantidad.grid(row=22, column=0, sticky="ew", pady=(10,0), padx=10)
+            
+            
+            info_cantidad = crear_info(formulario_frame, text=f"{valor[6]}", metodo="grid")
+            info_cantidad.grid(row=23, column=0, sticky="ew", pady=(0, 10), padx=10)
+            
+            # Vencimiento
+            label_id = crear_label(formulario_frame, 
+                                metodo="grid", 
+                                text=" ID", 
+                                font=("Roboto", 18, "bold"), 
+                                image=crear_imagen("src/assets/icons/hash.png", size=(22, 22)))
+            label_id.grid(row=22, column=1, sticky="ew", pady=(10,0), padx=10)
+            
+            info_id = crear_info(formulario_frame, text=f"{valor[0]}", metodo="grid")
+            info_id.grid(row=23, column=1, sticky="ew", pady=(0, 20), padx=10)
+            
+        # Datos previos - Lotes
+        if procedencia == "tabla_lote":
+            # Separador, línea horizontal
+            separador = ttk.Separator(formulario_frame, orient='horizontal')
+            separador.grid(row=14, column=0, columnspan=2, pady=(30, 10), sticky="ew")
+            
+            label_titulo = crear_label(formulario_frame, 
+                                    metodo="grid", 
+                                    text="Datos previos",  
+                                    font=("Roboto", 24, "bold"))
+            label_titulo.grid(row=15, columnspan=2, pady=(25, 10), sticky="ew")
+            
+            # Nombre
+            label_nombre = crear_label(formulario_frame, 
+                                metodo="grid", 
+                                text=" Nombre del producto", 
+                                font=("Roboto", 18, "bold"), 
+                                image=crear_imagen("src/assets/icons/title.png", size=(22, 22)))
+            label_nombre.grid(row=16, columnspan=2, sticky="ew", pady=(10,0), padx=10)
+            
+            
+            info_nombre = crear_info(formulario_frame, text=f"{valor[2]}", metodo="grid")
+            info_nombre.grid(row=17, columnspan=2, sticky="ew", pady=(0, 10), padx=10)
+            
+            # Lote
+            label_lote = crear_label(formulario_frame, 
+                                metodo="grid", 
+                                text=" Lote", 
+                                font=("Roboto", 18, "bold"), 
+                                image=crear_imagen("src/assets/icons/lote.png", size=(22, 22)))
+            label_lote.grid(row=18, column=0, sticky="ew", pady=(10,0), padx=10)
+            
+            
+            info_lote = crear_info(formulario_frame, text=f"{valor[0]}", metodo="grid")
+            info_lote.grid(row=19, column=0, sticky="ew", pady=(0, 10), padx=10)
+            
+            # Marca
+            label_marca = crear_label(formulario_frame, 
+                                metodo="grid", 
+                                text=" Marca", 
+                                font=("Roboto", 18, "bold"), 
+                                image=crear_imagen("src/assets/icons/description.png", size=(22, 22)))
+            label_marca.grid(row=18, column=1, sticky="ew", pady=(10,0), padx=10)
+            
+            
+            info_marca = crear_info(formulario_frame, text=f"{valor[3]}", metodo="grid")
+            info_marca.grid(row=19, column=1, sticky="ew", pady=(0, 10), padx=10)
+            
+            # Cantidad
+            label_cantidad = crear_label(formulario_frame, 
+                                metodo="grid", 
+                                text=" Cantidad",  
+                                font=("Roboto", 18, "bold"), 
+                                image=crear_imagen("src/assets/icons/pencil.png", size=(22, 22)))
+            label_cantidad.grid(row=20, column=0, sticky="ew", pady=(10,0), padx=10)
+            
+            
+            info_cantidad = crear_info(formulario_frame, text=f"{valor[4]}", metodo="grid")
+            info_cantidad.grid(row=21, column=0, sticky="ew", pady=(0, 10), padx=10)
+            
+            # Vencimiento
+            label_vencimiento = crear_label(formulario_frame, 
+                                metodo="grid", 
+                                text=" Vencimiento",  
+                                font=("Roboto", 18, "bold"), 
+                                image=crear_imagen("src/assets/icons/calendar.png", size=(22, 22)))
+            label_vencimiento.grid(row=20, column=1, sticky="ew", pady=(10,0), padx=10)
+            
+            info_vencimiento = crear_info(formulario_frame, text=f"{valor[5]}", metodo="grid")
+            info_vencimiento.grid(row=21, column=1, sticky="ew", pady=(0, 20), padx=10)
+            
+        
     def validar_y_convertir_fecha(self, fecha_ingresada):
         try:
             fecha = datetime.strptime(fecha_ingresada, "%d/%m/%Y")
