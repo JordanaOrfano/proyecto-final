@@ -1,6 +1,6 @@
 # Lógica de registro e inicio sesión
 from database.conexion import *
-import bcrypt  # Para enscriptar contraseñas
+import bcrypt  # Para encriptar contraseñas
 
 
 class Usuario:
@@ -36,7 +36,7 @@ class Usuario:
             correo_ingresado = correo_ingresado
             self.__contrasena_ingresada = contrasena_ingresada
 
-            sql = "SELECT nombre, apellido, rol, contrasena FROM usuarios WHERE correo = %s"
+            sql = "SELECT nombre, apellido, rol, contrasena, correo, documento FROM usuarios WHERE correo = %s"
             Usuario.usuario_actual = self.database.ejecutar_bd(sql, (correo_ingresado,))
 
             if Usuario.usuario_actual:

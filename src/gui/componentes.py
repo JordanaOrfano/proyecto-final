@@ -2,7 +2,7 @@ from config.config import *
 from core.productos import *
 
 def crear_boton(
-    parent, text, command=None, fill="none", padx=50, width=350, pady=20, metodo="pack", **kwargs,
+    parent, text, command=None, fill="none", fg_color=COLOR_PRIMARIO, font=("Roboto", 16, "bold"), padx=50, width=350, pady=20, metodo="pack", **kwargs,
 ):
     boton = ctk.CTkButton(
         parent,
@@ -11,9 +11,9 @@ def crear_boton(
         width=width,
         height=45,
         corner_radius=8,
-        font=("Roboto", 16, "bold"),
+        font=font,
         compound="left",
-        fg_color=COLOR_PRIMARIO,
+        fg_color=fg_color,
         hover_color=COLOR_PRIMARIO_HOVER,
         **kwargs,
     )
@@ -134,7 +134,7 @@ def crear_dropdown(parent, values=[], metodo="pack", pady=10, padx=0, width=200,
     
     return dropdown
 
-def crear_optionmenu(parent, values=[], pady=10, padx=0, width=200, **kwargs):
+def crear_optionmenu(parent, values=[], pady=10, padx=0, width=200, metodo="pack", **kwargs):
     dropdown = ctk.CTkOptionMenu(
             parent,
             height=45,
@@ -148,7 +148,10 @@ def crear_optionmenu(parent, values=[], pady=10, padx=0, width=200, **kwargs):
             dropdown_hover_color=COLOR_PRIMARIO,
         )
 
-    dropdown.pack(pady=pady, padx=padx, fill="x")
+    if metodo == "grid":
+        pass
+    else:
+        dropdown.pack(pady=pady, padx=padx, fill="x")
     
     return dropdown
 
