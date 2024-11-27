@@ -112,6 +112,29 @@ def crear_stat(parent, titulo, contador, padx=0, image=None, **kwargs):
 
     return label_stat
 
+def crear_info(parent, text, command=None, fill="none", padx=50, width=350, pady=20, metodo="pack", **kwargs):
+        info = ctk.CTkButton(
+        parent,
+        text=text,
+        command=command,
+        width=width,
+        height=45,
+        corner_radius=8,
+        font=("Roboto", 15),
+        fg_color="white",
+        hover=False,
+        border_width=2,
+        border_color=COLOR_PRIMARIO,
+        text_color="black",
+    )
+    
+        if metodo == "grid":
+            pass
+        else:
+            info.pack(pady=pady, padx=padx, fill=fill)
+
+        return info
+
 def crear_dropdown(parent, values=[], metodo="pack", pady=10, padx=0, width=200, **kwargs):
     dropdown = ctk.CTkComboBox(
             parent,

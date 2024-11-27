@@ -45,15 +45,9 @@ class Configuracion:
                     )
         label_nombre.grid(row=2, columnspan=2, pady=(10, 0), sticky="ew")
         
-        nombre = crear_boton(frame_contenido, 
-                             text=f"{Usuario.usuario_actual[0][0]} {Usuario.usuario_actual[0][1]}",
-                             metodo="grid", 
-                             border_width=2,
-                             border_color=COLOR_PRIMARIO,
-                             fg_color="white",
-                             hover=False, 
-                             text_color="black",
-                             font=("Roboto", 15),
+        nombre = crear_info(frame_contenido, 
+                             text=f"{Usuario.usuario_actual[0][0].capitalize()} {Usuario.usuario_actual[0][1].capitalize()}",
+                             metodo="grid",
                             )
         nombre.grid(row=3, columnspan=2, pady=0, sticky="ew")
 
@@ -66,15 +60,9 @@ class Configuracion:
                     )
         label_correo.grid(row=4, column=0, pady=(15, 0), sticky="ew")
         
-        correo = crear_boton(frame_contenido, 
+        correo = crear_info(frame_contenido, 
                              text=f"{Usuario.usuario_actual[0][4]}",
-                             metodo="grid", 
-                             border_width=2,
-                             border_color=COLOR_PRIMARIO,
-                             fg_color="white",
-                             hover=False, 
-                             text_color="black",
-                             font=("Roboto", 15),
+                             metodo="grid",
                             )
         correo.grid(row=5, column=0, pady=0, padx=(0, 10), sticky="ew")
 
@@ -87,15 +75,9 @@ class Configuracion:
                     )
         label_dni.grid(row=4, column=1, pady=(15, 0), sticky="ew")
         
-        dni = crear_boton(frame_contenido, 
+        dni = crear_info(frame_contenido, 
                              text=f"{Usuario.usuario_actual[0][5]}",
-                             metodo="grid", 
-                             border_width=2,
-                             border_color=COLOR_PRIMARIO,
-                             fg_color="white",
-                             hover=False, 
-                             text_color="black",
-                             font=("Roboto", 15),
+                             metodo="grid",
                             )
         dni.grid(row=5, column=1, pady=0, padx=(10, 0), sticky="ew")
         

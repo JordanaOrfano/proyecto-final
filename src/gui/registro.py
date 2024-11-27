@@ -116,11 +116,11 @@ class RegistroFrame(ctk.CTkFrame):
             self.mostrar_notificacion(frame, "Correo inválido, en uso o demasiado largo.")
             return
 
-        if not self.usuario_nombre.get().strip() or len(self.usuario_nombre.get().strip()) < 4 or len(self.usuario_nombre.get().strip()) > 30 :
+        if not self.usuario_nombre.get().strip() or len(self.usuario_nombre.get().strip()) < 3 or len(self.usuario_nombre.get().strip()) > 30 :
             self.mostrar_notificacion(frame, "Nombre inválido o demasiado largo.")
             return
         
-        if not self.usuario_apellido.get().strip() or len(self.usuario_apellido.get().strip()) < 4 or len(self.usuario_apellido.get().strip()) > 30:
+        if not self.usuario_apellido.get().strip() or len(self.usuario_apellido.get().strip()) < 3 or len(self.usuario_apellido.get().strip()) > 30:
             self.mostrar_notificacion(frame, "Apellido inválido o demasiado largo.")
             return
         
