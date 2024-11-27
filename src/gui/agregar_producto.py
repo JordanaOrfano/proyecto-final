@@ -195,11 +195,13 @@ class CrearProducto:
                                     command=lambda: self.editar_lote(procedencia, id_producto = valor[0]))
             boton_editar.grid(row=13, column=0, pady=(20, 10), padx=10, sticky="ew")
 
-        boton_volver = crear_boton(formulario_frame, 
-                                metodo="grid",
-                                text="Volver",
-                                )
-        boton_volver.grid(row=13, column=1, pady=(20, 10), padx=10, sticky="ew")
+        
+        if procedencia in ("tabla_lote", "tabla_producto"):
+            boton_volver = crear_boton(formulario_frame, 
+                                    metodo="grid",
+                                    text="Volver",
+                                    )
+            boton_volver.grid(row=13, column=1, pady=(20, 10), padx=10, sticky="ew")
 
         # ------------- Datos previos -------------
         
@@ -278,14 +280,14 @@ class CrearProducto:
             # Cantidad
             label_cantidad = crear_label(formulario_frame, 
                                 metodo="grid", 
-                                text=" Cantidad", 
+                                text=" Cantidad total", 
                                 font=("Roboto", 18, "bold"), 
                                 image=crear_imagen("src/assets/icons/pencil.png", size=(22, 22)))
             label_cantidad.grid(row=22, column=0, sticky="ew", pady=(10,0), padx=10)
             
             
             info_cantidad = crear_info(formulario_frame, text=f"{valor[6]}", metodo="grid")
-            info_cantidad.grid(row=23, column=0, sticky="ew", pady=(0, 10), padx=10)
+            info_cantidad.grid(row=23, column=0, sticky="ew", pady=(0, 20), padx=10)
             
             # Vencimiento
             label_id = crear_label(formulario_frame, 
@@ -356,7 +358,7 @@ class CrearProducto:
             
             
             info_cantidad = crear_info(formulario_frame, text=f"{valor[4]}", metodo="grid")
-            info_cantidad.grid(row=21, column=0, sticky="ew", pady=(0, 10), padx=10)
+            info_cantidad.grid(row=21, column=0, sticky="ew", pady=(0, 20), padx=10)
             
             # Vencimiento
             label_vencimiento = crear_label(formulario_frame, 
@@ -426,7 +428,7 @@ class CrearProducto:
         return True
 
     def mostrar_notificacion(self, message, tipo="info"):
-        notificacion = CTkNotification(master=self.contenedor, state=tipo, message=message, side="right_bottom")
+        notificacion = CTkNotification(master=self.contenedor, state=tipo, message=message, side="right_top")
         self.contenedor.after(3000, notificacion.destroy)
 
     def enviar_producto_a_bd(self):
