@@ -27,7 +27,7 @@ class Estadisticas:
         
         crear_label(
             frame_estadisticas,
-            text=" Mensuales",
+            text=" Mensual",
             font=("Roboto", 24, "bold"),
             pady=(20, 10),
             padx=30
@@ -45,7 +45,7 @@ class Estadisticas:
         
         crear_label(
             frame_estadisticas,
-            text=" Totales",
+            text=f" {(datetime.now()).year}",
             font=("Roboto", 24, "bold"),
             pady=(30, 0),
             padx=30

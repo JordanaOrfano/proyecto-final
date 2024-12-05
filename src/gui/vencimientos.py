@@ -19,7 +19,7 @@ class Vencimientos:
             frame_vencimientos,
             text="Vencimientos",
             font=("Roboto", 32, "bold"),
-            pady=(0, 25),
+            pady=(10, 25),
         )
 
         # Contadores de productos

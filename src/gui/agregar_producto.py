@@ -422,7 +422,7 @@ class CrearProducto:
     def validar_campo_agregar_producto(self, campo, message, max_length=21):
         
         if len(campo.get().strip()) == 0 or len(campo.get().strip()) > max_length:
-            notificacion = CTkNotification(master=self.contenedor, state="warning", message=message, side="right_bottom")
+            notificacion = CTkNotification(master=self.contenedor, state="warning", message=message, side="right_top")
             self.contenedor.after(3000, notificacion.destroy)
             return False
         return True
@@ -467,7 +467,7 @@ class CrearProducto:
 
             if self.productos_funciones.subir_producto_a_bd(self.producto_nombre.get(), self.producto_marca.get(), precio_compra, precio_venta, self.producto_categoria.get(), cantidad, fecha_formateada):
                 self.mostrar_notificacion("Se cargó el producto, redirigiendo...")
-                self.contenedor.after(2000, lambda: self.frame_origen())
+                self.contenedor.after(1000, lambda: self.frame_origen())
             
             else:
                 self.mostrar_notificacion("Error al cargar el producto, intentelo nuevamente")
@@ -539,7 +539,7 @@ class CrearProducto:
                     conexion.ejecutar_bd(sql_producto, valores_producto, "update")
 
                     self.mostrar_notificacion("Producto actualizado, redirigiendo...")
-                    self.contenedor.after(2000, lambda: self.frame_origen())
+                    self.contenedor.after(1000, lambda: self.frame_origen())
 
             else:
                 self.mostrar_notificacion("Debes ingresar al menos un campo para modificar")
@@ -591,7 +591,7 @@ class CrearProducto:
                     conexion.ejecutar_bd(sql_lote, valores_lote, "update")
 
                     self.mostrar_notificacion("Lote actualizado, redirigiendo...")
-                    self.contenedor.after(2000, lambda: self.frame_origen())
+                    self.contenedor.after(1000, lambda: self.frame_origen())
                     
             else:
                 self.mostrar_notificacion("Debes ingresar al menos un campo a modificar")
