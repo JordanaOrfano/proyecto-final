@@ -139,7 +139,8 @@ class Productos:
                         productos.nombre, 
                         productos.marca, 
                         lotes.cantidad, 
-                        lotes.fecha_vencimiento
+                        lotes.fecha_vencimiento,
+                        productos.precio_venta
                     FROM 
                         lotes
                     JOIN

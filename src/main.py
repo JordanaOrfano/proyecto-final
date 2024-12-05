@@ -10,6 +10,9 @@ class App(ctk.CTk):
     def __init__(self):
         super().__init__()
 
+        conexion = Database() # Asegura que exista una conexión con la bd o se cree la bd
+        conexion.conectar_db()
+
         centrar_ventana(self, 1300, 700)
         self.title("StockUp!")
         self.minsize(width=1300, height=700)
@@ -35,8 +38,6 @@ class App(ctk.CTk):
 
 
 def run_app():
-    conexion = Database() # Asegura que exista una conexión con la bd o se cree la bd
-    conexion.conectar_db()
 
     app = App()
     app.mainloop()  # Ejecutar la ventana principal

@@ -178,7 +178,7 @@ def crear_optionmenu(parent, values=[], pady=10, padx=0, width=200, metodo="pack
     
     return dropdown
 
-def crear_tabla(parent, columnas, encabezados, lotes, pady=20, menu = None, frame_origen = None):
+def crear_tabla(parent, columnas, encabezados, lotes, pady=20, menu = None, frame_origen = None, boton_carrito = None, carrito = None):
     configurar_estilo_tabla()
 
     # Frame de la tabla
@@ -234,13 +234,17 @@ def crear_tabla(parent, columnas, encabezados, lotes, pady=20, menu = None, fram
                            )
     
     if menu == "productos":
-        menu_contextual.add_command(label="Agregar al carrito", command=lambda: MenuTablas().agregar_a_carrito(tree))
         menu_contextual.add_command(label="Editar Producto", command=lambda: MenuTablas(parent).editar_producto(tree, frame_origen))
         menu_contextual.add_command(label="Eliminar producto", command=lambda: MenuTablas().eliminar_producto(tree, frame_tabla))
     
     if menu == "lotes":
+        menu_contextual.add_command(label="Agregar al carrito", command=lambda: MenuTablas().agregar_a_carrito(tree, boton_carrito))
         menu_contextual.add_command(label="Editar Lote", command=lambda: MenuTablas(parent).editar_lote(tree, frame_origen))
         menu_contextual.add_command(label="Eliminar lote", command=lambda: MenuTablas().eliminar_lote(tree, frame_tabla))
+    
+    if menu == "carrito":
+        menu_contextual.add_command(label="Modificar Cantidad", command=lambda: MenuTablas().agregar_a_carrito(tree)) # FALTA CÓDIGO MODIFICAR CANTIDAD
+        menu_contextual.add_command(label="Eliminar del carrito", command=lambda: eliminar_del_carrito(tree, carrito))
         
     
     # Función para mostrar el menú en clic derecho
@@ -279,23 +283,70 @@ def configurar_estilo_tabla():
                 background=[('selected', COLOR_PRIMARIO_HOVER)])
 
 
+# TODAS LAS ACCIONES POSIBLES SOBRE EL CARRITO
+productos_del_carrito = []
+
+def agregar_productos_carrito(valores):
+    # Si el producto ya está en el carrito se le suma cantidad
+    valores_lista = list(valores)
+    valores_lista[4] = 1
+
+    if not valores_lista in productos_del_carrito:
+        productos_del_carrito.append(valores_lista)
+        CTkAlert(
+            state="info",
+            title="Agregar al producto",
+            body_text=f"Producto {valores[2]} agregado.",
+            btn1="Ok",
+        )
+    else:
+        CTkAlert(
+            state="info",
+            title="Agregar al producto",
+            body_text=f"El producto {valores[2]} ya está en el carrito.",
+            btn1="Ok",
+        )
+
+def editar_cantidad(valores):
+    pass
+
+def obtener_productos_carrito():
+    return productos_del_carrito
+
+def vaciar_productos_carro():
+    global productos_del_carrito
+    productos_del_carrito = []
+
+def eliminar_del_carrito(tree, carrito):
+    productos_del_carrito = obtener_productos_carrito()
+
+    try:
+        item = tree.selection()[0]  
+        valores = tree.item(item, "values")  
+
+        valores_lista = list(valores)
+        valores_lista[4] = 1
+
+        productos_del_carrito.remove(valores_lista)
+
+        tree.delete(item)
+        carrito()
+
+    except IndexError:
+        pass
+
 class MenuTablas:    
     def __init__(self, frame = None):
         self.db = Database()
         self.frame = frame
         
-
-    def agregar_a_carrito(self, tree):
+    def agregar_a_carrito(self, tree, boton_carrito):
         item = tree.selection()[0]
         valores = tree.item(item, "values")
-        # Código para agregar el producto al carrito, FALTA
+        agregar_productos_carrito(valores)
 
-        CTkAlert(
-            state="info",
-            title="Agregar al producto",
-            body_text=f"Producto {valores[1]} agregado.",
-            btn1="Ok",
-        )
+        contador_carrito = len(obtener_productos_carrito())
+        boton_carrito.configure(text=contador_carrito)
 
     def editar_producto(self, tree, frame_origen):
         item = tree.selection()[0]

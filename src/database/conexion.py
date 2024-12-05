@@ -1,6 +1,5 @@
 import mysql.connector
 
-
 class Database:
     def __init__(self):
         self.conexion = None
@@ -49,12 +48,15 @@ class Database:
                         resultados = cursor.fetchall()
                         return resultados
                     
-                    # Si es un INSERT, UPDATE, DELETE, hacer commit
-                    if tipo != "diccionario" and tipo !="select":
-                        conexion.commit()
-                        if tipo == "insert":
-                            return cursor.lastrowid # Obtengo el id del último registro ingresado para usarlo como clave foranea
-                        return True  # Sirve para retornar true y señalar que todo fue correcto
+                    try:
+                        # Si es un INSERT, UPDATE, DELETE, hacer commit
+                        if tipo != "diccionario" and tipo !="select":
+                            conexion.commit()
+                            if tipo == "insert":
+                                return cursor.lastrowid # Obtengo el id del último registro ingresado para usarlo como clave foranea
+                            return True  # Sirve para retornar true y señalar que todo fue correcto
+                    except:
+                        conexion.rollback()
 
         except mysql.connector.Error as error:
             print(f"Error al ejecutar la consulta SQL {error}")
@@ -125,14 +127,15 @@ class Database:
         tabla_ventas = """
         CREATE TABLE IF NOT EXISTS ventas (
             id INT AUTO_INCREMENT PRIMARY KEY,
-            producto_id INT NOT NULL,
-            cantidad_vendida INT NOT NULL,
+            producto_id VARCHAR(1000) NOT NULL,
+            cantidad_vendida VARCHAR(1000) NOT NULL,
             ganancia_venta DECIMAL(10, 2) NOT NULL,
             fecha_venta DATE,
-            FOREIGN KEY (producto_id) REFERENCES productos(id)
+            empleado_documento INT NOT NULL,
+            FOREIGN KEY (empleado_documento) REFERENCES usuarios(documento)
         ) ENGINE=INNODB;
         """
-
+        
         # Crear las tablas
         cursor.execute(tabla_productos)
         cursor.execute(tabla_lotes)

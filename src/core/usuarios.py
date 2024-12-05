@@ -16,15 +16,15 @@ class Usuario:
         self.__hashed = bcrypt.hashpw(self.__contrasena.encode("utf-8"), salt)
         return self.__hashed
 
-    def registrar_usuario(self, dni, nombre, apellido):
+    def registrar_usuario(self, dni, nombre, apellido, rol = "empleado"):
         self.dni = dni
         self.nombre = nombre
         self.apellido = apellido
 
         try:
             self.__hashed = self.encriptar_contrasena()
-            valores = (self.dni, self.correo, self.__hashed, self.nombre, self.apellido)
-            sql = "insert into usuarios values(%s, %s, %s, %s, %s, 'empleado')"
+            valores = (self.dni, self.correo, self.__hashed, self.nombre, self.apellido, rol)
+            sql = "insert into usuarios values(%s, %s, %s, %s, %s, %s)"
 
             consulta = self.database.ejecutar_bd(sql, valores, "insert")
 
