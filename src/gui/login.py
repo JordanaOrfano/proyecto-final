@@ -40,7 +40,7 @@ class LoginFrame(ctk.CTkFrame):
         frameLogin.pack(expand=True, fill="x", padx=110)
 
         crear_label(
-            frameLogin, text="¡Bienvenido a EcoPrint!", font=("Roboto", 32, "bold"), pady=(0, 30), anchor="center"
+            frameLogin, text="¡Bienvenido a StockUp!", font=("Roboto", 32, "bold"), pady=(0, 30), anchor="center"
         )
 
         crear_label(frameLogin, text=" Correo electrónico", font=("Roboto", 18, "bold"), pady=(10, 0), padx=0,
