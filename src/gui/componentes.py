@@ -415,3 +415,12 @@ class MenuTablas:
                 
             except Exception as error:
                 print(f"Error al eliminar lote: {error}")
+
+def crear_notificacion(frame, state, texto):
+    notificacion = CTkNotification(
+        master=frame,
+        state=state,
+        message=texto,
+        side="right_bottom"
+    )
+    frame.after(3000, notificacion.destroy)
