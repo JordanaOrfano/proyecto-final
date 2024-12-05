@@ -7,6 +7,7 @@ import json
 import openpyxl  # Para exportar a excel
 import os  #Para crear carpeta de exportaciones
 from openpyxl.styles import Alignment, PatternFill, Font  # Estilos de excel
+import tkinter.filedialog as fd
 
 
 class Configuracion:
@@ -165,13 +166,14 @@ class Configuracion:
             values=["Seleccione formato", "Excel", "CSV", "JSON"],
             pady=0,
             metodo="grid",
-            command=lambda: self.importar_productos(importar_optionmenu.get())
             )
         importar_optionmenu.grid(row=15, column=0, sticky="ew", padx=(0, 10), pady=(0, 20))
         
         importar_btn = crear_boton(parent=frame_contenido, 
                                    text="Importar", 
-                                   metodo="grid")
+                                   metodo="grid",
+                                   command=lambda: self.importar_productos(importar_optionmenu.get())
+                                   )
         importar_btn.grid(row=15, column=1, sticky="ew", padx=(10, 0), pady=(0, 20))
     
     # -------------------------------- Exportar --------------------------------
@@ -183,7 +185,7 @@ class Configuracion:
         elif formato == "Excel":
             self.exportar_excel()
         else:
-            crear_notificacion(self.contenedor, "error", "Seleccione un formato")
+            crear_notificacion(self.contenedor, "error", "Seleccione un formato.")
     
     def exportar_csv(self):
         productos = self.conexion.ejecutar_bd("SELECT * FROM productos", tipo="select")
@@ -318,5 +320,72 @@ class Configuracion:
         elif formato == "Excel":
             self.importar_excel()
         else:
-            print("Formato no soportado")
+            crear_notificacion(self.contenedor, "error", "Seleccione un formato.")
     
+    def importar_json(self):
+        # Ventana para seleccionar archivo de productos
+        archivo_productos = fd.askopenfilename(title="Seleccionar archivo productos.json", 
+                                              filetypes=[("Archivos JSON", "*.json")])
+        
+        # Ventana para seleccionar archivo de lotes
+        archivo_lotes = fd.askopenfilename(title="Seleccionar archivo lotes.json", 
+                                           filetypes=[("Archivos JSON", "*.json")])
+
+        if archivo_productos and archivo_lotes:
+            try:
+                # Cargar productos desde archivo JSON
+                with open(archivo_productos, 'r', encoding='utf-8') as file:
+                    productos_data = json.load(file)
+                    if isinstance(productos_data, list):
+                        productos = productos_data  # Es una lista de productos directamente
+                        for producto in productos:
+                            query = """
+                                INSERT INTO productos (id, nombre, marca, categoria, precio_compra, precio_venta) 
+                                VALUES (%s, %s, %s, %s, %s, %s)
+                                ON DUPLICATE KEY UPDATE
+                                    nombre = VALUES(nombre),
+                                    marca = VALUES(marca),
+                                    categoria = VALUES(categoria),
+                                    precio_compra = VALUES(precio_compra),
+                                    precio_venta = VALUES(precio_venta)
+                            """
+                            self.conexion.ejecutar_bd(query, tipo="insert", valores=(
+                                producto['ID'],
+                                producto['Nombre'],
+                                producto['Marca'],
+                                producto['Categoría'],
+                                producto['Precio de compra'],
+                                producto['Precio de venta']
+                            ))
+                    else:
+                        crear_notificacion(self.contenedor, "error", "El archivo de productos no tiene el formato esperado (debe ser una lista de objetos).")
+
+                # Cargar lotes desde archivo JSON
+                with open(archivo_lotes, 'r', encoding='utf-8') as file:
+                    lotes_data = json.load(file)
+                    if isinstance(lotes_data, list):
+                        lotes = lotes_data  # Es una lista de lotes directamente
+                        for lote in lotes:
+                            query = """
+                                INSERT INTO lotes (lote, producto_id, cantidad, fecha_vencimiento) 
+                                VALUES (%s, %s, %s, %s)
+                                ON DUPLICATE KEY UPDATE
+                                    lote = VALUES(lote),
+                                    producto_id = VALUES(producto_id),
+                                    cantidad = VALUES(cantidad),
+                                    fecha_vencimiento = VALUES(fecha_vencimiento)
+                            """
+                            self.conexion.ejecutar_bd(query, tipo="insert", valores=(
+                                lote['Lote'],
+                                lote['Producto ID'],
+                                lote['Cantidad'],
+                                lote['Fecha de vencimiento']
+                            ))
+                    else:
+                        crear_notificacion(self.contenedor, "error", "El archivo de lotes no tiene el formato esperado (debe ser una lista de objetos).")
+
+                crear_notificacion(self.contenedor, "info", "Productos y lotes importados correctamente.")
+            except Exception as e:
+                crear_notificacion(self.contenedor, "error", f"Error: Seleccione los archivos correctos.")
+        else:
+            crear_notificacion(self.contenedor, "error", "Debe seleccionar los archivos 'productos' y 'lotes'.")
