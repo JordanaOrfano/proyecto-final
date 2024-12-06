@@ -38,7 +38,6 @@ class App(ctk.CTk):
 
 
 def run_app():
-
     app = App()
     app.mainloop()  # Ejecutar la ventana principal
 

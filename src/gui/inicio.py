@@ -1,5 +1,6 @@
 from config.config import *
 from gui.componentes import *
+from gui.revisar_ventas import *
 from gui.agregar_producto import *
 from gui.estadisticas import *
 from gui.vencimientos import *
@@ -18,11 +19,7 @@ class InicioFrame(ctk.CTkFrame):
         self.frame_contenido = None
         self.botones_sideframe = {}  # Diccionario para almacenar botones del sideFrame
         self.side_frame()
-        if Usuario.usuario_actual[0][2].strip('"') == "empleado":
-            self.inicio()
-
-        if Usuario.usuario_actual[0][2].strip('"') == "supervisor":
-            self.inicio_administrador()
+        self.inicio()
 
     def side_frame(self):
         sideFrame = ctk.CTkFrame(master=self, width=240, fg_color=COLOR_PRIMARIO)
@@ -55,26 +52,35 @@ class InicioFrame(ctk.CTkFrame):
             image=crear_imagen("src/assets/icons/home.png"),
         )
 
+        if Usuario.usuario_actual[0][2] == "supervisor":
+            self.botones_sideframe["Revisar ventas"] = crear_boton_sideframe(
+                centrar_frame,
+                text="Revisar Ventas",
+                command=self.revisar_ventas,
+                pady=0,
+                image=crear_imagen("src/assets/icons/shopping-cart-share.png"),
+            )
+
         self.botones_sideframe["crear_producto"] = crear_boton_sideframe(
             centrar_frame,
             text="Añadir producto",
             command=self.crear_producto,
             image=crear_imagen("src/assets/icons/pencil-plus.png"),
         )
-        
-        self.botones_sideframe["vencimientos"] = crear_boton_sideframe(
-            centrar_frame,
-            text="Vencimientos",
-            command=self.vencimientos,
-            image=crear_imagen("src/assets/icons/calendar-exclamation.png"),
-        )
+        if Usuario.usuario_actual[0][2] == "supervisor":
+            self.botones_sideframe["vencimientos"] = crear_boton_sideframe(
+                centrar_frame,
+                text="Vencimientos",
+                command=self.vencimientos,
+                image=crear_imagen("src/assets/icons/calendar-exclamation.png"),
+            )
 
-        self.botones_sideframe["estadisticas"] = crear_boton_sideframe(
-            centrar_frame,
-            text="Estadísticas",
-            command=self.estadisticas,
-            image=crear_imagen("src/assets/icons/stats.png"),
-        )
+            self.botones_sideframe["estadisticas"] = crear_boton_sideframe(
+                centrar_frame,
+                text="Estadísticas",
+                command=self.estadisticas,
+                image=crear_imagen("src/assets/icons/stats.png"),
+            )
 
         self.botones_sideframe["configuracion"] = crear_boton_sideframe(
             centrar_frame, text="Configuración", command=self.configuracion,
@@ -228,18 +234,13 @@ class InicioFrame(ctk.CTkFrame):
         self.frame_inicio_cont = frame_inicio_cont
         self.cambiar_contenido(frame_inicio, "inicio")
     
-    def inicio_administrador(self):
-        frame_inicio = ctk.CTkScrollableFrame(master=self, fg_color=COLOR_BG)
-        crear_label(
-            frame_inicio,
-            text="Inicio ADMINISTRADOR",
-            font=("Roboto", 32, "bold"),
-            pady=(30, 10),
-        )
-
-        self.funciones_productos.mostrar_publicaciones(contenedor=frame_inicio)
-
-        self.cambiar_contenido(frame_inicio, "inicio")
+    def revisar_ventas(self):
+        # frame_ventas = ctk.CTkFrame(master=self, fg_color=COLOR_BG)
+        frame_ventas = ctk.CTkScrollableFrame(master=self, fg_color=COLOR_BG)
+        
+        
+        RevisarVentas(contenedor=frame_ventas)
+        self.cambiar_contenido(frame_ventas, "Revisar ventas")
 
     # Obtiene el click cuando el usuario toca "buscar" y hace una funcion
     def evento_buscar(self):
@@ -368,19 +369,22 @@ class InicioFrame(ctk.CTkFrame):
             # ----- QUERY UPDATE TABLA PRODUCTOS -----
             case_statements = [] # Almacena las instrucciones CASE  WHEN condicion THEN resultado
             ids = [] # Almacena todos los ids de los productos
+            ganancia_unitaria = [] # Almacena la ganancia por la venta de cada producto
             cantidades = [] # Almacena todas las cantidades para hacer un join separadas por comas
             valores = []
 
             # Construir los CASE WHEN para cada producto
             for producto in productos_carrito:
-                producto_id = producto[0]  # ID del producto
+                producto_id = producto[1]  # ID del producto
                 cantidad_vendida = producto[4]  # Cantidad vendida
+                ganancia_recibida = float(producto[4]) * float(producto[6])
 
                 case_statements.append("WHEN lote = %s THEN cantidad - %s")
                 valores.extend([producto_id, cantidad_vendida])  # Agregar ID y cantidad como parámetros
 
                 ids.append(producto_id)
                 cantidades.append(cantidad_vendida)
+                ganancia_unitaria.append(ganancia_recibida)
 
             # El CASE se utiliza para colocar multiples WHEN, y el THEN se utiliza para modificar la cantidad actual
             # EL WHEN se utiliza cómo un if pero para un resultado especifico, esa es la diferencia entre el WHERE y WHEN. WHERE es para señalar las condiciones de una fila.
@@ -401,14 +405,15 @@ class InicioFrame(ctk.CTkFrame):
             self.conexion.ejecutar_bd(sql, valores, "update")
 
             # ----- QUERY INSERT TABLA VENTAS -----
-            fecha_venta = datetime.now()  
+            fecha_venta = datetime.now()
 
             ids_productos_str = ",".join(ids) # Juntar todas las ids de los productos
+            ganancias_unitarias = ",".join(map(str, ganancia_unitaria)) 
             cantidades_str = ",".join(map(str, cantidades)) # Juntar todas las cantidades en un string, el map itera sobre todas y las transforma en strings.
 
             sql = """
-                INSERT INTO VENTAS (producto_id, cantidad_vendida, ganancia_venta, fecha_venta, empleado_documento)
-                VALUES (%s, %s, %s, %s, %s)
+                INSERT INTO VENTAS (producto_id, cantidad_vendida, ganancia_unitaria, ganancia_venta, fecha_venta, empleado_documento)
+                VALUES (%s, %s, %s, %s, %s, %s)
                 """
             
             valores = (ids_productos_str, cantidades_str, total, fecha_venta, Usuario.usuario_actual[0][5])

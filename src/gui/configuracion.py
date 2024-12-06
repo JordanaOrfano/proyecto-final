@@ -2,6 +2,8 @@ from config.config import *
 from gui.componentes import *
 from core.usuarios import *
 from core.productos import *
+
+
 import csv
 import json
 import openpyxl  # Para exportar a excel
@@ -132,19 +134,20 @@ class Configuracion:
                                      text="Actualizar contraseña")
         btn_contrasena.grid(row=9, columnspan=2, pady=(20, 0), sticky="ew")
         
-        # -------------------------------- Agregar empleado --------------------------------
-        label_exportar = crear_label(frame_contenido, 
-                                     text="Agregar empleado", 
-                                     font=("Roboto", 24, "bold"), 
-                                     metodo="grid")
-        label_exportar.grid(row=10, columnspan=2, pady=(35, 10), sticky="ew")
-        
-        btn_contrasena = crear_boton(frame_contenido,
-                                     metodo="grid", 
-                                     text="Registrar empleado",
-                                     command=self.mostrar_registro)
-        btn_contrasena.grid(row=11, columnspan=2, pady=0, sticky="ew")
-        
+        if Usuario.usuario_actual[0][2] == "supervisor":
+            # -------------------------------- Agregar empleado --------------------------------
+            label_agregar_empleado = crear_label(frame_contenido, 
+                                        text="Agregar empleado", 
+                                        font=("Roboto", 24, "bold"), 
+                                        metodo="grid")
+            label_agregar_empleado.grid(row=10, columnspan=2, pady=(35, 10), sticky="ew")
+            
+            btn_registrar_empleado= crear_boton(frame_contenido,
+                                        metodo="grid", 
+                                        text="Registrar empleado",
+                                        command=self.mostrar_registro)
+            btn_registrar_empleado.grid(row=11, columnspan=2, pady=0, sticky="ew")
+            
         # -------------------------------- Exportar productos --------------------------------
         label_exportar = crear_label(frame_contenido, 
                                      text="Exportar productos", 
