@@ -94,7 +94,7 @@ def crear_label(parent, metodo="pack", text="", pady=10, anchor="w", padx=0, tex
     return label
 
 
-def crear_stat(parent, titulo, contador, padx=0, image=None, **kwargs):
+def crear_stat(parent, titulo, contador, padx=0, pady= 0, image=None, **kwargs):
     label_stat = ctk.CTkLabel(
         parent,
         text=f"{titulo} | {contador}",
@@ -108,7 +108,7 @@ def crear_stat(parent, titulo, contador, padx=0, image=None, **kwargs):
         fg_color=COLOR_PRIMARIO,
         image=image,
     )
-    label_stat.pack(side="left", expand=True, fill="x", padx=padx, pady=0, ipady=20, ipadx=0)
+    label_stat.pack(side="left", expand=True, fill="x", padx=padx, pady=pady, ipady=20, ipadx=0)
 
     return label_stat
 

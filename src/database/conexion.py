@@ -129,8 +129,9 @@ class Database:
             id INT AUTO_INCREMENT PRIMARY KEY,
             producto_id VARCHAR(1000) NOT NULL,
             cantidad_vendida VARCHAR(1000) NOT NULL,
+            ganancia_unitaria VARCHAR(1000) NOT NULL,
             ganancia_venta DECIMAL(10, 2) NOT NULL,
-            fecha_venta DATE,
+            fecha_venta DATETIME NOT NULL,
             empleado_documento INT NOT NULL,
             FOREIGN KEY (empleado_documento) REFERENCES usuarios(documento)
         ) ENGINE=INNODB;
@@ -142,3 +143,15 @@ class Database:
         cursor.execute(tabla_usuarios)
         cursor.execute(tabla_ventas)
         print("Tablas creadas exitosamente.")
+        
+        from core.usuarios import Usuario
+        usuario = Usuario(
+                "administrador", "administrador",
+            )
+
+        usuario.registrar_usuario(
+                0,
+                "supervisor",
+                "supervisor",
+                rol = "supervisor"
+            )
