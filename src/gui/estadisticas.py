@@ -77,32 +77,20 @@ class Estadisticas:
         self.crear_grafico(column_right, "Productos más vendidos", self.grafico_pastel, self.datos_productos)
         
         # Ganancias
-        self.datos_ganancias = {
-            "labels": ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio'],
-            "values": [7000, 8000, 6000, 9000, 6000, 7000, 7000]
-        }
+        self.actualizar_ganancias()
         self.crear_grafico(column_left, "Ganancias", self.grafico_linea, self.datos_ganancias)
         
         # Pérdidas
-        self.datos_perdidas = {
-            "labels": ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-            "values": [700, 800, 600, 900, 200, 1000, 270, 500, 400, 200, 600, 1000]
-        }
+        self.actualizar_perdidas()
         self.crear_grafico(column_right, "Pérdidas", self.grafico_barras, self.datos_perdidas)
         
         # Ventas mensuales
-        self.datos_ventas = {
-            "labels": ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-            "values": [7000, 8000, 6000, 9000, 6000, 7000, 7000, 500, 400, 2000, 6000, 1000]
-        }
-        self.crear_grafico(column_right, "Ventas mensuales", self.grafico_barras, self.datos_ventas)
+        self.actualizar_ventas_mensuales()
+        self.crear_grafico(column_right, "Ventas mensuales", self.grafico_barras, self.datos_ventas_mensuales)
         
         # Ventas según empleado
-        self.datos_ventas = {
-            "labels": ['Fernando', 'Maria', 'Pepe', 'Jordana', 'José'],
-            "values": [800, 600, 400, 900, 280]
-        }
-        self.crear_grafico(column_left, "Ventas según empleado", self.grafico_barras, self.datos_ventas)
+        self.actualizar_ventas_empleado()
+        self.crear_grafico(column_left, "Ventas según empleado", self.grafico_barras, self.datos_ventas_empleados)
 
 
     def crear_grafico(self, frame, title, chart_function, datos):
@@ -137,11 +125,12 @@ class Estadisticas:
 
     def grafico_barras(self, frame, datos):
         fig, ax = plt.subplots(figsize=(3, 3), facecolor="#FFFFFF")
-        ax.bar(datos["labels"], datos["values"], color=self.colors)
+        bars =ax.bar(datos["labels"], datos["values"], color=self.colors)
+        
+        # Label del valor de la barra
+        ax.bar_label(bars, labels=[f"{value}" for value in datos["values"]], label_type='edge', fontsize=8, color="#000000")
 
         # Estética del gráfico
-        ax.set_xlabel("Meses")
-        ax.set_ylabel("Dinero ($)")
         ax.tick_params(axis='x', rotation=45, labelsize=8)  # Rotar etiquetas si son largas
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
@@ -159,7 +148,7 @@ class Estadisticas:
 
         # Estética del gráfico
         ax.set_xlabel("Meses")
-        ax.set_ylabel("Ganancias ($)")
+        ax.set_ylabel("($)")
         ax.tick_params(axis='x', rotation=45, labelsize=7)  # Rotar etiquetas si son largas
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
@@ -179,7 +168,8 @@ class Estadisticas:
     def actualizar_contadores(self):
         perdidas = self.conexion.ejecutar_bd(
         """
-        SELECT SUM(productos.precio_compra * lotes.cantidad) AS perdidas
+        SELECT 
+            SUM(productos.precio_compra * lotes.cantidad) AS perdidas
         FROM 
             lotes 
         JOIN 
@@ -202,3 +192,133 @@ class Estadisticas:
         #     text=f" Ventas | {}"
         # )
         self.contador_perdidas.configure(text=f" Pérdidas | ${perdidas}")
+    
+    def actualizar_perdidas(self):
+        datos = self.conexion.ejecutar_bd(
+        """
+        SELECT 
+            MONTH(lotes.fecha_vencimiento) AS mes_vencimiento, 
+            SUM(lotes.cantidad * productos.precio_compra) AS perdidas
+        FROM 
+            lotes
+        JOIN 
+            productos ON lotes.producto_id = productos.id
+        WHERE 
+            (lotes.fecha_vencimiento <= CURDATE()) AND (YEAR(lotes.fecha_vencimiento) = YEAR(CURDATE()))
+        GROUP BY 
+            mes_vencimiento
+        ORDER BY 
+            mes_vencimiento;
+        """
+        )
+        
+        meses_abreviados = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
+        labels = []
+        values = []
+        
+        for i in range(len(datos)):
+            mes_numero = datos[i][0]  # Obtiene el numero del mes
+            labels.append(meses_abreviados[mes_numero - 1])  # Convierte el numero del mes en texto
+            
+            values.append(datos[i][1])
+        
+        self.datos_perdidas = {
+            "labels": labels,
+            "values": values,
+        }
+    
+    def actualizar_ventas_mensuales(self):
+            datos = self.conexion.ejecutar_bd(
+            """
+            SELECT 
+                MONTH(fecha_venta) AS mes,
+                SUM(cantidad_vendida) AS total_ventas
+            FROM 
+                ventas
+            WHERE 
+                YEAR(fecha_venta) = YEAR(CURDATE())
+            GROUP BY 
+                mes
+            ORDER BY 
+                mes
+            """
+            )
+
+            # Formatear los datos para el gráfico
+            meses_abreviados = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
+            labels = []
+            values = []
+
+            for fila in datos:
+                mes_numero = fila[0]  # Mes (número)
+                labels.append(meses_abreviados[mes_numero - 1])  # Convertir número a nombre abreviado
+                values.append(round(fila[1]))  # Total de ventas
+
+            # Actualizar los datos del gráfico
+            self.datos_ventas_mensuales = {
+                "labels": labels,
+                "values": values
+            }
+
+    def actualizar_ventas_empleado(self):
+        datos = self.conexion.ejecutar_bd(
+        """
+        SELECT 
+            empleado_documento,
+            SUM(cantidad_vendida) AS total_ventas
+        FROM 
+            ventas
+        WHERE 
+            YEAR(fecha_venta) = YEAR(CURDATE())
+        GROUP BY 
+            empleado_documento
+        ORDER BY 
+            total_ventas DESC
+        """
+        )
+
+        labels = []
+        values = []
+
+        for fila in datos:
+            labels.append(f"{fila[0]}")  # Documento del empleado como label
+            values.append(round(fila[1]))  # Total de ventas
+
+        # Actualizar los datos del gráfico
+        self.datos_ventas_empleados = {
+            "labels": labels,
+            "values": values
+        }
+
+    def actualizar_ganancias(self):
+        datos = self.conexion.ejecutar_bd(
+        """
+        SELECT 
+            MONTH(fecha_venta) AS mes,
+            SUM(ganancia_venta) AS total_ganancias
+        FROM 
+            ventas
+        WHERE 
+            YEAR(fecha_venta) = YEAR(CURDATE())
+        GROUP BY 
+            mes
+        ORDER BY 
+            mes
+        """
+        )
+
+        # Formatear los datos para el gráfico
+        meses_abreviados = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
+        labels = []
+        values = []
+
+        for fila in datos:
+            mes_numero = fila[0]  # Mes (número)
+            labels.append(meses_abreviados[mes_numero - 1])  # Convertir número a nombre abreviado
+            values.append(fila[1])  # Total de ganancias
+
+        # Actualizar los datos del gráfico
+        self.datos_ganancias = {
+            "labels": labels,
+            "values": values
+        }
