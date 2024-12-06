@@ -109,26 +109,27 @@ class RegistroFrame(ctk.CTkFrame):
         dni, correo = chequear(self.usuario_dni.get().strip(), self.usuario_correo.get().strip())
         
         if not self.usuario_dni.get().strip() or not dni:
-            self.mostrar_notificacion(frame, "Documento inválido o ya registrado.")
+            crear_notificacion(frame, "info", "Documento inválido o ya registrado.")
             return
         
         if not self.usuario_correo.get().strip() or not correo:
-            self.mostrar_notificacion(frame, "Correo inválido, en uso o demasiado largo.")
+            crear_notificacion(frame, "info", "Correo inválido, en uso o demasiado largo.")
             return
 
         if not self.usuario_nombre.get().strip() or len(self.usuario_nombre.get().strip()) < 3 or len(self.usuario_nombre.get().strip()) > 30 :
-            self.mostrar_notificacion(frame, "Nombre inválido o demasiado largo.")
+            crear_notificacion(frame, "info", "Nombre inválido o demasiado largo.")
             return
         
         if not self.usuario_apellido.get().strip() or len(self.usuario_apellido.get().strip()) < 3 or len(self.usuario_apellido.get().strip()) > 30:
             self.mostrar_notificacion(frame, "Apellido inválido o demasiado largo.")
+            crear_notificacion(frame, "info", "Apellido inválido o demasiado largo.")
             return
         
         if (
             not self.__usuario_contrasena.get()
             or len(self.__usuario_contrasena.get()) < 8 or len(self.__usuario_contrasena.get()) > 60
         ):
-            self.mostrar_notificacion(frame, "Contraseña debe tener entre 8 y 60 caracteres.")
+            crear_notificacion(frame, "info", "Contraseña debe tener entre 8 y 60 caracteres.")
             return
 
         try:
@@ -142,10 +143,10 @@ class RegistroFrame(ctk.CTkFrame):
                 self.usuario_nombre.get().strip(),
                 self.usuario_apellido.get().strip(),
             )
-            self.mostrar_notificacion(frame, "Registrado, redirigiendo...")
+            crear_notificacion(frame, "info", "Registrado, redirigiendo...")
             frame.after(2000, lambda: self.frame_cambiar("login"))
             return
         
         except:
-            self.mostrar_notificacion(frame, "Error al registrar el usuario.")
+            crear_notificacion(frame, "info", "Error al registrar el usuario.")
             return

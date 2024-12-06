@@ -195,7 +195,7 @@ class InicioFrame(ctk.CTkFrame):
         
         lotes, self.tree_lotes = crear_tabla(frame_inicio_cont, columnas, encabezados, lotes_acomodados, pady=(10, 30), menu="lotes", frame_origen = self.inicio, boton_carrito = self.boton_carrito)
 
-                # --------------- tabla productos ---------------
+        # --------------- tabla productos ---------------
         # Crear las columnas y encabezados
         columnas = (
             "id",
