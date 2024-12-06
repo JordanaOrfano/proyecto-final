@@ -166,6 +166,7 @@ class Estadisticas:
             plt.close(fig)
     
     def actualizar_contadores(self):
+        # ---------------------------- Pérdidas ----------------------------
         perdidas = self.conexion.ejecutar_bd(
         """
         SELECT 
@@ -184,13 +185,49 @@ class Estadisticas:
 
         else:
             perdidas = 0
+        
+        # ---------------------------- Ganancias ----------------------------
+        ganancias = self.conexion.ejecutar_bd(
+        """
+        SELECT 
+            SUM(ganancia_venta) AS ganancias
+        FROM 
+            ventas
+        WHERE 
+            MONTH(fecha_venta) = MONTH(CURRENT_DATE) AND YEAR(fecha_venta) = YEAR(CURRENT_DATE);
+        """
+        )
 
-        # self.contador_ganancias.configure(
-        #     text=f" Ganancias | {}"
-        # )
-        # self.contador_ventas.configure(
-        #     text=f" Ventas | {}"
-        # )
+        if ganancias and ganancias[0][0] is not None:
+            ganancias = round(ganancias[0][0])
+        else:
+            ganancias = 0
+
+        
+        # ---------------------------- Ventas ----------------------------
+        ventas_mensuales = self.conexion.ejecutar_bd(
+        """
+        SELECT 
+            SUM(cantidad_vendida) AS total_ventas
+        FROM 
+            ventas
+        WHERE 
+            MONTH(fecha_venta) = MONTH(CURRENT_DATE) AND YEAR(fecha_venta) = YEAR(CURRENT_DATE);
+        """
+        )
+
+        if ventas_mensuales and ventas_mensuales[0][0] is not None:
+            ventas_mensuales = round(ventas_mensuales[0][0])
+        else:
+            ventas_mensuales = 0
+            
+        self.contador_ganancias.configure(
+            text=f" Ganancias | ${ganancias}"
+        )
+        self.contador_ventas.configure(
+            text=f" Ventas | {ventas_mensuales}"
+        )
+        
         self.contador_perdidas.configure(text=f" Pérdidas | ${perdidas}")
     
     def actualizar_perdidas(self):
