@@ -1,5 +1,6 @@
 from config.config import *
 from gui.componentes import *
+from gui.registro import *
 from core.usuarios import *
 from core.productos import *
 
@@ -410,11 +411,10 @@ class Configuracion:
     # -------------------------------- Agregar empleado --------------------------------
     def mostrar_registro(self):
         # Muestra el frame de registro y oculta el frame principal
-        if self.frame_registro is None:
-            self.frame_registro = RegistroFrame(
-                master=self.contenedor,
-                frame_cambiar=self.regresar_configuracion
-            )
+        self.frame_registro = RegistroFrame(
+            master=self.contenedor,
+            frame_cambiar=self.regresar_configuracion
+        )
 
         self.frame_config.grid_forget()
 
