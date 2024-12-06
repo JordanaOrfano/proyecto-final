@@ -132,6 +132,19 @@ class Configuracion:
                                      text="Actualizar contraseña")
         btn_contrasena.grid(row=9, columnspan=2, pady=(20, 0), sticky="ew")
         
+        # -------------------------------- Agregar empleado --------------------------------
+        label_exportar = crear_label(frame_contenido, 
+                                     text="Agregar empleado", 
+                                     font=("Roboto", 24, "bold"), 
+                                     metodo="grid")
+        label_exportar.grid(row=10, columnspan=2, pady=(35, 10), sticky="ew")
+        
+        btn_contrasena = crear_boton(frame_contenido,
+                                     metodo="grid", 
+                                     text="Registrar empleado",
+                                     command=self.mostrar_registro)
+        btn_contrasena.grid(row=11, columnspan=2, pady=0, sticky="ew")
+        
         # -------------------------------- Exportar productos --------------------------------
         label_exportar = crear_label(frame_contenido, 
                                      text="Exportar productos", 
@@ -389,3 +402,23 @@ class Configuracion:
                 crear_notificacion(self.contenedor, "error", f"Error: Seleccione los archivos correctos.")
         else:
             crear_notificacion(self.contenedor, "error", "Debe seleccionar los archivos 'productos' y 'lotes'.")
+    
+    
+    # -------------------------------- Agregar empleado --------------------------------
+    def mostrar_registro(self):
+        # Muestra el frame de registro y oculta el frame principal
+        if self.frame_registro is None:
+            self.frame_registro = RegistroFrame(
+                master=self.contenedor,
+                frame_cambiar=self.regresar_configuracion
+            )
+
+        self.frame_config.grid_forget()
+
+        self.frame_registro.grid(sticky="nsew")
+
+    def regresar_configuracion(self):
+        if self.frame_registro:
+            self.frame_registro.grid_forget()
+        # Mostrar nuevamente el frame de configuración
+        self.frame_config.grid(sticky="nsew")

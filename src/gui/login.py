@@ -62,14 +62,6 @@ class LoginFrame(ctk.CTkFrame):
         self.login_button = crear_boton(
             frameLogin, text="Iniciar Sesión", command=lambda: self.login(frameFondo), fill="x", padx=0)
 
-        self.label_registrar = crear_label(
-            frameLogin, text="¿No tienes una cuenta?",
-            font=("Roboto", 18, "bold"), pady=(30, 0), anchor="center", padx=0
-        )
-
-        self.registrar_button = crear_boton(
-            frameLogin, text="¡Registrate!", command=self.registrarse, pady=(5, 0), padx=0, fill="x")
-
     def resize_image(self, event):
         # Ajusta la imagen al tamaño actual de imgFrame
         nuevo_width = event.width
@@ -102,6 +94,3 @@ class LoginFrame(ctk.CTkFrame):
 
         self.mostrar_notificacion(frame, "Sesión iniciada con éxito, redirigiendo...")
         frame.after(2000, lambda: self.frame_cambiar("inicio"))
-
-    def registrarse(self):
-        self.frame_cambiar("registrar")

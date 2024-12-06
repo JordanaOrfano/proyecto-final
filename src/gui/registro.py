@@ -12,27 +12,8 @@ class RegistroFrame(ctk.CTkFrame):
         frameFondo = ctk.CTkFrame(master=self, fg_color=COLOR_BG)
         frameFondo.pack(expand=True, fill="both")
 
-        # Frame izquierdo con imagen
-        imgFrame = ctk.CTkFrame(master=frameFondo, width=1000, fg_color="#e3f0df")
-        imgFrame.pack(side="left", fill="y")
-
-        # Cargar imagen y ajustarla con CTkImage
-        self.image_original = Image.open("src/assets/bg.png")
-        self.image_ctk = ctk.CTkImage(self.image_original, size=(imgFrame.winfo_width(), imgFrame.winfo_height()))
-
-        # Label con la imagen redimensionable
-        self.image_label = ctk.CTkLabel(imgFrame, text="", image=self.image_ctk)
-        self.image_label.pack(expand=True, fill="both")
-
-        # Redimensionar la imagen al cambiar el tamaño de imgFrame
-        imgFrame.bind("<Configure>", self.resize_image)
-
-        # Botón en el frame izquierdo
-        self.login_button = crear_boton(imgFrame, text="", fill="x", width=470)
-
-        # Frame derecho con formulario de registro
         frameRegistro = ctk.CTkFrame(master=frameFondo, fg_color=COLOR_BG)
-        frameRegistro.pack(expand=True, fill="x", padx=110)
+        frameRegistro.pack(expand=True, fill="x", padx=130)
 
         # Configuración de grid para organizar los elementos
         frameRegistro.grid_rowconfigure(0, weight=1)
@@ -41,7 +22,7 @@ class RegistroFrame(ctk.CTkFrame):
         frameRegistro.grid_columnconfigure(1, weight=1)
 
         # Título
-        label_bienvenida = crear_label(frameRegistro, metodo="grid", text="Registrarse", font=("Roboto", 32, "bold"), anchor="center")
+        label_bienvenida = crear_label(frameRegistro, metodo="grid", text="Registrar empleado", font=("Roboto", 32, "bold"), anchor="center")
         label_bienvenida.grid(row=0, column=0, columnspan=2, pady=(0, 30))
 
         # Documento
@@ -66,7 +47,7 @@ class RegistroFrame(ctk.CTkFrame):
         label_nombre.grid(row=5, column=0, sticky="ew", pady=(10, 0))
         
         self.usuario_nombre = crear_entry(frameRegistro, metodo="grid", placeholder_text="Nombre", fill="x")
-        self.usuario_nombre.grid(row=6, column=0, sticky="ew", padx=(0, 5))
+        self.usuario_nombre.grid(row=6, column=0, sticky="ew", padx=(0, 10))
 
         # Apellido
         label_apellido = crear_label(frameRegistro, metodo="grid", text=" Apellido", font=("Roboto", 18, "bold"), pady=(20, 0), padx=(90, 170),
@@ -84,12 +65,12 @@ class RegistroFrame(ctk.CTkFrame):
         self.__usuario_contrasena = crear_entry(frameRegistro, metodo="grid", show="*", placeholder_text="**********", fill="x")
         self.__usuario_contrasena.grid(row=8, column=0, columnspan=2, sticky="ew")
 
-        # Botones de registrarse y volver
-        self.registrar_button = crear_boton(frameRegistro, metodo="grid", text="Registrarse", command=lambda: self.verificar_campos(frameFondo), pady=10, fill="x")
-        self.registrar_button.grid(row=9, column=0, pady=20, sticky="ew", padx=(0, 5))
+        # Botones de registrar y volver
+        self.registrar_button = crear_boton(frameRegistro, metodo="grid", text="Registrar", command=lambda: self.verificar_campos(frameFondo), pady=10, fill="x")
+        self.registrar_button.grid(row=9, column=0, pady=20, sticky="ew", padx=(0, 10))
 
         self.volver_button = crear_boton(frameRegistro, metodo="grid", text="Volver", command=self.volver_login, pady=10, fill="x")
-        self.volver_button.grid(row=9, column=1, pady=20, sticky="ew", padx=(5, 0))
+        self.volver_button.grid(row=9, column=1, pady=20, sticky="ew", padx=(10, 0))
 
     def resize_image(self, event):
         # Ajusta la imagen al tamaño actual de imgFrame
@@ -98,7 +79,7 @@ class RegistroFrame(ctk.CTkFrame):
         self.image_ctk.configure(size=(new_width, new_height))
 
     def volver_login(self):
-        self.frame_cambiar("login")
+        self.frame_cambiar()
 
     def mostrar_notificacion(self, frame, mensaje):
         notificacion = CTkNotification(master=frame, state="info", message=mensaje, side="right_bottom")
