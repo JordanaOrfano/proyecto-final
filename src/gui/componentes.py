@@ -1,6 +1,7 @@
 from config.config import *
 from core.productos import *
 
+
 def crear_boton(
     parent, text, command=None, fill="none", fg_color=COLOR_PRIMARIO, font=("Roboto", 16, "bold"), padx=50, width=350, pady=20, metodo="pack", **kwargs,
 ):
@@ -178,7 +179,7 @@ def crear_optionmenu(parent, values=[], pady=10, padx=0, width=200, metodo="pack
     
     return dropdown
 
-def crear_tabla(parent, columnas, encabezados, lotes, pady=20, menu = None, frame_origen = None, boton_carrito = None, carrito = None):
+def crear_tabla(parent, columnas, encabezados, lotes, pady=20, menu = None, funciones_inicio = None):
     configurar_estilo_tabla()
 
     # Frame de la tabla
@@ -234,17 +235,17 @@ def crear_tabla(parent, columnas, encabezados, lotes, pady=20, menu = None, fram
                            )
     
     if menu == "productos":
-        menu_contextual.add_command(label="Editar Producto", command=lambda: MenuTablas(parent).editar_producto(tree, frame_origen))
+        menu_contextual.add_command(label="Editar Producto", command=lambda: MenuTablas(parent).editar_producto(tree, funciones_inicio))
         menu_contextual.add_command(label="Eliminar producto", command=lambda: MenuTablas().eliminar_producto(tree, frame_tabla))
     
     if menu == "lotes":
-        menu_contextual.add_command(label="Agregar al carrito", command=lambda: MenuTablas().agregar_a_carrito(tree, boton_carrito))
-        menu_contextual.add_command(label="Editar Lote", command=lambda: MenuTablas(parent).editar_lote(tree, frame_origen))
-        menu_contextual.add_command(label="Eliminar lote", command=lambda: MenuTablas().eliminar_lote(tree, frame_tabla))
+        menu_contextual.add_command(label="Agregar al carrito", command=lambda: MenuTablas().agregar_a_carrito(tree, funciones_inicio))
+        menu_contextual.add_command(label="Editar Lote", command=lambda: MenuTablas(parent).editar_lote(tree, funciones_inicio))
+        menu_contextual.add_command(label="Eliminar lote", command=lambda: MenuTablas().eliminar_lote(tree, funciones_inicio))
     
     if menu == "carrito":
         menu_contextual.add_command(label="Modificar Cantidad", command=lambda: MenuTablas().agregar_a_carrito(tree)) # FALTA CÓDIGO MODIFICAR CANTIDAD
-        menu_contextual.add_command(label="Eliminar del carrito", command=lambda: eliminar_del_carrito(tree, carrito))
+        menu_contextual.add_command(label="Eliminar del carrito", command=lambda: eliminar_del_carrito(tree, funciones_inicio))
         
     
     # Función para mostrar el menú en clic derecho
@@ -281,44 +282,10 @@ def configurar_estilo_tabla():
                     borderwidth=0) 
     style.map("Treeview",
                 background=[('selected', COLOR_PRIMARIO_HOVER)])
+    
+def eliminar_del_carrito(tree, funciones_inicio):
 
-
-# TODAS LAS ACCIONES POSIBLES SOBRE EL CARRITO
-productos_del_carrito = []
-
-def agregar_productos_carrito(valores):
-    # Si el producto ya está en el carrito se le suma cantidad
-    valores_lista = list(valores)
-    valores_lista[4] = 1
-
-    if not valores_lista in productos_del_carrito:
-        productos_del_carrito.append(valores_lista)
-        CTkAlert(
-            state="info",
-            title="Agregar al producto",
-            body_text=f"Producto {valores[2]} agregado.",
-            btn1="Ok",
-        )
-    else:
-        CTkAlert(
-            state="info",
-            title="Agregar al producto",
-            body_text=f"El producto {valores[2]} ya está en el carrito.",
-            btn1="Ok",
-        )
-
-def editar_cantidad(valores):
-    pass
-
-def obtener_productos_carrito():
-    return productos_del_carrito
-
-def vaciar_productos_carro():
-    global productos_del_carrito
-    productos_del_carrito = []
-
-def eliminar_del_carrito(tree, carrito):
-    productos_del_carrito = obtener_productos_carrito()
+    productos_del_carrito = funciones_inicio.obtener_productos_carrito()
 
     try:
         item = tree.selection()[0]  
@@ -330,25 +297,25 @@ def eliminar_del_carrito(tree, carrito):
         productos_del_carrito.remove(valores_lista)
 
         tree.delete(item)
-        carrito()
+        funciones_inicio.carrito()
 
-    except IndexError:
-        pass
+    except IndexError as e:
+        print("Error al eliminar el producto", e)
 
 class MenuTablas:    
     def __init__(self, frame = None):
         self.db = Database()
         self.frame = frame
         
-    def agregar_a_carrito(self, tree, boton_carrito):
+    def agregar_a_carrito(self, tree, funciones_inicio):
         item = tree.selection()[0]
         valores = tree.item(item, "values")
-        agregar_productos_carrito(valores)
+        funciones_inicio.agregar_productos_carrito(valores)
 
-        contador_carrito = len(obtener_productos_carrito())
-        boton_carrito.configure(text=contador_carrito)
+        contador_carrito = len(funciones_inicio.obtener_productos_carrito())
+        funciones_inicio.boton_carrito.configure(text=contador_carrito)
 
-    def editar_producto(self, tree, frame_origen):
+    def editar_producto(self, tree, funciones_inicio):
         item = tree.selection()[0]
         valores = tree.item(item, "values")  # obtiene los valores de la fila
 
@@ -357,9 +324,9 @@ class MenuTablas:
             elemento.destroy()
 
         from gui.agregar_producto import CrearProducto
-        CrearProducto(contenedor = self.frame, frame_origen = frame_origen, procedencia = "tabla_producto", valor = valores)
+        CrearProducto(contenedor = self.frame, frame_origen = funciones_inicio.inicio, procedencia = "tabla_producto", valor = valores)
         
-    def editar_lote(self, tree, frame_origen):
+    def editar_lote(self, tree, funciones_inicio):
         item = tree.selection()[0]
         valores = tree.item(item, "values") 
     
@@ -368,7 +335,7 @@ class MenuTablas:
             elemento.destroy()
 
         from gui.agregar_producto import CrearProducto
-        CrearProducto(contenedor = self.frame, frame_origen = frame_origen, procedencia = "tabla_lote", valor = valores)
+        CrearProducto(contenedor = self.frame, frame_origen = funciones_inicio.inicio, procedencia = "tabla_lote", valor = valores)
 
     def eliminar_producto(self, tree, frame):
         item = tree.selection()[0]

@@ -15,6 +15,7 @@ class InicioFrame(ctk.CTkFrame):
         self.frame_cambiar = frame_cambiar
         self.conexion = Database()
         self.funciones_productos = Productos()
+        self.productos_del_carrito = []
 
         self.frame_contenido = None
         self.botones_sideframe = {}  # Diccionario para almacenar botones del sideFrame
@@ -115,7 +116,7 @@ class InicioFrame(ctk.CTkFrame):
 
     # ------------------------------------- FRAMES DE CONTENIDO -------------------------------------
     def inicio(self):
-        contador_carrito = obtener_productos_carrito()
+        contador_carrito = self.obtener_productos_carrito()
 
         frame_inicio = ctk.CTkScrollableFrame(master=self, fg_color=COLOR_BG)
         
@@ -199,7 +200,7 @@ class InicioFrame(ctk.CTkFrame):
             pady=(24, 0),
         )
         
-        lotes, self.tree_lotes = crear_tabla(frame_inicio_cont, columnas, encabezados, lotes_acomodados, pady=(10, 30), menu="lotes", frame_origen = self.inicio, boton_carrito = self.boton_carrito)
+        lotes, self.tree_lotes = crear_tabla(frame_inicio_cont, columnas, encabezados, lotes_acomodados, pady=(10, 30), menu="lotes", funciones_inicio = self)
 
         # --------------- tabla productos ---------------
         # Crear las columnas y encabezados
@@ -229,7 +230,7 @@ class InicioFrame(ctk.CTkFrame):
             pady=(24, 0),
         )
 
-        productos, self.tree_productos = crear_tabla(frame_inicio_cont, columnas, encabezados, tabla_productos, pady=10, menu="productos", frame_origen = self.inicio)
+        productos, self.tree_productos = crear_tabla(frame_inicio_cont, columnas, encabezados, tabla_productos, pady=10, menu="productos", funciones_inicio = self)
         
         self.frame_inicio_cont = frame_inicio_cont
         self.cambiar_contenido(frame_inicio, "inicio")
@@ -237,7 +238,6 @@ class InicioFrame(ctk.CTkFrame):
     def revisar_ventas(self):
         # frame_ventas = ctk.CTkFrame(master=self, fg_color=COLOR_BG)
         frame_ventas = ctk.CTkScrollableFrame(master=self, fg_color=COLOR_BG)
-        
         
         RevisarVentas(contenedor=frame_ventas)
         self.cambiar_contenido(frame_ventas, "Revisar ventas")
@@ -260,7 +260,7 @@ class InicioFrame(ctk.CTkFrame):
         for lote in lotes_acomodados:
             self.tree_lotes.insert("", tk.END, values=lote)
 
-    
+    # ----- Carrito de productos -----
     def carrito(self):
         frame_carrito_fondo = ctk.CTkFrame(master=self, fg_color=COLOR_BG)
         
@@ -274,12 +274,12 @@ class InicioFrame(ctk.CTkFrame):
             pady=(0, 10),
         )
         
-        columnas = ("Lote", "id", "producto", "marca", "cantidad", "vencimiento", "precio")
+        columnas = ("lote", "id", "producto", "marca", "cantidad", "vencimiento", "precio")
         encabezados = ("Lote", "ID", "Producto", "Marca", "Cantidad", "Vencimiento", "Precio")
         
-        productos_carrito = obtener_productos_carrito()
+        productos_carrito = self.obtener_productos_carrito()
 
-        tabla, self.tree = crear_tabla(frame_carrito, columnas=columnas, encabezados=encabezados, lotes=productos_carrito, pady=10, menu = "carrito", carrito = self.carrito)
+        tabla, self.tree = crear_tabla(frame_carrito, columnas=columnas, encabezados=encabezados, lotes=productos_carrito, pady=10, menu = "carrito", funciones_inicio = self)
         total = 0
         for producto in productos_carrito:
             total += float(producto[6]) * int(producto[4])
@@ -303,10 +303,10 @@ class InicioFrame(ctk.CTkFrame):
         frame_botones = ctk.CTkFrame(master=frame_carrito, fg_color=COLOR_BG)
         frame_botones.pack(fill="x") 
 
-        btn_finalizar_compra = crear_boton(frame_botones, text="Finalizar compra", command=lambda: self.evento_finalizar_compra(productos_carrito, total))
+        btn_finalizar_compra = crear_boton(frame_botones, text="Finalizar compra", command=lambda: self.evento_finalizar_compra(self.productos_del_carrito, total))
         btn_finalizar_compra.pack(side="left", padx=5, pady=0, fill="x", expand=True) 
         
-        btn_cancelar_compra = crear_boton(frame_botones, text="Vaciar Carrito", command=self.vaciar_productos_carrito)
+        btn_cancelar_compra = crear_boton(frame_botones, text="Vaciar Carrito", command=self.vaciar_productos_carro)
         btn_cancelar_compra.pack(side="left", padx=5, pady=0, fill="x", expand=True)
         
         btn_volver = crear_boton(frame_botones, text="Volver", command=self.inicio)
@@ -314,8 +314,25 @@ class InicioFrame(ctk.CTkFrame):
         
         self.cambiar_contenido(frame_carrito_fondo, "ventas")
 
-    def vaciar_productos_carrito(self):
-        vaciar_productos_carro()
+    def agregar_productos_carrito(self, valores):
+        valores_lista = list(valores)
+        valores_lista[4] = 1
+
+        if not valores_lista in self.productos_del_carrito:
+            self.productos_del_carrito.append(valores_lista)
+            crear_notificacion(self, "info", f"Producto {valores[2]} agregado")
+
+        else:
+            crear_notificacion(self, "info", f"El producto {valores[2]} ya está en el carrito.")
+
+    def editar_cantidad(self, valores):
+        pass
+
+    def obtener_productos_carrito(self):
+        return self.productos_del_carrito
+
+    def vaciar_productos_carro(self):
+        self.productos_del_carrito = []
         self.carrito()
         
     def validar_pago(self, pago, total):
@@ -365,73 +382,79 @@ class InicioFrame(ctk.CTkFrame):
             return
 
         try:
-                
-            # ----- QUERY UPDATE TABLA PRODUCTOS -----
-            case_statements = [] # Almacena las instrucciones CASE  WHEN condicion THEN resultado
-            ids = [] # Almacena todos los ids de los productos
-            ganancia_unitaria = [] # Almacena la ganancia por la venta de cada producto
-            cantidades = [] # Almacena todas las cantidades para hacer un join separadas por comas
-            valores = []
+                                    
+            # ----- QUERY UPDATE TABLA LOTES -----
+            case_statements = []  # Almacena las instrucciones CASE WHEN
+            ids = []  # Almacena todos los ids de los productos
+            ganancia_unitaria = []  # Almacena la ganancia por la venta de cada producto
+            cantidades = []  # Almacena todas las cantidades para hacer un join separadas por comas
+            valores = []  
+            lotes = []  # Almacena los lotes únicos
 
             # Construir los CASE WHEN para cada producto
             for producto in productos_carrito:
-                producto_id = producto[1]  # ID del producto
-                cantidad_vendida = producto[4]  # Cantidad vendida
-                ganancia_recibida = float(producto[4]) * float(producto[6])
+                lote_id = producto[0]  
+                cantidad_vendida = int(producto[4])  # Cantidad vendida
+                ganancia_recibida = float(producto[4]) * float(producto[6])  # Ganancia por unidad
 
+                # Generar el CASE WHEN para actualizar la cantidad del lote
                 case_statements.append("WHEN lote = %s THEN cantidad - %s")
-                valores.extend([producto_id, cantidad_vendida])  # Agregar ID y cantidad como parámetros
+                valores.extend([lote_id, cantidad_vendida])  # Agregar lote y cantidad a los parámetros
 
-                ids.append(producto_id)
+                if lote_id not in lotes:
+                    lotes.append(lote_id)
+
+                # Almacenar el id y la ganancia para la tabla de ventas
+                ids.append(producto[1])  # ID del producto
                 cantidades.append(cantidad_vendida)
                 ganancia_unitaria.append(ganancia_recibida)
-
-            # El CASE se utiliza para colocar multiples WHEN, y el THEN se utiliza para modificar la cantidad actual
-            # EL WHEN se utiliza cómo un if pero para un resultado especifico, esa es la diferencia entre el WHERE y WHEN. WHERE es para señalar las condiciones de una fila.
-            # El END se utiliza despues del CASE para señalar el fin de las condiciones.
 
             sql = f"""
                 UPDATE lotes
                 SET cantidad = CASE
                     {' '.join(case_statements)}
                 END
-                WHERE lote IN ({', '.join(['%s'] * len(ids))}) 
+                WHERE lote IN ({', '.join(['%s'] * len(lotes))})
             """
 
-            # La multiplicacion es para colocar un %s por cada id
+            # El CASE se utiliza para colocar multiples WHEN, y el THEN se utiliza para modificar la cantidad actual
+            # EL WHEN se utiliza cómo un if pero para un resultado especifico, esa es la diferencia entre el WHERE y WHEN. WHERE es para señalar las condiciones de una fila.
+            # El END se utiliza despues del CASE para señalar el fin de las condiciones.
 
-            valores.extend(ids)
+            # Agregar los lotes al final de los parámetros
+            valores.extend(lotes)
 
+            # Ejecutar la consulta para actualizar las cantidades en la tabla lotes
             self.conexion.ejecutar_bd(sql, valores, "update")
 
             # ----- QUERY INSERT TABLA VENTAS -----
             fecha_venta = datetime.now()
 
-            ids_productos_str = ",".join(ids) # Juntar todas las ids de los productos
-            ganancias_unitarias = ",".join(map(str, ganancia_unitaria)) 
-            cantidades_str = ",".join(map(str, cantidades)) # Juntar todas las cantidades en un string, el map itera sobre todas y las transforma en strings.
+            ids_productos_str = ",".join(map(str, ids))  # Juntar todas las ids de los productos
+            ganancias_unitarias_str = ",".join(map(str, ganancia_unitaria))  
+            cantidades_str = ",".join(map(str, cantidades))  # Juntar todas las cantidades en un string, el map itera sobre todas y las transforma en strings.
 
             sql = """
                 INSERT INTO VENTAS (producto_id, cantidad_vendida, ganancia_unitaria, ganancia_venta, fecha_venta, empleado_documento)
                 VALUES (%s, %s, %s, %s, %s, %s)
-                """
+            """
             
-            valores = (ids_productos_str, cantidades_str, total, fecha_venta, Usuario.usuario_actual[0][5])
+            valores_ventas = (ids_productos_str, cantidades_str, ganancias_unitarias_str, total, fecha_venta, Usuario.usuario_actual[0][5])
 
-            consulta = self.conexion.ejecutar_bd(sql, valores, "insert")
+            self.conexion.ejecutar_bd(sql, valores_ventas, "insert")
 
-            # Alerta para mostrar el vuelto a devolver al cliente
             CTkAlert(
                 state="info",
                 title="Venta realizada",
-                body_text=f"El vuelto que corresponde al cliente es de: { pago_valido - total }.",
+                body_text=f"El vuelto que corresponde al cliente es de: {pago_valido - total}.",
                 btn1="Ok",
             )
-            
-            self.vaciar_productos_carrito()
+
+            # Vaciar el carrito de productos
+            self.vaciar_productos_carro()
 
         except Exception as e:
-            print("Error al registrar la venta:", e)
+            print(f"Error al ejecutar las consultas: {e}")
 
     def crear_producto(self):
         frame_publicar = ctk.CTkFrame(master=self, fg_color=COLOR_BG)
