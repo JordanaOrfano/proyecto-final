@@ -21,6 +21,7 @@ class RevisarVentas:
             frame_contadores,
             " Productos vendidos",
             "0",
+            padx=5,
             pady=30,
             image=crear_imagen("src/assets/icons/alarm.png", size=(40, 40)),
         )
@@ -29,6 +30,7 @@ class RevisarVentas:
             frame_contadores,
             " Ganancias",
             "$0.00",
+            padx=5,
             pady=30,
             image=crear_imagen("src/assets/icons/dollar.png", size=(40, 40)),
         )
@@ -113,7 +115,7 @@ class RevisarVentas:
         return VALORES_HOY
 
     def obtener_ventas_totales(self):
-        ganancias_totales = 0
+        ganancia_total = 0
         VALORES_TOTALES = []
         productos_agrupados_totales = defaultdict(lambda: {"cantidad": 0, "ganancia": 0.0})
         ventas_agrupadas_totales = defaultdict(lambda: {"cantidad": 0, "ganancia": 0.0})
@@ -143,22 +145,18 @@ class RevisarVentas:
                 SELECT 
                     producto_id, 
                     cantidad_vendida,
-                    ganancia_unitaria,
-                    SUM(ganancia_venta) AS ganancia_total
+                    ganancia_unitaria
                 FROM 
                     ventas
-                GROUP BY 
-                    producto_id, cantidad_vendida, ganancia_unitaria
             """,
             valores=None,
         )
 
         # Agrupar ventas totales
-        for productos, cantidades, ganancias, ganancia_total in ventas_totales:
+        for productos, cantidades, ganancias in ventas_totales:
             ids = productos.split(",")
             cantidades_vendidas = cantidades.split(",")
             ganancias_venta = ganancias.split(",")
-            ganancias_totales += ganancia_total
             for id_producto, cantidad, ganancia in zip(
                 ids, cantidades_vendidas, ganancias_venta
             ):
@@ -171,15 +169,15 @@ class RevisarVentas:
             nombre = detalle[1]
             marca = detalle[2]
             cantidad_vendida = ventas_agrupadas_totales[producto_id]["cantidad"]
-            ganancia_total = ventas_agrupadas_totales[producto_id]["ganancia"]
+            ganancia_venta_producto = ventas_agrupadas_totales[producto_id]["ganancia"]
             key = (nombre, marca)
             productos_agrupados_totales[key]["cantidad"] += cantidad_vendida
-            productos_agrupados_totales[key]["ganancia"] += ganancia_total
-
+            productos_agrupados_totales[key]["ganancia"] += ganancia_venta_producto
 
         for (nombre, marca), data in productos_agrupados_totales.items():
             cantidad = data["cantidad"]
             ganancia = data["ganancia"]
+            ganancia_total += ganancia
             VALORES_TOTALES.append((nombre, marca, cantidad, ganancia))
 
 
@@ -188,7 +186,7 @@ class RevisarVentas:
         )
 
         self.contador_ganancias.configure(
-            text=f" Ganancias ${ganancias_totales}"
+            text=f" Ganancias ${ganancia_total}"
         )
 
         return VALORES_TOTALES

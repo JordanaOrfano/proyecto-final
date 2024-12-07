@@ -187,8 +187,8 @@ class InicioFrame(ctk.CTkFrame):
         
         # --------------- tabla lotes ---------------
         # Crear las columnas y encabezados
-        columnas = ("lote", "id", "producto", "marca", "cantidad", "fecha_vencimiento")
-        encabezados = ("Lote", "ID", "Producto", "Marca", "Cantidad", "Fecha vencimiento")     
+        columnas = ("lote", "id", "producto", "marca", "cantidad", "fecha_vencimiento", "precio")
+        encabezados = ("Lote", "ID", "Producto", "Marca", "Cantidad", "Fecha vencimiento", "Precio")     
 
         # Pasamos los lotes por una lista, para acomodarle la fecha y que sea en formato dia/mes/año
         lotes_acomodados = self.funciones_productos.transformar_lotes_a_lista(tabla_lotes)

@@ -163,6 +163,10 @@ class Productos:
             sql_productos += f" ORDER BY {orden_tabla_productos};"
             sql_lotes += f" ORDER BY {orden_tabla_lotes};"
 
+        if orden == "Ordenar por":
+            orden_tabla_lotes = "productos.nombre"
+            sql_lotes += f" ORDER BY {orden_tabla_lotes};"
+            
         if criterio_busqueda:
             tabla_productos = self.database.ejecutar_bd(
                 sql_productos, ("%" + criterio_busqueda + "%",) * 4, "select"
@@ -177,10 +181,11 @@ class Productos:
         return tabla_productos, tabla_lotes
 
     def ordenamiento(self, orden):
-        orden_tabla_lotes = "lotes.lote"
+        orden_tabla_lotes = "productos.nombre"
 
         if orden == "ID":
             orden_tabla_productos = "productos.id"
+            orden_tabla_lotes = "lotes.lote"
 
         if orden == "Nombre":
             orden_tabla_productos = "productos.nombre"
