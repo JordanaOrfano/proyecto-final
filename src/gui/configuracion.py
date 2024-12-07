@@ -3,8 +3,7 @@ from gui.componentes import *
 from gui.registro import *
 from core.usuarios import *
 from core.productos import *
-
-
+from gui.registro import *
 import csv
 import json
 import openpyxl  # Para exportar a excel
@@ -17,6 +16,7 @@ class Configuracion:
     def __init__(self, contenedor):
         self.contenedor = contenedor
         self.conexion = Database()
+        self.frame_registro = None
         
         # -------------------------------- Configuración de frame --------------------------------
         self.frame_config = ctk.CTkScrollableFrame(master=self.contenedor, fg_color=COLOR_BG)
@@ -24,7 +24,6 @@ class Configuracion:
 
         self.contenedor.grid_rowconfigure(0, weight=1)
         self.contenedor.grid_columnconfigure(0, weight=1)
-        self.frame_config.grid_rowconfigure(0, weight=1)
         self.frame_config.grid_rowconfigure(2, weight=1)
         self.frame_config.grid_columnconfigure(0, weight=1)
         
@@ -95,7 +94,7 @@ class Configuracion:
         
         # -------------------------------- Restablecer contraseña --------------------------------
         label_correo = crear_label(frame_contenido, 
-                                   text=f" Restablecer contraseña",
+                                   text=f"Restablecer contraseña",
                                    font=("Roboto", 24, "bold"),
                                    metodo="grid",
                                    )
@@ -133,28 +132,14 @@ class Configuracion:
         btn_contrasena = crear_boton(frame_contenido,
                                      metodo="grid", 
                                      text="Actualizar contraseña")
-        btn_contrasena.grid(row=9, columnspan=2, pady=(20, 0), sticky="ew")
-        
-        if Usuario.usuario_actual[0][2] == "supervisor":
-            # -------------------------------- Agregar empleado --------------------------------
-            label_agregar_empleado = crear_label(frame_contenido, 
-                                        text="Agregar empleado", 
-                                        font=("Roboto", 24, "bold"), 
-                                        metodo="grid")
-            label_agregar_empleado.grid(row=10, columnspan=2, pady=(35, 10), sticky="ew")
-            
-            btn_registrar_empleado= crear_boton(frame_contenido,
-                                        metodo="grid", 
-                                        text="Registrar empleado",
-                                        command=self.mostrar_registro)
-            btn_registrar_empleado.grid(row=11, columnspan=2, pady=0, sticky="ew")
+        btn_contrasena.grid(row=9, columnspan=2, pady=(20, 0), sticky="ew")  
             
         # -------------------------------- Exportar productos --------------------------------
         label_exportar = crear_label(frame_contenido, 
                                      text="Exportar productos", 
                                      font=("Roboto", 24, "bold"), 
                                      metodo="grid")
-        label_exportar.grid(row=12, columnspan=2, pady=(35, 5), sticky="ew")
+        label_exportar.grid(row=10, columnspan=2, pady=(35, 5), sticky="ew")
         
         exportar_optionmenu = crear_optionmenu(
             parent=frame_contenido,
@@ -162,21 +147,21 @@ class Configuracion:
             pady=0,
             metodo="grid",
             )
-        exportar_optionmenu.grid(row=13, column=0, sticky="ew", padx=(0, 10))
+        exportar_optionmenu.grid(row=11, column=0, sticky="ew", padx=(0, 10))
         
         exportar_btn = crear_boton(parent=frame_contenido, 
                                    text="Exportar", 
                                    metodo="grid",
                                    command=lambda: self.exportar_productos(exportar_optionmenu.get())
                                    )
-        exportar_btn.grid(row=13, column=1, sticky="ew", padx=(10, 0))
+        exportar_btn.grid(row=11, column=1, sticky="ew", padx=(10, 0))
         
         # -------------------------------- Importar productos --------------------------------
         label_importar = crear_label(frame_contenido, 
                                      text="Importar productos", 
                                      font=("Roboto", 24, "bold"), 
                                      metodo="grid")
-        label_importar.grid(row=14, columnspan=2, pady=(35, 5), sticky="ew")
+        label_importar.grid(row=12, columnspan=2, pady=(35, 5), sticky="ew")
         
         importar_optionmenu = crear_optionmenu(
             parent=frame_contenido,
@@ -184,15 +169,54 @@ class Configuracion:
             pady=0,
             metodo="grid",
             )
-        importar_optionmenu.grid(row=15, column=0, sticky="ew", padx=(0, 10), pady=(0, 20))
+        importar_optionmenu.grid(row=13, column=0, sticky="ew", padx=(0, 10), pady=0)
         
         importar_btn = crear_boton(parent=frame_contenido, 
                                    text="Importar", 
                                    metodo="grid",
                                    command=lambda: self.importar_productos(importar_optionmenu.get())
                                    )
-        importar_btn.grid(row=15, column=1, sticky="ew", padx=(10, 0), pady=(0, 20))
+        importar_btn.grid(row=13, column=1, sticky="ew", padx=(10, 0), pady=0)
     
+        
+        # -------------------------------- MENÚ SUPERVISOR --------------------------------
+        if Usuario.usuario_actual[0][2] == "supervisor":
+            label_agregar_empleado = crear_label(frame_contenido, 
+                                        text="Gestionar empleados", 
+                                        font=("Roboto", 24, "bold"), 
+                                        metodo="grid")
+            label_agregar_empleado.grid(row=14, columnspan=2, pady=(35, 0), sticky="ew")
+            
+            # -------------------------------- Registrar empleado --------------------------------
+            label_registrar_empleado = crear_label(frame_contenido, 
+                                    text=f" Registrar empleado",
+                                    font=("Roboto", 18, "bold"),
+                                    metodo="grid",
+                                    image=crear_imagen("src/assets/icons/user.png", size=(22, 22))
+                                    )
+            label_registrar_empleado.grid(row=15, column=0, pady=(10, 0), sticky="ew")
+            
+            btn_registrar_empleado= crear_boton(frame_contenido,
+                                        metodo="grid", 
+                                        text="Registrar empleado",
+                                        command=self.mostrar_registro)
+            btn_registrar_empleado.grid(row=16, column=0, pady=(0, 10), padx=(0, 10), sticky="ew")
+            
+            # -------------------------------- Otorgar rol --------------------------------
+            label_otorgar_rol = crear_label(frame_contenido, 
+                                    text=f" Otorgar rol",
+                                    font=("Roboto", 18, "bold"),
+                                    metodo="grid",
+                                    image=crear_imagen("src/assets/icons/pencil.png", size=(22, 22))
+                                    )
+            label_otorgar_rol.grid(row=15, column=1, pady=(10, 0), padx=(0, 10), sticky="ew")
+            
+            btn_otorgar_rol= crear_boton(frame_contenido,
+                                        metodo="grid", 
+                                        text="Cambiar rol",
+                                        command=self.mostrar_otorgar_rol)
+            btn_otorgar_rol.grid(row=16, column=1, pady=(0, 10), padx=(10, 0), sticky="ew")
+            
     # -------------------------------- Exportar --------------------------------
     def exportar_productos(self, formato):
         if formato == "CSV":
@@ -425,3 +449,133 @@ class Configuracion:
             self.frame_registro.grid_forget()
         # Mostrar nuevamente el frame de configuración
         self.frame_config.grid(sticky="nsew")
+    
+    # -------------------------------- Otorgar rol --------------------------------
+    def mostrar_otorgar_rol(self):
+        self.frame_config.grid_forget()
+        
+        self.frame_otorgar_rol = ctk.CTkFrame(master=self.contenedor, fg_color=COLOR_BG)
+        self.frame_otorgar_rol.pack(expand=True, fill="x", padx=130)
+     
+        datos = self.conexion.ejecutar_bd(
+            """
+            SELECT documento, nombre, apellido 
+            FROM usuarios
+            """
+        )
+        
+        empleados = [f"{documento} - {nombre} {apellido}" for documento, nombre, apellido in datos]
+
+        crear_label(self.frame_otorgar_rol,
+                    text="Otorgar rol", 
+                    font=("Roboto", 32, "bold")
+        )
+
+        crear_label(self.frame_otorgar_rol,
+                    text=" Seleccionar usuario",
+                    font=("Roboto", 18, "bold"),
+                    image=crear_imagen("src/assets/icons/user.png", size=(22, 22))
+        )
+        
+        self.usuario_empleados = crear_optionmenu(
+                    parent=self.frame_otorgar_rol,
+                    values=["Seleccionar empleado"] + empleados,
+                    pady=0
+        )
+        
+        crear_label(self.frame_otorgar_rol,
+                    text="Ó",
+                    font=("Roboto", 18, "bold"),
+                    pady= (15, 0),
+                    anchor="center",
+        )
+        
+        crear_label(self.frame_otorgar_rol,
+                    text=" Asignar por D.N.I",
+                    font=("Roboto", 18, "bold"),
+                    image=crear_imagen("src/assets/icons/id.png", size=(22, 22))
+        )
+        
+        self.documento_input = crear_entry(self.frame_otorgar_rol, fill="x", pady=0)
+
+        crear_label(self.frame_otorgar_rol,
+                    text=" Rol", 
+                    font=("Roboto", 18, "bold"),
+                    image=crear_imagen("src/assets/icons/pencil.png", size=(22, 22)),
+                    pady=(20, 10)
+        )
+
+        self.usuario_rol = crear_optionmenu(
+            parent=self.frame_otorgar_rol,
+            values=["Empleado", "Supervisor"],
+            pady=0
+        )
+
+        botones_frame = ctk.CTkFrame(self.frame_otorgar_rol, fg_color=COLOR_BG)
+        botones_frame.pack(pady=(20, 0), fill="x")
+
+        btn_guardar = crear_boton(botones_frame, text="Guardar", command=lambda: self.guardar_rol(self.contenedor), metodo="grid")
+        btn_guardar.pack(side="left", padx=(0, 10), fill="x", expand="True")
+
+        btn_cancelar = crear_boton(botones_frame, text="Cancelar", command=self.cancelar_rol, metodo="grid")
+        btn_cancelar.pack(side="right", padx=(10, 0), fill="x", expand="True")
+        
+    def cancelar_rol(self):
+        self.frame_otorgar_rol.pack_forget()
+        self.frame_config.grid(sticky="nsew")
+
+    def guardar_rol(self, parent_frame):
+        # Validar si se ingresó un DNI por escrito
+        documento = self.documento_input.get().strip()
+        
+        if not documento:  # Si el campo está vacío
+            # Validar que se seleccionó un empleado en el optionmenu
+            empleado_seleccionado = self.usuario_empleados.get()
+            if empleado_seleccionado == "Seleccionar empleado":
+                crear_notificacion(parent_frame, "error", "Selecciona un empleado o ingresa un DNI.")
+                return
+            
+            # Extraer el documento del empleado seleccionado (antes del primer guion)
+            documento = empleado_seleccionado.split(" - ")[0]
+
+        if not documento.isdigit():
+            crear_notificacion(parent_frame, "error", "El DNI debe contener solo números.")
+            return
+        
+        # Validar si el documento existe en la base de datos
+        existe_documento = self.conexion.ejecutar_bd(
+            """
+            SELECT COUNT(*) 
+            FROM usuarios 
+            WHERE documento = %s
+            """,
+            (documento,)
+        )[0][0]
+
+        if not existe_documento:
+            crear_notificacion(parent_frame, "error", f"El documento no es válido.")
+            return
+
+        rol_seleccionado = self.usuario_rol.get()
+        
+        try:
+            self.conexion.ejecutar_bd(
+                """
+                UPDATE usuarios
+                SET rol = %s
+                WHERE documento = %s
+                """, 
+                (rol_seleccionado.lower(), documento), 
+                "update"
+            )
+            
+            crear_notificacion(parent_frame, "info", f"Se asignó el rol '{rol_seleccionado}' al usuario.")
+            
+            # Limpiar los campos después de guardar
+            self.usuario_empleados.set("Seleccionar empleado")
+            self.usuario_rol.set("Empleado")
+            self.documento_input.delete(0, "end")
+            
+        except Exception as e:
+            print(f"No se pudo asignar el rol: {e}")
+    
