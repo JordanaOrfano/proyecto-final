@@ -30,7 +30,7 @@ class RegistroFrame(ctk.CTkFrame):
                     image=crear_imagen("src/assets/icons/id.png", size=(22, 22)))
         label_dni.grid(row=1, column=0, columnspan=2, sticky="ew", pady=(10, 0))
 
-        self.usuario_dni = crear_entry(frameRegistro,metodo="grid", placeholder_text="Ingresa tu documento sin puntos (.)", fill="x")
+        self.usuario_dni = crear_entry(frameRegistro,metodo="grid", placeholder_text="Ingresa documento sin puntos (.)", fill="x")
         self.usuario_dni.grid(row=2, column=0, columnspan=2, sticky="ew")
         
         # Correo
@@ -124,8 +124,7 @@ class RegistroFrame(ctk.CTkFrame):
                 self.usuario_nombre.get().strip(),
                 self.usuario_apellido.get().strip(),
             )
-            crear_notificacion(frame, "info", "Registrado, redirigiendo...")
-            frame.after(2000, lambda: self.frame_cambiar("login"))
+            crear_notificacion(frame, "info", "Usuario registrado correctamente.")
             return
         
         except:

@@ -41,8 +41,8 @@ class InicioFrame(ctk.CTkFrame):
         ctk.CTkLabel(
             centrar_frame,
             text="",
-            image=crear_imagen("src/assets/menu-icon.png", size=(225, 225)),
-        ).pack(pady=30)
+            image=crear_imagen("src/assets/menu-icon.png", size=(210, 210)),
+        ).pack(pady=20)
 
         # Creación de botones en el sideFrame con el estado de selección inicial
         self.botones_sideframe["inicio"] = crear_boton_sideframe(
@@ -92,6 +92,7 @@ class InicioFrame(ctk.CTkFrame):
             centrar_frame,
             text="Cerrar sesión",
             command=self.cerrar_sesion,
+            pady=(5, 0),
             image=crear_imagen("src/assets/icons/logout.png"),
         )
 
@@ -364,12 +365,7 @@ class InicioFrame(ctk.CTkFrame):
 
         pago_valido = self.validar_pago(self.pago.get(), total)
         if not pago_valido:
-            CTkNotification(
-                master=self,
-                state="warning",
-                message="Debes ingresar un monto de pago válido.",
-                side="right_bottom",
-            ).after(3000, lambda: None)
+            crear_notificacion(self, "warning", "Debes ingresar un monto de pago válido.")
             return
 
         if not productos_carrito:
