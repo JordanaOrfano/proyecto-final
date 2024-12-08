@@ -297,8 +297,8 @@ class InicioFrame(ctk.CTkFrame):
         frame_info = ctk.CTkFrame(master=frame_carrito, fg_color=COLOR_BG)
         frame_info.pack(pady=15, fill="x") 
         
-        label_total = crear_label(frame_info, text=f"Total: ${total}", font=("Roboto", 24, "bold"), metodo="grid")
-        label_total.pack(side="left", fill="x")
+        self.label_total = crear_label(frame_info, text=f"Total: ${total}", font=("Roboto", 24, "bold"), metodo="grid")
+        self.label_total.pack(side="left", fill="x")
         
         # Sección botones
         frame_botones = ctk.CTkFrame(master=frame_carrito, fg_color=COLOR_BG)
@@ -325,9 +325,6 @@ class InicioFrame(ctk.CTkFrame):
 
         else:
             crear_notificacion(self, "info", f"El producto {valores[2]} ya está en el carrito.")
-
-    def editar_cantidad(self, valores):
-        pass
 
     def obtener_productos_carrito(self):
         return self.productos_del_carrito

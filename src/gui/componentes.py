@@ -257,8 +257,8 @@ def crear_tabla(parent, columnas, encabezados, lotes, pady=20, menu = None, func
         menu_contextual.add_command(label="Eliminar lote", command=lambda: MenuTablas().eliminar_lote(tree, funciones_inicio))
     
     if menu == "carrito":
-        menu_contextual.add_command(label="Modificar Cantidad", command=lambda: MenuTablas().agregar_a_carrito(tree)) # FALTA CÓDIGO MODIFICAR CANTIDAD
         menu_contextual.add_command(label="Eliminar del carrito", command=lambda: eliminar_del_carrito(tree, funciones_inicio))
+        menu_contextual.add_command(label="Editar Cantidad", command=lambda: MenuTablas().editar_cantidad(tree, funciones_inicio)) 
         
     
     # Función para mostrar el menú en clic derecho
@@ -295,25 +295,8 @@ def configurar_estilo_tabla():
                     borderwidth=0) 
     style.map("Treeview",
                 background=[('selected', COLOR_PRIMARIO_HOVER)])
-    
-def eliminar_del_carrito(tree, funciones_inicio):
-
-    productos_del_carrito = funciones_inicio.obtener_productos_carrito()
-
-    try:
-        item = tree.selection()[0]  
-        valores = tree.item(item, "values")  
-
-        valores_lista = list(valores)
-        valores_lista[4] = 1
-
-        productos_del_carrito.remove(valores_lista)
-
-        tree.delete(item)
-        funciones_inicio.carrito()
-
-    except IndexError as e:
-        print("Error al eliminar el producto", e)
+                
+valores_reales = []
 
 class MenuTablas:    
     def __init__(self, frame = None):
@@ -321,16 +304,76 @@ class MenuTablas:
         self.frame = frame
         
     def agregar_a_carrito(self, tree, funciones_inicio):
+        global valores_reales
+
         item = tree.selection()[0]
         valores = tree.item(item, "values")
-        funciones_inicio.agregar_productos_carrito(valores)
 
-        contador_carrito = len(funciones_inicio.obtener_productos_carrito())
+        productos_del_carrito = funciones_inicio.obtener_productos_carrito()
+
+        if not productos_del_carrito:
+            valores_reales = [] # Vacia la lista si no hay productos en el carrito
+
+        funciones_inicio.agregar_productos_carrito(valores)
+        valores_reales.append(valores) # Almacena las cantidades existentes de cada producto 
+
+        contador_carrito = len(productos_del_carrito)
         funciones_inicio.boton_carrito.configure(text=contador_carrito)
+        
+
+    def editar_cantidad(self, tree, funciones_inicio):
+        total = 0
+
+        productos_del_carrito = funciones_inicio.obtener_productos_carrito()
+        cantidad = ctk.CTkInputDialog(text="Ingresa una cantidad", title = "ingresar cantidad", fg_color = "white") # Crea un POPUP para ingresar la cantidad
+
+        centrar_ventana(cantidad, 300, 200)
+        cantidad_ingresada = self.validar_cantidad(cantidad.get_input()) # Verifica que la cantidad sea válida
+
+        if cantidad_ingresada:
+            item = tree.selection()[0]  
+            valores = tree.item(item, "values")  
+        
+            for valor in valores_reales:
+                if valor[0] == valores[0]: # Verificamos que el producto id coincida con el que se va a modificar
+                    if cantidad_ingresada > int(valor[4]):
+                        crear_notificacion(funciones_inicio, "info", "La cantidad es mayor al almacenado en stock")
+                        return
+                
+            # Recorre los productos de productos_del_carrito para reemplazar por la cantidad ingresada
+            for producto in productos_del_carrito:
+                if producto[0] == valores[0]:
+                    producto[4] = cantidad_ingresada
+                    break
+
+            # Actualizamos el nuevo precio total de la venta
+            for producto in productos_del_carrito:
+                total += float(producto[6]) * int(producto[4])
+
+            funciones_inicio.label_total.configure(text= f"Total: ${total}")
+
+            # Actualiza la vista de la tabla a la cantidad ingresada
+            valores_lista = list(valores)
+            valores_lista[4] = cantidad_ingresada  
+            tree.item(item, values=valores_lista)        
+
+    def validar_cantidad(self, cantidad):
+        try:
+            cantidad = str(cantidad).strip().replace(",", ".")
+            
+            cantidad = int(cantidad)
+
+            if cantidad > 0 and cantidad < 1000000:
+                return cantidad
+            
+            return False
+        except (ValueError, AttributeError):  
+            return False
+
+
 
     def editar_producto(self, tree, funciones_inicio):
         item = tree.selection()[0]
-        valores = tree.item(item, "values")  # obtiene los valores de la fila
 
         # Eliminar todos los elementos que están en pantalla
         for elemento in self.frame.winfo_children():
