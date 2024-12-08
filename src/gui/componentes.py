@@ -1,5 +1,6 @@
 from config.config import *
 from core.productos import *
+from core.usuarios import *
 
 
 def crear_boton(
@@ -253,9 +254,11 @@ def crear_tabla(parent, columnas, encabezados, lotes, pady=20, menu = None, func
     
     if menu == "lotes":
         menu_contextual.add_command(label="Agregar al carrito", command=lambda: MenuTablas().agregar_a_carrito(tree, funciones_inicio))
-        menu_contextual.add_command(label="Editar Lote", command=lambda: MenuTablas(parent).editar_lote(tree, funciones_inicio))
-        menu_contextual.add_command(label="Eliminar lote", command=lambda: MenuTablas().eliminar_lote(tree, frame_tabla, funciones_inicio))
-    
+
+        if Usuario.usuario_actual[0][2] == "supervisor":
+            menu_contextual.add_command(label="Editar Lote", command=lambda: MenuTablas(parent).editar_lote(tree, funciones_inicio))
+            menu_contextual.add_command(label="Eliminar lote", command=lambda: MenuTablas().eliminar_lote(tree, frame_tabla, funciones_inicio))
+        
     if menu == "carrito":
         menu_contextual.add_command(label="Editar Cantidad", command=lambda: MenuTablas().editar_cantidad(tree, funciones_inicio)) 
         menu_contextual.add_command(label="Eliminar del carrito", command=lambda: MenuTablas().eliminar_del_carrito(tree, funciones_inicio))

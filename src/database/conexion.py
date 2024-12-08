@@ -13,7 +13,6 @@ class Database:
 
                 self.crear_schema_tablas()
                 
-                print("Conexión exitosa a la base de datos")
             return self.conexion
 
         except mysql.connector.Error as error:
@@ -92,7 +91,6 @@ class Database:
     def cerrar_conexion(self):
         if self.conexion and self.conexion.is_connected():
             self.conexion.close()
-            print("Conexión cerrada correctamente")
 
     def _crear_tablas(self, cursor):
 
