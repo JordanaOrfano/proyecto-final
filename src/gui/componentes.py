@@ -440,17 +440,29 @@ class MenuTablas:
 
         if respuesta.get() == "Eliminar":
             try:
-                # Eliminar lotes asociados al producto
                 self.db.ejecutar_bd(
-                    "DELETE FROM lotes WHERE producto_id = %s",
+                    "UPDATE lotes SET cantidad = 0 WHERE lote = %s",
                     (producto_id,),
-                    tipo="delete"
-                )
-                # Eliminar producto
+                    tipo="update"
+                )           
+                    
+                # ----- Ocultar Productos sin lotes asociados mostrar = False -----
+                sql_productos_invisibles = """
+                    UPDATE productos
+                    SET mostrar = 0
+                    WHERE id NOT IN (
+                        SELECT DISTINCT producto_id
+                        FROM lotes
+                        WHERE mostrar = 1
+                    )
+                """
+                self.db.ejecutar_bd(sql_productos_invisibles, tipo = "update")
+                    
+                # Ocultar producto
                 self.db.ejecutar_bd(
-                    "DELETE FROM productos WHERE id = %s",
+                    "UPDATE productos SET mostrar = 0 WHERE id = %s",
                     (producto_id,),
-                    tipo="delete"
+                    tipo="update"
                 )
 
                 # Eliminar la fila en la interfaz
@@ -488,10 +500,10 @@ class MenuTablas:
             try:
                 # Eliminar lote de la base de datos
                 self.db.ejecutar_bd(
-                    "DELETE FROM lotes WHERE lote = %s",
-                    (lote,),
-                    tipo="delete"
-                )
+                        "UPDATE lotes SET mostrar = 0, cantidad = 0 WHERE lote = %s",
+                        (lote,),
+                        tipo="update"
+                    )
                 
                 # Verificar si el producto tiene otros lotes asociados
                 resultado = self.db.ejecutar_bd(
@@ -502,11 +514,12 @@ class MenuTablas:
 
                 # Si no hay más lotes, eliminar el producto
                 if resultado[0][0] == 0:
-                    self.db.ejecutar_bd(
-                        "DELETE FROM productos WHERE id = %s",
+                   self.db.ejecutar_bd(
+                        "UPDATE productos SET mostrar = 0 WHERE id = %s",
                         (producto_id,),
-                        tipo="delete"
+                        tipo="update"
                     )
+
 
                 # Eliminar la fila en la interfaz
                 tree.delete(item)

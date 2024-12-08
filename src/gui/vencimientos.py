@@ -95,25 +95,49 @@ class Vencimientos:
 
         # Obtenemos los productos y lotes combinados
         self.conexion = Database()
+        # lotes = self.conexion.ejecutar_bd(
+        #     sql="""
+        #             SELECT 
+        #                 lotes.lote, 
+        #                 productos.nombre, 
+        #                 productos.marca, 
+        #                 productos.categoria, 
+        #                 productos.precio_compra, 
+        #                 productos.precio_venta, 
+        #                 lotes.cantidad, 
+        #                 lotes.fecha_vencimiento 
+        #             FROM 
+        #                 lotes
+        #             JOIN 
+        #                 productos ON lotes.producto_id = productos.id
+        #             ORDER BY productos.nombre, lotes.fecha_vencimiento;
+        #         """,
+        #     valores=None,
+        # )
+
         lotes = self.conexion.ejecutar_bd(
-            sql="""
-                    SELECT 
-                        lotes.lote, 
-                        productos.nombre, 
-                        productos.marca, 
-                        productos.categoria, 
-                        productos.precio_compra, 
-                        productos.precio_venta, 
-                        lotes.cantidad, 
-                        lotes.fecha_vencimiento 
-                    FROM 
-                        lotes
-                    JOIN 
-                        productos ON lotes.producto_id = productos.id
-                    ORDER BY productos.nombre, lotes.fecha_vencimiento;
-                """,
-            valores=None,
+        sql="""
+            SELECT 
+                lotes.lote, 
+                productos.nombre, 
+                productos.marca, 
+                productos.categoria, 
+                productos.precio_compra, 
+                productos.precio_venta, 
+                lotes.cantidad, 
+                lotes.fecha_vencimiento 
+            FROM 
+                lotes
+            JOIN 
+                productos ON lotes.producto_id = productos.id
+            WHERE 
+                productos.mostrar = 1 AND lotes.cantidad > 0
+            ORDER BY 
+                productos.nombre, lotes.fecha_vencimiento;
+        """,
+        valores=None,
         )
+
 
         # Transformamos a una lista
         lotes_lista = []
@@ -196,17 +220,32 @@ class Vencimientos:
         return productos_vencidos, proximo_vencimiento
 
     def actualizar_contadores(self):
+        # perdidas = self.conexion.ejecutar_bd(
+        #     """
+        # SELECT SUM(productos.precio_compra * lotes.cantidad) AS perdidas
+        # FROM 
+        #     lotes 
+        # JOIN 
+        #     productos ON lotes.producto_id = productos.id
+        # WHERE 
+        #     lotes.fecha_vencimiento < CURRENT_DATE;""",
+        #     None,
+        # )
         perdidas = self.conexion.ejecutar_bd(
-            """
+        """
         SELECT SUM(productos.precio_compra * lotes.cantidad) AS perdidas
         FROM 
             lotes 
         JOIN 
             productos ON lotes.producto_id = productos.id
         WHERE 
-            lotes.fecha_vencimiento < CURRENT_DATE;""",
-            None,
+            lotes.fecha_vencimiento < CURRENT_DATE 
+            AND productos.mostrar = 1 
+            AND lotes.cantidad > 0;
+        """,
+        None,
         )
+
 
         productos_vencidos, proximo_vencimiento = self.obtener_vencimientos(False)
 
@@ -267,26 +306,54 @@ class Vencimientos:
         else:
             busqueda = self.conexion.ejecutar_bd(
             sql="""
-            SELECT 
-                lotes.lote, 
-                productos.nombre,
-                productos.marca, 
-                productos.categoria, 
-                productos.precio_compra, 
-                productos.precio_venta, 
-                lotes.cantidad, 
-                lotes.fecha_vencimiento 
-            FROM 
-                lotes
-            JOIN 
-                productos ON lotes.producto_id = productos.id
-            WHERE 
-                lotes.lote LIKE %s OR
-                productos.nombre LIKE %s 
-                OR productos.marca LIKE %s 
-                OR productos.categoria LIKE %s
-            ORDER BY productos.nombre, lotes.fecha_vencimiento;
-        """,
+                SELECT 
+                    lotes.lote, 
+                    productos.nombre,
+                    productos.marca, 
+                    productos.categoria, 
+                    productos.precio_compra, 
+                    productos.precio_venta, 
+                    lotes.cantidad, 
+                    lotes.fecha_vencimiento 
+                FROM 
+                    lotes
+                JOIN 
+                    productos ON lotes.producto_id = productos.id
+                WHERE 
+                    (lotes.lote LIKE %s OR
+                    productos.nombre LIKE %s OR 
+                    productos.marca LIKE %s OR 
+                    productos.categoria LIKE %s)
+                    AND productos.mostrar = 1 AND lotes.cantidad > 0
+                ORDER BY 
+                    productos.nombre, lotes.fecha_vencimiento;
+            """,
             valores=("%" + self.entry_busqueda.get().strip() + "%",) * 4,
-        )
+            )
             self.filtrar(busqueda)
+
+        #     busqueda = self.conexion.ejecutar_bd(
+        #     sql="""
+        #     SELECT 
+        #         lotes.lote, 
+        #         productos.nombre,
+        #         productos.marca, 
+        #         productos.categoria, 
+        #         productos.precio_compra, 
+        #         productos.precio_venta, 
+        #         lotes.cantidad, 
+        #         lotes.fecha_vencimiento 
+        #     FROM 
+        #         lotes
+        #     JOIN 
+        #         productos ON lotes.producto_id = productos.id
+        #     WHERE 
+        #         lotes.lote LIKE %s OR
+        #         productos.nombre LIKE %s 
+        #         OR productos.marca LIKE %s 
+        #         OR productos.categoria LIKE %s
+        #     ORDER BY productos.nombre, lotes.fecha_vencimiento;
+        # """,
+        #     valores=("%" + self.entry_busqueda.get().strip() + "%",) * 4,
+        # )
+        

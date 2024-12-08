@@ -418,6 +418,27 @@ class InicioFrame(ctk.CTkFrame):
             # Ejecutar la consulta para actualizar las cantidades en la tabla lotes
             self.conexion.ejecutar_bd(sql, valores, "update")
 
+            # ----- Ocultar Lotes sin cantidades a mostrar = False -----
+            sql_lotes_invisibles = """
+                UPDATE lotes
+                SET mostrar = 0
+                WHERE cantidad = 0
+            """
+            self.conexion.ejecutar_bd(sql_lotes_invisibles, tipo = "update")
+
+            # ----- Ocultar Productos sin lotes asociados mostrar = False -----
+            sql_productos_invisibles = """
+                UPDATE productos
+                SET mostrar = 0
+                WHERE id NOT IN (
+                    SELECT DISTINCT producto_id
+                    FROM lotes
+                    WHERE mostrar = 1
+                )
+            """
+            self.conexion.ejecutar_bd(sql_productos_invisibles, tipo = "update")
+
+
             # ----- QUERY INSERT TABLA VENTAS -----
             fecha_venta = datetime.now()
 

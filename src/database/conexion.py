@@ -95,6 +95,7 @@ class Database:
             print("Conexión cerrada correctamente")
 
     def _crear_tablas(self, cursor):
+
         tabla_productos = """
         CREATE TABLE IF NOT EXISTS productos (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -102,18 +103,22 @@ class Database:
             marca VARCHAR(30) NOT NULL,
             categoria VARCHAR(30) NOT NULL, 
             precio_compra DECIMAL(10, 2) NOT NULL,
-            precio_venta DECIMAL(10, 2) NOT NULL
+            precio_venta DECIMAL(10, 2) NOT NULL,
+            mostrar TINYINT NOT NULL
         ) ENGINE=INNODB;
         """
+
         tabla_lotes = """
         CREATE TABLE IF NOT EXISTS lotes (
             lote INT AUTO_INCREMENT PRIMARY KEY,
             producto_id INT NOT NULL,
             cantidad INT NOT NULL,
             fecha_vencimiento DATE,
+            mostrar TINYINT NOT NULL,
             FOREIGN KEY (producto_id) REFERENCES productos(id)
         ) ENGINE=INNODB;
         """
+
         tabla_usuarios = """
         CREATE TABLE IF NOT EXISTS usuarios (
             documento INT PRIMARY KEY,
@@ -124,6 +129,7 @@ class Database:
             rol VARCHAR(20) DEFAULT 'empleado'
         ) ENGINE=INNODB;
         """
+
         tabla_ventas = """
         CREATE TABLE IF NOT EXISTS ventas (
             id INT AUTO_INCREMENT PRIMARY KEY,
