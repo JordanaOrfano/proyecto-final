@@ -257,8 +257,8 @@ def crear_tabla(parent, columnas, encabezados, lotes, pady=20, menu = None, func
         menu_contextual.add_command(label="Eliminar lote", command=lambda: MenuTablas().eliminar_lote(tree, funciones_inicio))
     
     if menu == "carrito":
-        menu_contextual.add_command(label="Eliminar del carrito", command=lambda: eliminar_del_carrito(tree, funciones_inicio))
         menu_contextual.add_command(label="Editar Cantidad", command=lambda: MenuTablas().editar_cantidad(tree, funciones_inicio)) 
+        menu_contextual.add_command(label="Eliminar del carrito", command=lambda: MenuTablas().eliminar_del_carrito(tree, funciones_inicio))
         
     
     # Función para mostrar el menú en clic derecho
@@ -371,9 +371,41 @@ class MenuTablas:
             return False
 
 
+    def eliminar_del_carrito(self, tree, funciones_inicio):
+        productos_del_carrito = funciones_inicio.obtener_productos_carrito()
+        try:
+            global valores_reales
+            total = 0
+            item = tree.selection()[0]  
+            valores = tree.item(item, "values")  
+
+            # Buscar el producto por su identificador (ID del producto)
+            for producto in productos_del_carrito:
+                if producto[0] == valores[0]:  # Compara el ID del producto
+                    productos_del_carrito.remove(producto)
+                    break
+
+            # Eliminar el producto de la lista con las cantidades reales de los productos
+            for valor in productos_del_carrito:
+                if valor[0] == valores[0]:
+                    valores_reales.remove(valor)
+                    break
+
+            # Actualizamos el nuevo precio total de la venta
+            for producto in productos_del_carrito:
+                total += float(producto[6]) * int(producto[4])
+
+            funciones_inicio.label_total.configure(text= f"Total: ${total}")
+
+            tree.delete(item)
+
+        except IndexError as e:
+            print("Error al eliminar el producto", e)
+
 
     def editar_producto(self, tree, funciones_inicio):
         item = tree.selection()[0]
+        valores = tree.item(item, "values")  # Obtiene los valores de la fila
 
         # Eliminar todos los elementos que están en pantalla
         for elemento in self.frame.winfo_children():
