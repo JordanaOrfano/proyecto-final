@@ -240,13 +240,13 @@ class Configuracion:
         
         with open('Exportaciones/productos.csv', mode='w', newline='', encoding='utf-8') as file:
             writer = csv.writer(file)
-            writer.writerow(["ID", "Nombre", "Marca", "Categoría", "Precio de compra", "Precio de venta"])
+            writer.writerow(["ID", "Nombre", "Marca", "Categoría", "Precio de compra", "Precio de venta", "Mostrar"])
             for producto in productos:
                 writer.writerow(producto)
         
         with open('Exportaciones/lotes.csv', mode='w', newline='', encoding='utf-8') as file:
             writer = csv.writer(file)
-            writer.writerow(["Lote", "Producto ID", "Cantidad", "Fecha de vencimiento"])
+            writer.writerow(["Lote", "Producto ID", "Cantidad", "Fecha de vencimiento", "Mostrar"])
             for lote in lotes:
                 writer.writerow(lote)
         
@@ -263,7 +263,8 @@ class Configuracion:
                 "Marca": producto[2],
                 "Categoría": producto[3],
                 "Precio de compra": float(producto[4]),
-                "Precio de venta": float(producto[5])
+                "Precio de venta": float(producto[5]),
+                "Mostrar": int(producto[6]),
             })
             
         lotes_lista = []
@@ -275,6 +276,7 @@ class Configuracion:
                 "Producto ID": lote[1],
                 "Cantidad": lote[2],
                 "Fecha de vencimiento": str(lote[3]),
+                "Mostrar": int(lote[4]),
             })
         
         os.makedirs("Exportaciones", exist_ok=True)  # Crea carpeta para exportaciones
@@ -300,7 +302,7 @@ class Configuracion:
             ws_productos.title = "Productos"
 
             # Encabezados
-            headers_productos = ["ID", "Nombre", "Marca", "Categoría", "Precio de compra", "Precio de venta"]
+            headers_productos = ["ID", "Nombre", "Marca", "Categoría", "Precio de compra", "Precio de venta", "Mostrar"]
             ws_productos.append(headers_productos)
 
             # Agregar datos de productos
@@ -324,7 +326,7 @@ class Configuracion:
             ws_lotes = wb.create_sheet(title="Lotes")
 
             # Encabezados
-            headers_lotes = ["Lote", "Producto ID", "Cantidad", "Fecha de vencimiento"]
+            headers_lotes = ["Lote", "Producto ID", "Cantidad", "Fecha de vencimiento", "Mostrar"]
             ws_lotes.append(headers_lotes)
 
             # Agregar datos de lotes
@@ -385,14 +387,15 @@ class Configuracion:
                         productos = productos_data  # Es una lista de productos directamente
                         for producto in productos:
                             query = """
-                                INSERT INTO productos (id, nombre, marca, categoria, precio_compra, precio_venta) 
-                                VALUES (%s, %s, %s, %s, %s, %s)
+                                INSERT INTO productos (id, nombre, marca, categoria, precio_compra, precio_venta, mostrar) 
+                                VALUES (%s, %s, %s, %s, %s, %s, %s)
                                 ON DUPLICATE KEY UPDATE
                                     nombre = VALUES(nombre),
                                     marca = VALUES(marca),
                                     categoria = VALUES(categoria),
                                     precio_compra = VALUES(precio_compra),
-                                    precio_venta = VALUES(precio_venta)
+                                    precio_venta = VALUES(precio_venta),
+                                    mostrar = VALUES(mostrar)
                             """
                             self.conexion.ejecutar_bd(query, tipo="insert", valores=(
                                 producto['ID'],
@@ -400,7 +403,8 @@ class Configuracion:
                                 producto['Marca'],
                                 producto['Categoría'],
                                 producto['Precio de compra'],
-                                producto['Precio de venta']
+                                producto['Precio de venta'],
+                                producto['Mostrar']
                             ))
                     else:
                         crear_notificacion(self.contenedor, "error", "El archivo de productos no tiene el formato esperado (debe ser una lista de objetos).")
@@ -412,19 +416,21 @@ class Configuracion:
                         lotes = lotes_data  # Es una lista de lotes directamente
                         for lote in lotes:
                             query = """
-                                INSERT INTO lotes (lote, producto_id, cantidad, fecha_vencimiento) 
-                                VALUES (%s, %s, %s, %s)
+                                INSERT INTO lotes (lote, producto_id, cantidad, fecha_vencimiento, mostrar) 
+                                VALUES (%s, %s, %s, %s, %s)
                                 ON DUPLICATE KEY UPDATE
                                     lote = VALUES(lote),
                                     producto_id = VALUES(producto_id),
                                     cantidad = VALUES(cantidad),
-                                    fecha_vencimiento = VALUES(fecha_vencimiento)
+                                    fecha_vencimiento = VALUES(fecha_vencimiento),
+                                    mostrar = VALUES(mostrar)
                             """
                             self.conexion.ejecutar_bd(query, tipo="insert", valores=(
                                 lote['Lote'],
                                 lote['Producto ID'],
                                 lote['Cantidad'],
-                                lote['Fecha de vencimiento']
+                                lote['Fecha de vencimiento'],
+                                lote['Mostrar']
                             ))
                     else:
                         crear_notificacion(self.contenedor, "error", "El archivo de lotes no tiene el formato esperado (debe ser una lista de objetos).")

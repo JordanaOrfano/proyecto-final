@@ -249,12 +249,12 @@ def crear_tabla(parent, columnas, encabezados, lotes, pady=20, menu = None, func
     
     if menu == "productos":
         menu_contextual.add_command(label="Editar Producto", command=lambda: MenuTablas(parent).editar_producto(tree, funciones_inicio))
-        menu_contextual.add_command(label="Eliminar producto", command=lambda: MenuTablas().eliminar_producto(tree, frame_tabla))
+        menu_contextual.add_command(label="Eliminar producto", command=lambda: MenuTablas().eliminar_producto(tree, frame_tabla, funciones_inicio))
     
     if menu == "lotes":
         menu_contextual.add_command(label="Agregar al carrito", command=lambda: MenuTablas().agregar_a_carrito(tree, funciones_inicio))
         menu_contextual.add_command(label="Editar Lote", command=lambda: MenuTablas(parent).editar_lote(tree, funciones_inicio))
-        menu_contextual.add_command(label="Eliminar lote", command=lambda: MenuTablas().eliminar_lote(tree, funciones_inicio))
+        menu_contextual.add_command(label="Eliminar lote", command=lambda: MenuTablas().eliminar_lote(tree, frame_tabla, funciones_inicio))
     
     if menu == "carrito":
         menu_contextual.add_command(label="Editar Cantidad", command=lambda: MenuTablas().editar_cantidad(tree, funciones_inicio)) 
@@ -425,7 +425,7 @@ class MenuTablas:
         from gui.agregar_producto import CrearProducto
         CrearProducto(contenedor = self.frame, frame_origen = funciones_inicio.inicio, procedencia = "tabla_lote", valor = valores)
 
-    def eliminar_producto(self, tree, frame):
+    def eliminar_producto(self, tree, frame, funciones_inicio):
         item = tree.selection()[0]
         valores = tree.item(item, "values")  # Obtiene los valores de la fila
         producto_id = valores[0]
@@ -475,12 +475,13 @@ class MenuTablas:
                     side="right_bottom"
                 )
                 frame.after(3000, notificacion.destroy)
+                funciones_inicio.inicio()
                 
             except Exception as error:
                 print(f"Error al eliminar producto: {error}")
     
     
-    def eliminar_lote(self, tree, frame):
+    def eliminar_lote(self, tree, frame, funciones_inicio):
         item = tree.selection()[0]
         valores = tree.item(item, "values")
         
@@ -531,6 +532,7 @@ class MenuTablas:
                     side="right_bottom"
                 )
                 frame.after(3000, notificacion.destroy)
+                funciones_inicio.inicio()
                 
             except Exception as error:
                 print(f"Error al eliminar lote: {error}")
