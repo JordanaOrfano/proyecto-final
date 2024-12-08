@@ -14,7 +14,7 @@ Este sistema está diseñado para facilitar la gestión del inventario y la admi
 
 ### Gestión de Roles y Permisos
 
-- **Administrador**: Acceso completo a todas las funciones del sistema. Puede crear y gestionar cuentas de empleados, visualizar estadísticas completas, y visualizar productos eliminados.
+- **Administrador**: Acceso completo a todas las funciones del sistema. Puede crear y gestionar cuentas de empleados, visualizar estadísticas completas, productos, lotes y ventas.
 - **Empleado**: Acceso limitado a la gestión de productos y al registro de ventas.
 
 ### Registro de Ventas
@@ -29,7 +29,8 @@ Visualiza información clave para la toma de decisiones:
 - **Producto más vendido**
 - **Ganancia total**
 - **Pérdidas**
-- **Cantidad de productos por categoría**
+- **Ventas según empleado**
+- **Ventas mensuales**
 
 ## 💡 Uso
 
@@ -37,17 +38,20 @@ Visualiza información clave para la toma de decisiones:
 
 Al iniciar la aplicación, el usuario debe ingresar sus credenciales. El usuario predeterminado es:
 
-- Usuario: `admin`
-- Contraseña: `123`
+- Usuario: `administrador`
+- Contraseña: `administrador`
 
 ## 🛠️ Tecnologías utilizadas
 
 - Python
 - MySQL
 - Tkinter y [CustomTkinter](https://customtkinter.tomschimansky.com/)
-- PIL
-- Email Validator
+- Pillow
+- Email_Validator
 - [CtkComponents](https://github.com/rudymohammadbali/ctk_components)
+- Matplotlib
+- Openpyxl
+- Bcrypt
 
 ## 📋 Prerrequisitos
 

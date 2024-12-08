@@ -115,7 +115,7 @@ class LoginFrame(ctk.CTkFrame):
             return
 
         self.mostrar_notificacion(frame, "Sesión iniciada con éxito, redirigiendo...")
-        frame.after(10, lambda: self.frame_cambiar("inicio"))
+        frame.after(1500, lambda: self.frame_cambiar("inicio"))
 
     def abrir_manual(self):
         popup = ctk.CTkToplevel(self)
