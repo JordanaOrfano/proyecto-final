@@ -61,6 +61,8 @@ class LoginFrame(ctk.CTkFrame):
 
         self.login_button = crear_boton(
             frameLogin, text="Iniciar Sesión", command=lambda: self.login(frameFondo), fill="x", padx=0)
+        
+        crear_label(frameLogin, text="¿Tenés alguna duda o consulta? Contactanos por mail a horizonweb@gmail.com", anchor="center", font=("Roboto", 16, "bold"), pady=(30, 0))
 
     def resize_image(self, event):
         # Ajusta la imagen al tamaño actual de imgFrame

@@ -13,10 +13,18 @@ class RevisarVentas:
         frame_ventas = ctk.CTkFrame(self.contenedor, fg_color=COLOR_BG)
         frame_ventas.pack(expand=True, fill="x", padx=40)
 
+        crear_label(
+            frame_ventas,
+            text="Revisar ventas",
+            font=("Roboto", 32, "bold"),
+            pady=(30, 0),
+            padx=0
+        )
+
         # Contadores
         frame_contadores = ctk.CTkFrame(frame_ventas, fg_color=COLOR_BG)
         frame_contadores.pack(fill="x", pady=(0, 20))
-
+        
         self.contador_ventas = crear_stat(
             frame_contadores,
             " Productos vendidos",
@@ -210,12 +218,12 @@ class RevisarVentas:
         # Creamos las tablas con un label arriba
         crear_label(
             frame_ventas,
-            text="Ventas Hoy",
+            text="Ventas hoy",
             font=("Roboto", 24, "bold"),
             pady=(0, 0),
         )
 
-        crear_tabla(frame_ventas, columnas, encabezados, VALORES_HOY)
+        crear_tabla(frame_ventas, columnas, encabezados, VALORES_HOY, pady=10)
 
         crear_label(
             frame_ventas,
@@ -224,4 +232,4 @@ class RevisarVentas:
             pady=(20, 0),
         )
 
-        crear_tabla(frame_ventas, columnas, encabezados, VALORES_TOTALES)
+        crear_tabla(frame_ventas, columnas, encabezados, VALORES_TOTALES, pady=(10, 20))

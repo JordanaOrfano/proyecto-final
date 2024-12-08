@@ -165,7 +165,7 @@ class Configuracion:
         
         importar_optionmenu = crear_optionmenu(
             parent=frame_contenido,
-            values=["Seleccione formato", "Excel", "CSV", "JSON"],
+            values=["Seleccione formato", "JSON"],
             pady=0,
             metodo="grid",
             )
@@ -496,7 +496,7 @@ class Configuracion:
                     image=crear_imagen("src/assets/icons/id.png", size=(22, 22))
         )
         
-        self.documento_input = crear_entry(self.frame_otorgar_rol, fill="x", pady=0)
+        self.documento_input = crear_entry(self.frame_otorgar_rol, fill="x", pady=0, placeholder_text="Ingresa documento sin puntos (.)")
 
         crear_label(self.frame_otorgar_rol,
                     text=" Rol", 
