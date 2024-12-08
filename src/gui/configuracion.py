@@ -517,7 +517,7 @@ class Configuracion:
         btn_guardar = crear_boton(botones_frame, text="Guardar", command=lambda: self.guardar_rol(self.contenedor), metodo="grid")
         btn_guardar.pack(side="left", padx=(0, 10), fill="x", expand="True")
 
-        btn_cancelar = crear_boton(botones_frame, text="Cancelar", command=self.cancelar_rol, metodo="grid")
+        btn_cancelar = crear_boton(botones_frame, text="Volver", command=self.cancelar_rol, metodo="grid")
         btn_cancelar.pack(side="right", padx=(10, 0), fill="x", expand="True")
         
     def cancelar_rol(self):

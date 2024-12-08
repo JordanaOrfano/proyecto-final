@@ -434,10 +434,10 @@ class CrearProducto:
     def enviar_producto_a_bd(self):
         try:
             # Verificar todos los campos, para evitar errores del usuario al ingresar un nuevo producto
-            if not self.validar_campo_agregar_producto(self.producto_nombre, "Nombre no válido o muy largo"):
+            if not self.validar_campo_agregar_producto(self.producto_nombre, "Nombre no válido o muy largo."):
                 return
 
-            if not self.validar_campo_agregar_producto(self.producto_marca, "Marca no válida o muy larga"):
+            if not self.validar_campo_agregar_producto(self.producto_marca, "Marca no válida o muy larga."):
                 return
                 
             if self.producto_categoria.get().strip() == "Elija o escriba una categoría" or len(self.producto_categoria.get().strip()) == 0 or len(self.producto_categoria.get().strip()) > 21:
@@ -446,31 +446,31 @@ class CrearProducto:
 
             precio_compra = self.validar_precio(self.producto_precio_compra.get().strip())
             if not precio_compra or len(self.producto_precio_compra.get().strip()) == 0:
-                self.mostrar_notificacion("Debes ingresar un precio de compra válido", tipo = "warning")
+                self.mostrar_notificacion("Debes ingresar un precio de compra válido.", tipo = "warning")
                 return
 
             precio_venta = self.validar_precio(self.producto_precio_venta.get().strip())
             if not precio_venta or len(self.producto_precio_venta.get().strip()) == 0:
-                self.mostrar_notificacion("Debes ingresar un precio de venta válido", tipo = "warning")
+                self.mostrar_notificacion("Debes ingresar un precio de venta válido.", tipo = "warning")
                 return
 
             cantidad = self.validar_cantidad(self.producto_cantidad.get().strip())
             if not cantidad:
-                self.mostrar_notificacion("Debes ingresar una cantidad válida", tipo = "warning")
+                self.mostrar_notificacion("Debes ingresar una cantidad válida.", tipo = "warning")
                 return
             
             fecha_formateada = self.validar_y_convertir_fecha(self.producto_vencimiento.get())
             if not fecha_formateada:
-                self.mostrar_notificacion("Debes ingresar una fecha válida", tipo = "warning")
+                self.mostrar_notificacion("Debes ingresar una fecha válida.", tipo = "warning")
                 
                 return
 
             if self.productos_funciones.subir_producto_a_bd(self.producto_nombre.get(), self.producto_marca.get(), precio_compra, precio_venta, self.producto_categoria.get(), cantidad, fecha_formateada):
-                self.mostrar_notificacion("Se cargó el producto, redirigiendo...")
-                self.contenedor.after(1000, lambda: self.frame_origen())
+                self.mostrar_notificacion("Producto cargado correctamente.")
+                self.limpiar_campos()
             
             else:
-                self.mostrar_notificacion("Error al cargar el producto, intentelo nuevamente")
+                self.mostrar_notificacion("Error al cargar el producto, intentelo nuevamente.")
 
         except Exception as e:
             print(f"Error en la bd: {e}")
@@ -598,3 +598,13 @@ class CrearProducto:
 
         except Exception as e:
             print(f"Error en la bd: {e}")
+
+    def limpiar_campos(self):
+        # Restablece los campos del formulario
+        self.producto_nombre.delete(0, 'end')
+        self.producto_marca.delete(0, 'end')
+        self.producto_categoria.set("Elija o escriba una categoría")
+        self.producto_precio_compra.delete(0, 'end')
+        self.producto_precio_venta.delete(0, 'end')
+        self.producto_cantidad.delete(0, 'end')
+        self.producto_vencimiento.delete(0, 'end')
