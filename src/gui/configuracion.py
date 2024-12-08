@@ -156,31 +156,31 @@ class Configuracion:
                                    )
         exportar_btn.grid(row=11, column=1, sticky="ew", padx=(10, 0))
         
-        # -------------------------------- Importar productos --------------------------------
-        label_importar = crear_label(frame_contenido, 
-                                     text="Importar productos", 
-                                     font=("Roboto", 24, "bold"), 
-                                     metodo="grid")
-        label_importar.grid(row=12, columnspan=2, pady=(35, 5), sticky="ew")
-        
-        importar_optionmenu = crear_optionmenu(
-            parent=frame_contenido,
-            values=["Seleccione formato", "JSON"],
-            pady=0,
-            metodo="grid",
-            )
-        importar_optionmenu.grid(row=13, column=0, sticky="ew", padx=(0, 10), pady=0)
-        
-        importar_btn = crear_boton(parent=frame_contenido, 
-                                   text="Importar", 
-                                   metodo="grid",
-                                   command=lambda: self.importar_productos(importar_optionmenu.get())
-                                   )
-        importar_btn.grid(row=13, column=1, sticky="ew", padx=(10, 0), pady=0)
-    
         
         # -------------------------------- MENÚ SUPERVISOR --------------------------------
         if Usuario.usuario_actual[0][2] == "supervisor":
+            # -------------------------------- Importar productos --------------------------------
+            label_importar = crear_label(frame_contenido, 
+                                        text="Importar productos", 
+                                        font=("Roboto", 24, "bold"), 
+                                        metodo="grid")
+            label_importar.grid(row=12, columnspan=2, pady=(35, 5), sticky="ew")
+            
+            importar_optionmenu = crear_optionmenu(
+                parent=frame_contenido,
+                values=["Seleccione formato", "JSON"],
+                pady=0,
+                metodo="grid",
+                )
+            importar_optionmenu.grid(row=13, column=0, sticky="ew", padx=(0, 10), pady=0)
+            
+            importar_btn = crear_boton(parent=frame_contenido, 
+                                    text="Importar", 
+                                    metodo="grid",
+                                    command=lambda: self.importar_productos(importar_optionmenu.get())
+                                    )
+            importar_btn.grid(row=13, column=1, sticky="ew", padx=(10, 0), pady=0)
+    
             label_agregar_empleado = crear_label(frame_contenido, 
                                         text="Gestionar empleados", 
                                         font=("Roboto", 24, "bold"), 
