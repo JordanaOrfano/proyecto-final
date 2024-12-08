@@ -454,11 +454,15 @@ class InicioFrame(ctk.CTkFrame):
             valores_ventas = (ids_productos_str, cantidades_str, ganancias_unitarias_str, total, fecha_venta, Usuario.usuario_actual[0][5])
 
             self.conexion.ejecutar_bd(sql, valores_ventas, "insert")
-
+            
+            total = 0
+            for producto in productos_carrito:
+                total += float(producto[6]) * int(producto[4])
+            
             CTkAlert(
                 state="info",
                 title="Venta realizada",
-                body_text=f"El vuelto que corresponde al cliente es de: {pago_valido - total}.",
+                body_text=f"El vuelto que corresponde al cliente es de: ${(pago_valido - total):.2f}.",
                 btn1="Ok",
             )
 
