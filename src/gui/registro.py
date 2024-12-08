@@ -125,6 +125,11 @@ class RegistroFrame(ctk.CTkFrame):
                 self.usuario_apellido.get().strip(),
             )
             crear_notificacion(frame, "info", "Usuario registrado correctamente.")
+            self.usuario_dni.delete(0, "end")
+            self.usuario_correo.delete(0, "end")
+            self.usuario_nombre.delete(0, "end")
+            self.usuario_apellido.delete(0, "end")
+            self.__usuario_contrasena.delete(0, "end")
             return
         
         except:
