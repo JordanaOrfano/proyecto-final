@@ -11,7 +11,7 @@ from core.usuarios import *
 class InicioFrame(ctk.CTkFrame):
     def __init__(self, master, frame_cambiar):
         super().__init__(master)
-
+        
         self.frame_cambiar = frame_cambiar
         self.conexion = Database()
         self.funciones_productos = Productos()
@@ -49,16 +49,14 @@ class InicioFrame(ctk.CTkFrame):
             centrar_frame,
             text="Inicio",
             command=self.inicio,
-            pady=0,
             image=crear_imagen("src/assets/icons/home.png"),
         )
 
         if Usuario.usuario_actual[0][2] == "supervisor":
             self.botones_sideframe["Revisar ventas"] = crear_boton_sideframe(
                 centrar_frame,
-                text="Revisar Ventas",
+                text="Revisar ventas",
                 command=self.revisar_ventas,
-                pady=0,
                 image=crear_imagen("src/assets/icons/shopping-cart-share.png"),
             )
 
@@ -475,6 +473,6 @@ class InicioFrame(ctk.CTkFrame):
         self.cambiar_contenido(frame_configuracion, "configuracion")
 
     def cerrar_sesion(self):
-        notificacion = CTkNotification(master=self, state="info", message="Cerrando Sesión...", side="right_bottom")
+        notificacion = CTkNotification(master=self, state="info", message="Cerrando sesión...", side="right_bottom")
         self.after(3000, notificacion.destroy)
-        self.after(2000, lambda: self.frame_cambiar("login"))
+        self.after(1500, lambda: self.frame_cambiar("login"))

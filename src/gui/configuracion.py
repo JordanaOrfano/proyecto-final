@@ -109,10 +109,11 @@ class Configuracion:
                                    )
         label_correo.grid(row=7, column=0, pady=(10, 0), sticky="ew")
         
-        entry_contrasena_actual = crear_entry(frame_contenido, 
+        self.__entry_contrasena_actual = crear_entry(frame_contenido, 
                             placeholder_text="**********", 
-                            metodo="grid")
-        entry_contrasena_actual.grid(row=8, column=0, pady=0, sticky="ew", padx=(0, 10))
+                            metodo="grid",
+                            show="*")
+        self.__entry_contrasena_actual.grid(row=8, column=0, pady=0, sticky="ew", padx=(0, 10))
         
         
         label_contrasena_nueva = crear_label(frame_contenido, 
@@ -123,16 +124,19 @@ class Configuracion:
                                    )
         label_contrasena_nueva.grid(row=7, column=1, pady=(10, 0), sticky="ew")
         
-        entry_contrasena_nueva = crear_entry(frame_contenido, 
+        self.__entry_contrasena_nueva = crear_entry(frame_contenido, 
                             placeholder_text="**********", 
-                            metodo="grid")
-        entry_contrasena_nueva.grid(row=8, column=1, pady=0, sticky="ew", padx=(10, 0))
+                            metodo="grid",
+                            show="*")
+        self.__entry_contrasena_nueva.grid(row=8, column=1, pady=0, sticky="ew", padx=(10, 0))
         
         
-        btn_contrasena = crear_boton(frame_contenido,
+        self.btn_contrasena = crear_boton(frame_contenido,
                                      metodo="grid", 
-                                     text="Actualizar contraseña")
-        btn_contrasena.grid(row=9, columnspan=2, pady=(20, 0), sticky="ew")  
+                                     text="Actualizar contraseña",
+                                     command=lambda: self.actualizar_contrasena(self.contenedor)
+                                     )
+        self.btn_contrasena.grid(row=9, columnspan=2, pady=(20, 0), sticky="ew")  
             
         # -------------------------------- Exportar productos --------------------------------
         label_exportar = crear_label(frame_contenido, 
@@ -579,3 +583,52 @@ class Configuracion:
         except Exception as e:
             print(f"No se pudo asignar el rol: {e}")
     
+    def actualizar_contrasena(self, frame):
+        
+        # Obtener las contraseñas ingresadas
+        self.__contrasena_ingresada_actual = self.__entry_contrasena_actual.get()
+        self.__contrasena_nueva = self.__entry_contrasena_nueva.get() 
+
+        # Validar que las contraseñas no estén vacías
+        if not self.__contrasena_ingresada_actual or not self.__contrasena_nueva:
+            crear_notificacion(frame, "error", "Ingrese ambas contraseñas.")
+            return
+        
+        self.__contrasena_actual = Usuario.usuario_actual[0][3]
+        if not bcrypt.checkpw(self.__contrasena_ingresada_actual.encode("utf-8"), self.__contrasena_actual.encode("utf-8")):
+            crear_notificacion(frame, "error", "La contraseña actual es incorrecta.")
+            return
+        
+        # Validar que la nueva contraseña cumpla con los requisitos
+        if not self.validar_contrasena_nueva(self.__contrasena_nueva):
+            crear_notificacion(frame, "error", "La nueva contraseña no es válida.")
+            return
+
+        self.__contrasena_generada = self.encriptar_contrasena(self.__contrasena_nueva)
+        
+        # Actualizar la contraseña en la base de datos
+        actualizado = self.conexion.ejecutar_bd(
+            "UPDATE usuarios SET contrasena = %s WHERE documento = %s", 
+            (self.__contrasena_generada, Usuario.usuario_actual[0][5]), 
+            "update"
+        )
+
+        if actualizado:
+            crear_notificacion(frame, "info", "La contraseña se ha actualizado correctamente.")
+            self.__entry_contrasena_actual.delete(0, "end")
+            self.__entry_contrasena_nueva.delete(0, "end")
+        else:
+            crear_notificacion(frame, "error", "Hubo un problema al actualizar la contraseña.")
+
+
+    def validar_contrasena_nueva(self, contrasena_nueva):
+        # Validar la nueva contraseña (mínimo 8 caracteres)
+        if len(contrasena_nueva) < 8:
+            return False
+        return True
+    
+    def encriptar_contrasena(self, contrasena_nueva):
+        # Genera una cadena de texto aleatoria en formato de bytes
+        salt = bcrypt.gensalt()
+        self.__hashed = bcrypt.hashpw(contrasena_nueva.encode("utf-8"), salt)
+        return self.__hashed
