@@ -73,16 +73,17 @@ def crear_entry(
     return entry
 
 
-def crear_label(parent, metodo="pack", text="", pady=10, anchor="w", padx=0, text_color=COLOR_PRIMARIO, font=("Roboto", 14), **kwargs):
+def crear_label(parent, metodo="pack", text="", pady=10, anchor="w", padx=0, text_color=COLOR_PRIMARIO, font=("Roboto", 14), wraplength=500, justify="center", **kwargs):
     label = ctk.CTkLabel(
         parent,
         text=text,
         height=40,
-        wraplength=500,
+        wraplength=wraplength,
         anchor=anchor,
         corner_radius=8,
         font=font,
         text_color=text_color,
+        justify=justify,
         compound="left",
         **kwargs,
     )
@@ -94,6 +95,18 @@ def crear_label(parent, metodo="pack", text="", pady=10, anchor="w", padx=0, tex
 
     return label
 
+def crear_texto(parent, text, pady=0, **kwargs):
+    texto = ctk.CTkLabel(
+        parent,
+        text=text,
+        height=40,
+        anchor="w", 
+        wraplength=500, 
+        justify="left", 
+        font=("Roboto", 14),
+        text_color="#333333"
+    )
+    texto.pack(pady=pady, padx=10, fill="x")
 
 def crear_stat(parent, titulo, contador, padx=0, pady= 0, image=None, **kwargs):
     label_stat = ctk.CTkLabel(
