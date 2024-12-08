@@ -4,6 +4,7 @@ from gui.agregar_producto import *
 from core.productos import *
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  # Permite renderizar los gráficos directamente en CustomTkinter
+from collections import defaultdict
 
 
 class Estadisticas:
@@ -63,17 +64,11 @@ class Estadisticas:
 
         # ------------------------------------- Gráficos -------------------------------------
         # Categorías más vendidas
-        self.datos_categorias = {
-            "labels": ['Categoría A', 'Categoría B', 'Categoría C', 'Categoría D'],
-            "values": [450, 300, 150, 100]
-        }
+        self.actualizar_categorias_vendidas()
         self.crear_grafico(column_left, "Categorías más vendidas", self.grafico_pastel, self.datos_categorias)
         
         # Productos más vendidos
-        self.datos_productos = {
-            "labels": ['Producto A', 'Producto B', 'Producto C', 'Producto D'],
-            "values": [450, 300, 150, 700]
-        }
+        self.actualizar_productos_vendidos()
         self.crear_grafico(column_right, "Productos más vendidos", self.grafico_pastel, self.datos_productos)
         
         # Ganancias
@@ -117,7 +112,10 @@ class Estadisticas:
 
         for autotext in autotexts:
             autotext.set_color(COLOR_BG)
-            autotext.set_fontsize(9)
+            autotext.set_fontsize(6)
+        
+        for text in texts:
+            text.set_fontsize(7)
 
         # Integrar el gráfico en CustomTkinter
         canvas = FigureCanvasTkAgg(fig, master=frame)
@@ -356,6 +354,159 @@ class Estadisticas:
 
         # Actualizar los datos del gráfico
         self.datos_ganancias = {
+            "labels": labels,
+            "values": values
+        }
+
+    def actualizar_productos_vendidos(self):
+        # Lista para almacenar los resultados finales
+        valores_mes = []
+
+        # Diccionarios para agrupar datos por producto
+        ventas_agrupadas_mes = defaultdict(lambda: {"cantidad": 0})
+        productos_agrupados_mes = defaultdict(lambda: {"cantidad": 0})
+
+        # Obtener productos vendidos
+        sql_detalles_mes = """
+            SELECT 
+                productos.id AS producto_id,
+                productos.nombre,
+                productos.marca
+            FROM 
+                ventas
+            JOIN 
+                productos
+            ON 
+                FIND_IN_SET(productos.id, ventas.producto_id) > 0 
+            GROUP BY 
+                productos.id, productos.nombre, productos.marca;
+        """
+
+        detalles_ventas_mes = self.conexion.ejecutar_bd(sql_detalles_mes, valores=None)
+
+        # Obtener detalles de ventas
+        sql_ventas_mes = """
+            SELECT 
+                producto_id, 
+                cantidad_vendida
+            FROM 
+                ventas
+        """
+
+        ventas_mes = self.conexion.ejecutar_bd(sql_ventas_mes, valores=None)
+
+        # Agrupar ventas diarias
+        for productos, cantidades in ventas_mes:
+            ids = productos.split(",")
+            cantidades_vendidas = cantidades.split(",")
+
+            # Agrupar ventas por producto
+            for id_producto, cantidad in zip(ids, cantidades_vendidas):
+                ventas_agrupadas_mes[id_producto]["cantidad"] += int(cantidad)
+
+        # Agrupar datos por producto
+        for detalle in detalles_ventas_mes:
+            producto_id = str(detalle[0])
+            nombre = detalle[1]
+            marca = detalle[2]
+            cantidad_vendida = ventas_agrupadas_mes[producto_id]["cantidad"]
+
+            key = (nombre, marca)
+            productos_agrupados_mes[key]["cantidad"] += cantidad_vendida
+
+        # Organizamos todo en una lista limpia para pasarlo a la tabla
+        for (nombre, marca), data in productos_agrupados_mes.items():
+            valores_mes.append((nombre, marca, data["cantidad"]))
+
+        # Ordenar los productos por cantidad vendida y tomar los 5 más vendidos
+        valores_mes.sort(key=lambda x: x[2], reverse=True)
+        valores_mes = valores_mes[:5]
+
+        # Extraer etiquetas y valores
+        labels = [f"{nombre} ({marca})" for nombre, marca, _ in valores_mes]
+        values = [cantidad for _, _, cantidad in valores_mes]
+
+        self.datos_productos = {
+            "labels": labels,
+            "values": values
+        }
+
+
+    def actualizar_categorias_vendidas(self):
+        valores_mes = []
+
+        # Creamos defaultdict para facilitar el contar las apariciones de un producto en la tabla ventas y ganancia
+        ventas_agrupadas_mes = defaultdict(lambda: {"cantidad": 0, "ganancia": 0.0}) 
+        productos_agrupados_mes = defaultdict(lambda: {"cantidad": 0, "ganancia": 0.0})
+
+        # QUERY para ventas
+        sql_detalles_mes = """
+            SELECT 
+                productos.id AS producto_id,
+                productos.categoria,
+                SUM(COALESCE(ventas.ganancia_venta, 0)) AS ganancia_total
+            FROM 
+                ventas
+            JOIN 
+                productos
+            ON 
+                FIND_IN_SET(productos.id, ventas.producto_id) > 0
+            GROUP BY 
+                productos.id, productos.categoria;
+        """
+
+        detalles_ventas_mes = self.conexion.ejecutar_bd(sql_detalles_mes, valores=None)
+
+        ventas_mes = self.conexion.ejecutar_bd(
+            sql="""
+                SELECT 
+                    producto_id, 
+                    cantidad_vendida,
+                    ganancia_unitaria
+                FROM 
+                    ventas
+            """,
+            valores=None,
+        )
+
+        # Agrupar ventas diarias
+        for productos, cantidades, ganancias in ventas_mes:
+            ids = productos.split(",")
+            cantidades_vendidas = cantidades.split(",")
+
+            # Almacenamos los valores en un diccionario para limpiar los datos
+            # El zip itera simultáneamente sobre las listas id_producto, cantidad. Ahorra unos for.
+            for id_producto, cantidad in zip(ids, cantidades_vendidas):
+                ventas_agrupadas_mes[id_producto]["cantidad"] += int(cantidad)
+
+        labels = []
+        values = []
+
+        for detalle in detalles_ventas_mes:
+            producto_id = str(detalle[0])
+            categoria = detalle[1]
+            cantidad_vendida = ventas_agrupadas_mes[producto_id]["cantidad"]
+            key = categoria
+            
+            productos_agrupados_mes[key]["cantidad"] += cantidad_vendida
+            
+            labels.append(categoria)  # Ahora usamos solo la categoría como label
+            values.append(cantidad_vendida)  # Agregar la cantidad vendida
+
+        # Organizamos todo en una lista limpia para pasarlo a la tabla
+        for categoria, data in productos_agrupados_mes.items():
+            cantidad = data["cantidad"]
+            valores_mes.append((categoria, cantidad))
+
+        # Obtener los primeros 5 productos con mayor cantidad
+        valores_mes.sort(key=lambda x: x[1], reverse=True)  # Ordenar por cantidad vendida (índice 1)
+        valores_mes = valores_mes[:5]  # Tomar los primeros 5
+
+        # Actualizar las etiquetas y valores
+        labels = [categoria for categoria, _ in valores_mes]
+        values = [cantidad for _, cantidad in valores_mes]
+
+        self.datos_categorias = {
             "labels": labels,
             "values": values
         }
